@@ -1,0 +1,250 @@
+<template>
+  <view class="goods-detail">
+    <!-- Image Gallery -->
+    <swiper class="gallery" indicator-dots autoplay v-if="images.length" indicator-color="rgba(255,255,255,0.4)" indicator-active-color="#ff5777">
+      <swiper-item v-for="(img, i) in images" :key="i">
+        <image :src="img" mode="aspectFill" class="gallery-img" />
+      </swiper-item>
+    </swiper>
+
+    <!-- Product Info -->
+    <view class="info-section" v-if="goods.id">
+      <view class="price-row">
+        <view class="price-main">
+          <text class="currency">¥</text>
+          <text class="price">{{ goods.price }}</text>
+        </view>
+        <view class="price-orig" v-if="goods.originalPrice">
+          <text class="orig-text">¥{{ goods.originalPrice }}</text>
+          <view class="discount-tag" v-if="discount">
+            <text>{{ discount }}折</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="name-row">
+        <text class="name">{{ goods.name }}</text>
+      </view>
+      <view class="subtitle" v-if="goods.subtitle">{{ goods.subtitle }}</view>
+
+      <view class="tags-row">
+        <view class="tag" v-if="goods.stock > 0"><text class="tag-text">有货</text></view>
+        <view class="tag" v-else><text class="tag-text out">缺货</text></view>
+        <view class="tag"><text class="tag-text">正品保证</text></view>
+        <view class="tag"><text class="tag-text">7天退换</text></view>
+      </view>
+    </view>
+
+    <!-- Description -->
+    <view class="desc-section" v-if="goods.description">
+      <view class="section-title">
+        <text>商品介绍</text>
+      </view>
+      <view class="desc-content">
+        <text>{{ goods.description }}</text>
+      </view>
+    </view>
+
+    <!-- Detail -->
+    <view class="detail-section" v-if="goods.detail">
+      <view class="section-title">
+        <text>详情描述</text>
+      </view>
+      <rich-text :nodes="goods.detail"></rich-text>
+    </view>
+
+    <!-- Bottom Action -->
+    <view class="bottom-bar">
+      <view class="action-icons">
+        <view class="icon-item" @tap="goHome">
+          <text class="icon">🏠</text>
+          <text class="icon-label">首页</text>
+        </view>
+        <view class="icon-item" @tap="toggleFavorite">
+          <text class="icon">{{ isFavorite ? '❤️' : '🤍' }}</text>
+          <text class="icon-label">收藏</text>
+        </view>
+        <view class="icon-item" @tap="goCart">
+          <text class="icon">🛒</text>
+          <text class="icon-label">购物车</text>
+        </view>
+      </view>
+      <view class="action-btns">
+        <view class="btn-cart" @tap="addCart">
+          <text>加入购物车</text>
+        </view>
+        <view class="btn-buy" @tap="buyNow">
+          <text>立即购买</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { request } from '@/utils/request'
+
+const goods = ref<any>({})
+const isFavorite = ref(false)
+const images = computed(() => {
+  if (!goods.value.images) return []
+  try { return JSON.parse(goods.value.images) } catch { return [] }
+})
+const discount = computed(() => {
+  if (!goods.value.price || !goods.value.originalPrice) return null
+  return Math.round((Number(goods.value.price) / Number(goods.value.originalPrice)) * 10)
+})
+
+onLoad(async (opt: any) => {
+  if (opt.id) {
+    try {
+      goods.value = await request(`/products/${opt.id}`, 'GET')
+    } catch (e) {
+      uni.showToast({ title: '加载失败', icon: 'none' })
+    }
+  }
+})
+
+const goHome = () => { uni.switchTab({ url: '/pages/index/index' }) }
+const goCart = () => { uni.switchTab({ url: '/pages/cart/index' }) }
+
+const toggleFavorite = () => {
+  isFavorite.value = !isFavorite.value
+  uni.showToast({ title: isFavorite.value ? '已收藏' : '取消收藏', icon: 'none' })
+}
+
+const addCart = () => {
+  const token = uni.getStorageSync('token')
+  if (!token) {
+    uni.showToast({ title: '请先登录', icon: 'none' })
+    setTimeout(() => uni.navigateTo({ url: '/pages/user/login' }), 1000)
+    return
+  }
+  request('/cart', 'POST', { productId: goods.value.id, quantity: 1 })
+    .then(() => uni.showToast({ title: '已加入购物车' }))
+    .catch(() => uni.showToast({ title: '添加失败', icon: 'none' }))
+}
+
+const buyNow = () => {
+  uni.navigateTo({ url: `/pages/order/create?productId=${goods.value.id}` })
+}
+</script>
+<style lang="scss" scoped>
+.goods-detail { 
+  padding-bottom: 120rpx; 
+  background: #f5f5f5; 
+}
+
+.gallery { 
+  height: 750rpx; 
+  background: #fff;
+  .gallery-img { 
+    width: 100%; 
+    height: 100%; 
+  } 
+}
+
+.info-section {
+  background: #fff;
+  padding: 28rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16rpx;
+}
+.price-main {
+  display: flex;
+  align-items: baseline;
+  .currency { font-size: 28rpx; color: #ff5777; font-weight: bold; }
+  .price { font-size: 52rpx; color: #ff5777; font-weight: bold; }
+}
+.price-orig {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  .orig-text { font-size: 26rpx; color: #bbb; text-decoration: line-through; }
+  .discount-tag {
+    background: #fff0f3;
+    padding: 4rpx 10rpx;
+    border-radius: 6rpx;
+    text { font-size: 20rpx; color: #ff5777; }
+  }
+}
+
+.name-row {
+  margin-top: 20rpx;
+  .name { font-size: 34rpx; font-weight: 600; color: #222; line-height: 1.4; }
+}
+.subtitle { font-size: 26rpx; color: #888; margin-top: 10rpx; }
+
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 20rpx;
+  .tag {
+    background: #f8f8f8;
+    padding: 6rpx 16rpx;
+    border-radius: 20rpx;
+    .tag-text { font-size: 22rpx; color: #666; }
+    .tag-text.out { color: #ff5777; }
+  }
+}
+
+.desc-section, .detail-section {
+  background: #fff;
+  margin-bottom: 16rpx;
+}
+.section-title {
+  padding: 28rpx 24rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  text { font-size: 30rpx; font-weight: 600; color: #333; }
+}
+.desc-content {
+  padding: 24rpx;
+  text { font-size: 28rpx; color: #666; line-height: 1.6; }
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100rpx;
+  background: #fff;
+  border-top: 1rpx solid #eee;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  z-index: 100;
+}
+
+.action-icons {
+  display: flex;
+  gap: 32rpx;
+}
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .icon { font-size: 40rpx; }
+  .icon-label { font-size: 20rpx; color: #888; margin-top: 2rpx; }
+}
+
+.action-btns {
+  flex: 1;
+  display: flex;
+  margin-left: 24rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  overflow: hidden;
+  margin-right: 8rpx;
+  view { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 28rpx; font-weight: 500; }
+  .btn-cart { background: #ff9500; color: #fff; }
+  .btn-buy { background: linear-gradient(135deg, #ff5777, #ff8a9a); color: #fff; }
+}
+</style>

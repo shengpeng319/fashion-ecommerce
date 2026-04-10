@@ -1,0 +1,19 @@
+{
+  "name": "时尚女装电商",
+  "appid": "",
+  "description": "时尚女装电商小程序",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "h5": {
+    "title": "时尚女装电商",
+    "router": {
+      "mode": "hash",
+      "base": "/"
+    },
+    "devServer": {
+      "port": 8081,
+      "disableHostCheck": true
+    }
+  }
+}

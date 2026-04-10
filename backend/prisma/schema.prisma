@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============ 管理员体系 ============
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  phone     String   @unique
+  password  String
+  nickname  String
+  role      String   @default("admin") // admin, super_admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============ 用户体系 ============
+
+model User {
+  id        String   @id @default(uuid())
+  phone     String   @unique
+  password  String
+  nickname  String?
+  avatar    String?
+  gender    String   @default("unknown")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  addresses Address[]
+  member    Member?
+  cartItems CartItem[]
+  orders    Order[]
+  dealer    Dealer?
+}
+
+// ============ 收货地址 ============
+
+model Address {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  phone     String
+  province  String
+  city      String
+  district  String
+  detail    String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Order Order[]
+}
+
+// ============ 会员体系 ============
+
+model Member {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  level        Int      @default(1)
+  points       Int      @default(0)
+  totalSpent   Decimal  @default(0)
+  discountRate Decimal  @default(1.0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 商品体系 ============
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  icon      String?
+  sort      Int       @default(0)
+  parentId  String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+}
+
+model Brand {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  logo      String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  name          String
+  subtitle      String?
+  price         Decimal
+  originalPrice Decimal?
+  image         String?  // 主图
+  thumbnail     String?  // 缩略图
+  images        String?  // 多图JSON
+  description   String?  
+  detail        String?  
+  categoryId    String
+  brandId       String?
+  sales         Int      @default(0)
+  stock         Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category          Category           @relation(fields: [categoryId], references: [id])
+  brand             Brand?             @relation(fields: [brandId], references: [id])
+  skus              SKU[]
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+  wholesaleProducts WholesaleProduct[]
+}
+
+model SKU {
+  id         String   @id @default(uuid())
+  productId  String
+  name       String
+  price      Decimal
+  stock      Int      @default(0)
+  attributes String
+  createdAt  DateTime @default(now())
+
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  CartItem  CartItem[]
+  OrderItem OrderItem[]
+}
+
+// ============ 购物车 ============
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  skuId     String?
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku     SKU?    @relation(fields: [skuId], references: [id])
+
+  @@unique([userId, productId, skuId])
+}
+
+// ============ 订单体系 ============
+
+model Order {
+  id             String    @id @default(uuid())
+  orderNo        String    @unique
+  userId         String
+  status         String
+  totalAmount    Decimal
+  discountAmount Decimal   @default(0)
+  payAmount      Decimal
+  payType        String?
+  payTime        DateTime?
+  addressId      String
+  remark         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user    User        @relation(fields: [userId], references: [id])
+  address Address     @relation(fields: [addressId], references: [id])
+  items   OrderItem[]
+}
+
+model OrderItem {
+  id          String  @id @default(uuid())
+  orderId     String
+  productId   String
+  skuId       String?
+  productName String
+  skuName     String?
+  price       Decimal
+  quantity    Int
+  image       String?
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+  sku     SKU?    @relation(fields: [skuId], references: [id])
+}
+
+// ============ B端批发 ============
+
+model Dealer {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  companyName String
+  licenseNo   String
+  level       String
+  creditLine  Decimal  @default(0)
+  usedCredit  Decimal  @default(0)
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wholesaleOrders WholesaleOrder[]
+}
+
+model WholesaleProduct {
+  id          String   @id @default(uuid())
+  productId   String
+  dealerPrice Decimal
+  minQty      Int      @default(1)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model WholesaleOrder {
+  id          String   @id @default(uuid())
+  orderNo     String   @unique
+  dealerId    String
+  status      String
+  totalAmount Decimal
+  payAmount   Decimal
+  remark      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  dealer Dealer @relation(fields: [dealerId], references: [id])
+}

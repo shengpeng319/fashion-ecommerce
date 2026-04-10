@@ -1,0 +1,10 @@
+page { background-color: #f8f8f8; font-size: 28rpx; color: #333; }
+.container { padding: 24rpx; }
+.flex { display: flex; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-center { display: flex; justify-content: center; align-items: center; }
+.gap { gap: 16rpx; }
+.text-primary { color: #ff5777; }
+.text-grey { color: #999; }
+.text-center { text-align: center; }
+.text-price { color: #ff5777; font-weight: bold; }
