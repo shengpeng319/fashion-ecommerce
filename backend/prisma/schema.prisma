@@ -35,7 +35,8 @@ model User {
   member    Member?
   cartItems CartItem[]
   orders    Order[]
-  dealer    Dealer?
+  dealer      Dealer?
+  shareholder Shareholder?
 }
 
 // ============ 收货地址 ============
@@ -233,4 +234,65 @@ model WholesaleOrder {
   updatedAt   DateTime @updatedAt
 
   dealer Dealer @relation(fields: [dealerId], references: [id])
+}
+
+// ============ 股东合伙体系 ============
+
+model ShareholderLevelConfig {
+  id        String   @id @default(uuid())
+  level     Int      @unique  // 1=普通股东, 2=战略股东, 3=创始人股东
+  name      String            // 级别名称
+  minAmount Decimal           // 门槛金额
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Shareholder {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  level     Int      @default(1)  // 股东级别
+  name      String
+  phone     String
+  status    String   @default("active")  // active, inactive
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  investments ShareholderInvestment[]
+  dividends   ShareholderDividend[]
+  costs       ShareholderCost[]
+}
+
+model ShareholderInvestment {
+  id            String   @id @default(uuid())
+  shareholderId String
+  amount        Decimal
+  type          String   // initial=初始投资, additional=追加投资, withdrawal=撤回
+  remark        String?
+  createdAt     DateTime @default(now())
+
+  shareholder Shareholder @relation(fields: [shareholderId], references: [id], onDelete: Cascade)
+}
+
+model ShareholderDividend {
+  id            String   @id @default(uuid())
+  shareholderId String
+  amount        Decimal
+  period        String   // 分红周期，如 "2024Q1"
+  status        String   @default("pending")  // pending=待发放, paid=已发放
+  createdAt     DateTime @default(now())
+
+  shareholder Shareholder @relation(fields: [shareholderId], references: [id], onDelete: Cascade)
+}
+
+model ShareholderCost {
+  id            String   @id @default(uuid())
+  shareholderId String
+  amount        Decimal
+  type          String   // platform=平台费用, marketing=营销费用, operation=运营费用
+  remark        String?
+  period        String   // 周期，如 "2024Q1"
+  createdAt     DateTime @default(now())
+
+  shareholder Shareholder @relation(fields: [shareholderId], references: [id], onDelete: Cascade)
 }

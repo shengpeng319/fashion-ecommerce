@@ -41,12 +41,14 @@ import adminProductRoutes from './routes/admin/product'
 import adminCategoryRoutes from './routes/admin/category'
 import adminOrderRoutes from './routes/admin/order'
 import adminUserRoutes from './routes/admin/user'
+import shareholderRoutes from './routes/shareholder'
 
 app.use('/api/admin/auth', adminAuthRoutes)
 app.use('/api/admin', adminProductRoutes)
 app.use('/api/admin', adminCategoryRoutes)
 app.use('/api/admin', adminOrderRoutes)
 app.use('/api/admin', adminUserRoutes)
+app.use('/api/shareholder', shareholderRoutes)
 
 app.listen(PORT, () => {
   console.log('Server running on port ' + PORT)

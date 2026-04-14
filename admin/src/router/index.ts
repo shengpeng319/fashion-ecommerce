@@ -42,6 +42,30 @@ const routes: RouteRecordRaw[] = [
         name: 'Users',
         component: () => import('../views/Users.vue'),
         meta: { title: '用户管理' }
+      },
+      {
+        path: 'shareholder/list',
+        name: 'ShareholderList',
+        component: () => import('../views/shareholder/ShareholderList.vue'),
+        meta: { title: '股东列表' }
+      },
+      {
+        path: 'shareholder/:id',
+        name: 'ShareholderDetail',
+        component: () => import('../views/shareholder/ShareholderDetail.vue'),
+        meta: { title: '股东详情' }
+      },
+      {
+        path: 'shareholder/config',
+        name: 'ShareholderConfig',
+        component: () => import('../views/shareholder/ShareholderConfig.vue'),
+        meta: { title: '股东配置' }
+      },
+      {
+        path: 'shareholder/dashboard',
+        name: 'ShareholderDashboard',
+        component: () => import('../views/shareholder/ShareholderDashboard.vue'),
+        meta: { title: '股东Dashboard' }
       }
     ]
   }
