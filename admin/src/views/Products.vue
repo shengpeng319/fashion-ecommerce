@@ -8,11 +8,22 @@
         </div>
       </template>
       
-      <el-table :data="products" v-loading="loading">
+      <el-table 
+        :data="products" 
+        v-loading="loading"
+        empty-text="暂无商品数据，请先添加商品"
+      >
         <el-table-column prop="image" label="图片" width="100">
           <template #default="{ row }">
-            <el-image v-if="row.image" :src="'http://192.168.101.50:3001' + row.image" style="width:60px;height:60px" fit="cover" />
-            <span v-else>-</span>
+            <el-image 
+              v-if="row.image" 
+              :src="'http://192.168.101.50:3001' + row.image" 
+              style="width:60px;height:60px" 
+              fit="cover"
+              :preview-src-list="['http://192.168.101.50:3001' + row.image]"
+              preview-teleported
+            />
+            <span v-else class="no-image">暂无图片</span>
           </template>
         </el-table-column>
         <el-table-column prop="name" label="名称" min-width="150" />
@@ -40,7 +51,7 @@
         :page-size="pageSize"
         :total="total"
         layout="total, prev, pager, next"
-        class="mt-20"
+        class="pagination"
         @current-change="fetchProducts"
       />
     </el-card>
@@ -250,7 +261,7 @@ const handleDelete = async (id: string) => {
   justify-content: space-between;
   align-items: center;
 }
-.mt-20 {
+.pagination {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
@@ -265,6 +276,7 @@ const handleDelete = async (id: string) => {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: border-color 0.2s;
 }
 .avatar-uploader:hover {
   border-color: #ff5777;
@@ -276,11 +288,15 @@ const handleDelete = async (id: string) => {
 }
 .avatar-uploader-icon {
   font-size: 28px;
-  color: #8c939d;
+  color: #666;
 }
 .upload-tip {
   font-size: 12px;
-  color: #999;
+  color: #666;
   margin-top: 8px;
+}
+.no-image {
+  color: #999;
+  font-size: 12px;
 }
 </style>

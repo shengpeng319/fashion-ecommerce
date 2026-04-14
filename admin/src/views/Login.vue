@@ -4,10 +4,20 @@
       <h2>时尚女装管理后台</h2>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="0">
         <el-form-item prop="phone">
-          <el-input v-model="form.phone" placeholder="手机号" prefix-icon="User" />
+          <el-input 
+            v-model="form.phone" 
+            placeholder="手机号" 
+            :prefix-icon="User" 
+          />
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="form.password" type="password" placeholder="密码" prefix-icon="Lock" @keyup.enter="handleLogin" />
+          <el-input 
+            v-model="form.password" 
+            type="password" 
+            placeholder="密码" 
+            :prefix-icon="Lock" 
+            @keyup.enter="handleLogin"
+          />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" class="login-btn" @click="handleLogin">登录</el-button>
@@ -22,6 +32,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { User, Lock } from '@element-plus/icons-vue'
 import { authApi } from '../api/auth'
 
 const router = useRouter()
@@ -67,8 +78,8 @@ const handleLogin = async () => {
   width: 400px;
   padding: 40px;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 .login-box h2 {
   text-align: center;
@@ -80,8 +91,17 @@ const handleLogin = async () => {
 }
 .tips {
   text-align: center;
-  color: #999;
+  color: #666;
   font-size: 12px;
   margin-top: 10px;
+}
+
+/* Focus visible 样式 */
+:deep(.el-input__wrapper:focus-within) {
+  box-shadow: 0 0 0 2px rgba(255, 87, 119, 0.2);
+}
+:deep(.el-button--primary:focus) {
+  background: #ff6b88;
+  border-color: #ff6b88;
 }
 </style>

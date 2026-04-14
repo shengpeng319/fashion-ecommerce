@@ -8,7 +8,11 @@
         </div>
       </template>
       
-      <el-table :data="shareholders" v-loading="loading">
+      <el-table 
+        :data="shareholders" 
+        v-loading="loading"
+        empty-text="暂无股东数据，请先添加股东"
+      >
         <el-table-column prop="name" label="姓名" width="100" />
         <el-table-column prop="phone" label="手机号" width="130" />
         <el-table-column prop="level" label="级别" width="120">

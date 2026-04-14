@@ -2,10 +2,10 @@
   <div class="orders-page">
     <el-card>
       <template #header>
-        <el-row :gutter="20" align="middle">
-          <el-col :span="4"><span>订单列表</span></el-col>
-          <el-col :span="8">
-            <el-select v-model="statusFilter" placeholder="订单状态" clearable @change="fetchOrders">
+        <el-row :gutter="20" align="middle" class="header-row">
+          <el-col :xs="24" :sm="8"><span>订单列表</span></el-col>
+          <el-col :xs="24" :sm="10">
+            <el-select v-model="statusFilter" placeholder="筛选订单状态" clearable @change="fetchOrders">
               <el-option label="待支付" value="pending" />
               <el-option label="已支付" value="paid" />
               <el-option label="已发货" value="shipped" />
@@ -16,7 +16,11 @@
         </el-row>
       </template>
       
-      <el-table :data="orders" v-loading="loading">
+      <el-table 
+        :data="orders" 
+        v-loading="loading"
+        empty-text="暂无订单数据"
+      >
         <el-table-column prop="orderNo" label="订单号" width="180" />
         <el-table-column prop="user.phone" label="用户" width="120" />
         <el-table-column label="商品" min-width="200">
@@ -41,7 +45,7 @@
         </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
-            <el-dropdown @command="(cmd: string) => handleAction(row, cmd)">
+            <el-dropdown @command="(cmd: string) => handleAction(row, cmd)" trigger="click">
               <el-button type="primary" size="small">操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -60,7 +64,7 @@
         :page-size="pageSize"
         :total="total"
         layout="total, prev, pager, next"
-        class="mt-20"
+        class="pagination"
         @current-change="fetchOrders"
       />
     </el-card>
@@ -144,7 +148,20 @@ const handleAction = async (row: any, cmd: string) => {
 </script>
 
 <style scoped>
-.mt-20 { margin-top: 20px; display: flex; justify-content: flex-end; }
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-row span {
+  font-weight: 600;
+  font-size: 16px;
+}
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
 .order-item { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
 .order-item-detail { padding: 4px 0; }
 </style>
