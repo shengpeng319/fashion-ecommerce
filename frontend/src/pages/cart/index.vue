@@ -48,7 +48,7 @@
       </view>
     </view>
 
-    <!-- Bottom Bar -->
+    <!-- Bottom Bar - positioned above tab bar -->
     <view class="bottom-bar" v-if="isLoggedIn && cartItems.length > 0">
       <view class="select-all" @tap="toggleSelectAll">
         <view class="checkbox" :class="{ checked: selectedIds.length === cartItems.length && cartItems.length > 0 }">
@@ -159,7 +159,6 @@ const checkout = () => {
 .cart-page { 
   min-height: 100vh; 
   background: #f5f5f5; 
-  padding-bottom: 200rpx;
 }
 
 .login-tip {
@@ -183,7 +182,7 @@ const checkout = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 120rpx 0 60rpx;
+  padding: 120rpx 0 200rpx;
   .empty-icon { font-size: 120rpx; }
   .empty-title { font-size: 32rpx; color: #333; font-weight: 600; margin-top: 24rpx; }
   .empty-sub { font-size: 26rpx; color: #999; margin-top: 12rpx; }
@@ -198,7 +197,9 @@ const checkout = () => {
   }
 }
 
-.cart-content { }
+.cart-content { 
+  padding-bottom: 160rpx;
+}
 .cart-header {
   display: flex;
   justify-content: space-between;
@@ -297,18 +298,22 @@ const checkout = () => {
   text { font-size: 22rpx; color: #999; }
 }
 
+/* Bottom bar - fixed above tab bar (tab bar is ~50px on H5) */
 .bottom-bar {
   position: fixed;
-  bottom: 0;
+  bottom: 50px;
   left: 0;
   right: 0;
-  height: 100rpx; padding-bottom: constant(safe-area-inset-bottom); padding-bottom: env(safe-area-inset-bottom);
+  height: 60px;
   background: #fff;
-  border-top: 1rpx solid #eee;
+  border-top: 1px solid #eee;
   display: flex;
   align-items: center;
   padding: 0 24rpx;
-  z-index: 100;
+  z-index: 9999;
+  /* iPhone safe area */
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .select-all {
   display: flex;
@@ -328,7 +333,7 @@ const checkout = () => {
       text { color: #fff; font-size: 24rpx; }
     }
   }
-  .select-text { font-size: 26rpx; color: #666; }
+  .select-text { font-size: 26rpx; color: #666; margin-left: 8rpx; }
 }
 .total-wrap {
   flex: 1;
