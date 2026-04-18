@@ -98,3 +98,25 @@ router.get('/:id', auth, async (req, res) => {
 })
 
 export default router
+
+// POST /api/fashions/orders/:id/pay
+router.post('/:id/pay', auth, async (req, res) => {
+  try {
+    const order = await prisma.order.findFirst({
+      where: { id: req.params.id, userId: req.userId }
+    })
+    if (!order) return res.status(404).json({ error: '订单不存在' })
+    if (order.status !== 'pending') {
+      return res.status(400).json({ error: '订单状态不允许支付' })
+    }
+    
+    // Simulate payment success
+    const updated = await prisma.order.update({
+      where: { id: req.params.id },
+      data: { status: 'paid', payTime: new Date() }
+    })
+    res.json({ success: true, order: updated })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})

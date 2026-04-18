@@ -27,6 +27,7 @@ import categoryRoutes from './routes/category'
 import cartRoutes from './routes/cart'
 import orderRoutes from './routes/order'
 import wholesaleRoutes from './routes/wholesale'
+import addressRoutes from './routes/address'
 
 app.use('/api/fashions/auth', authRoutes)
 app.use('/api/fashions/products', productRoutes)
@@ -34,6 +35,7 @@ app.use('/api/fashions/categories', categoryRoutes)
 app.use('/api/fashions/cart', cartRoutes)
 app.use('/api/fashions/orders', orderRoutes)
 app.use('/api/fashions/wholesale', wholesaleRoutes)
+app.use('/api/fashions/addresses', addressRoutes)
 
 // 管理端路由
 import adminAuthRoutes from './routes/admin/auth'

@@ -21,35 +21,39 @@
         <text class="item-count">共{{ cartItems.length }}件商品</text>
       </view>
 
-      <checkbox-group @change="onSelectChange">
-        <view v-for="item in cartItems" :key="item.id" class="cart-item">
-          <checkbox :value="item.id" :checked="selectedIds.includes(item.id)" class="item-checkbox" />
-          <view class="item-img">
-            <image :src="JSON.parse(item.product?.images || '[]')[0]" mode="aspectFill" />
-          </view>
-          <view class="item-info">
-            <text class="item-name">{{ item.product?.name }}</text>
-            <text class="item-sku">{{ item.sku?.name || '默认规格' }}</text>
-            <view class="item-bottom">
-              <text class="item-price">¥{{ item.product?.price }}</text>
-              <view class="stepper">
-                <view class="stepper-btn" @tap="changeQty(item, -1)">−</view>
-                <text class="stepper-num">{{ item.quantity }}</text>
-                <view class="stepper-btn" @tap="changeQty(item, 1)">+</view>
-              </view>
-            </view>
-          </view>
-          <view class="item-delete" @tap="deleteItem(item.id)">
-            <text>删除</text>
+      <view v-for="item in cartItems" :key="item.id" class="cart-item">
+        <view class="item-selector" @tap="toggleItem(item.id)">
+          <view class="checkbox" :class="{ checked: selectedIds.includes(item.id) }">
+            <text v-if="selectedIds.includes(item.id)">✓</text>
           </view>
         </view>
-      </checkbox-group>
+        <view class="item-img">
+          <image :src="JSON.parse(item.product?.images || '[]')[0]" mode="aspectFill" />
+        </view>
+        <view class="item-info">
+          <text class="item-name">{{ item.product?.name }}</text>
+          <text class="item-sku">{{ item.sku?.name || '默认规格' }}</text>
+          <view class="item-bottom">
+            <text class="item-price">¥{{ item.product?.price }}</text>
+            <view class="stepper">
+              <view class="stepper-btn" @tap.stop="changeQty(item, -1)">−</view>
+              <text class="stepper-num">{{ item.quantity }}</text>
+              <view class="stepper-btn" @tap.stop="changeQty(item, 1)">+</view>
+            </view>
+          </view>
+        </view>
+        <view class="item-delete" @tap.stop="deleteItem(item.id)">
+          <text>删除</text>
+        </view>
+      </view>
     </view>
 
     <!-- Bottom Bar -->
     <view class="bottom-bar" v-if="isLoggedIn && cartItems.length > 0">
       <view class="select-all" @tap="toggleSelectAll">
-        <checkbox :checked="isAllSelected" />
+        <view class="checkbox" :class="{ checked: selectedIds.length === cartItems.length && cartItems.length > 0 }">
+          <text v-if="selectedIds.length === cartItems.length && cartItems.length > 0">✓</text>
+        </view>
         <text class="select-text">全选</text>
       </view>
       <view class="total-wrap">
@@ -66,7 +70,7 @@
   </view>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
 
@@ -81,7 +85,8 @@ const checkLogin = () => {
 const loadCart = async () => {
   if (!isLoggedIn.value) return
   try {
-    cartItems.value = await request('/cart', 'GET')
+    const res: any = await request('/cart', 'GET')
+    cartItems.value = Array.isArray(res) ? res : (res.data || [])
     selectedIds.value = []
   } catch (e) {
     console.error('load cart error', e)
@@ -93,26 +98,29 @@ onShow(() => {
   if (isLoggedIn.value) loadCart()
 })
 
-const onSelectChange = (e: any) => {
-  selectedIds.value = e.detail.value
+const toggleItem = (id: string) => {
+  const idx = selectedIds.value.indexOf(id)
+  if (idx >= 0) {
+    selectedIds.value = selectedIds.value.filter((i: string) => i !== id)
+  } else {
+    selectedIds.value = [...selectedIds.value, id]
+  }
 }
 
-const isAllSelected = () => 
-  cartItems.value.length > 0 && selectedIds.value.length === cartItems.value.length
-
 const toggleSelectAll = () => {
-  if (isAllSelected()) {
+  if (selectedIds.value.length === cartItems.value.length) {
     selectedIds.value = []
   } else {
     selectedIds.value = cartItems.value.map((i: any) => i.id)
   }
 }
 
-const total = () => 
+const total = computed(() => 
   cartItems.value
     .filter((i: any) => selectedIds.value.includes(i.id))
     .reduce((sum: number, i: any) => sum + Number(i.product?.price || 0) * i.quantity, 0)
     .toFixed(2)
+)
 
 const changeQty = async (item: any, delta: number) => {
   const newQty = item.quantity + delta
@@ -143,6 +151,7 @@ const checkout = () => {
     uni.showToast({ title: '请选择商品', icon: 'none' })
     return
   }
+  uni.setStorageSync('cartSelectedItems', cartItems.value.filter((i: any) => selectedIds.value.includes(i.id)))
   uni.navigateTo({ url: '/pages/order/create' })
 }
 </script>
@@ -210,7 +219,23 @@ const checkout = () => {
   border-radius: 16rpx;
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
 }
-.item-checkbox { transform: scale(0.85); }
+.item-selector {
+  padding: 8rpx;
+  .checkbox {
+    width: 40rpx;
+    height: 40rpx;
+    border: 2rpx solid #ccc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.checked {
+      background: #ff5777;
+      border-color: #ff5777;
+      text { color: #fff; font-size: 24rpx; }
+    }
+  }
+}
 .item-img {
   width: 180rpx;
   height: 180rpx;
@@ -289,6 +314,20 @@ const checkout = () => {
   display: flex;
   align-items: center;
   gap: 8rpx;
+  .checkbox {
+    width: 40rpx;
+    height: 40rpx;
+    border: 2rpx solid #ccc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.checked {
+      background: #ff5777;
+      border-color: #ff5777;
+      text { color: #fff; font-size: 24rpx; }
+    }
+  }
   .select-text { font-size: 26rpx; color: #666; }
 }
 .total-wrap {

@@ -27,6 +27,23 @@
   ],
   "subPackages": [
     {
+      "root": "pages/address",
+      "pages": [
+        {
+          "path": "list",
+          "style": {
+            "navigationBarTitleText": "收货地址"
+          }
+        },
+        {
+          "path": "form",
+          "style": {
+            "navigationBarTitleText": "编辑地址"
+          }
+        }
+      ]
+    },
+    {
       "root": "pages/order",
       "pages": [
         {

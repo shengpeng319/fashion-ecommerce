@@ -115,10 +115,10 @@ const goOrders = (status?: string) => {
   uni.navigateTo({ url: `/pages/order/list${status ? '?status=' + status : ''}` })
 }
 
-const goAddress = () => { uni.showToast({ title: '功能开发中', icon: 'none' }) }
-const goMember = () => { uni.showToast({ title: '功能开发中', icon: 'none' }) }
-const goFavorites = () => { uni.showToast({ title: '功能开发中', icon: 'none' }) }
-const goSetting = () => { uni.showToast({ title: '功能开发中', icon: 'none' }) }
+const goAddress = () => { uni.navigateTo({ url: '/pages/address/list' }) }
+const goMember = () => { uni.navigateTo({ url: '/pages/address/list' }) }
+const goFavorites = () => { uni.navigateTo({ url: '/pages/address/list' }) }
+const goSetting = () => { uni.navigateTo({ url: '/pages/address/list' }) }
 
 const logout = () => {
   uni.removeStorageSync('token')
