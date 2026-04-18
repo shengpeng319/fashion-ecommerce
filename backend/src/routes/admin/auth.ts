@@ -86,3 +86,33 @@ router.put('/password', async (req, res) => {
 })
 
 export default router
+
+// 管理员注册
+router.post('/register', async (req, res) => {
+  try {
+    const { phone, password, nickname } = req.body
+    if (!phone || !password) {
+      return res.status(400).json({ error: '手机号和密码必填' })
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: '密码至少6位' })
+    }
+    const exist = await prisma.adminUser.findUnique({ where: { phone } })
+    if (exist) {
+      return res.status(400).json({ error: '账号已存在' })
+    }
+    const hashed = await bcrypt.hash(password, 10)
+    const admin = await prisma.adminUser.create({
+      data: { phone, password: hashed, nickname: nickname || '管理员' }
+    })
+    // 注册成功后自动登录，签发 token
+    const token = jwt.sign({ adminId: admin.id, role: admin.role }, JWT_SECRET, { expiresIn: ADMIN_EXPIRES })
+    res.json({
+      success: true,
+      token,
+      admin: { id: admin.id, phone: admin.phone, nickname: admin.nickname, role: admin.role }
+    })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})

@@ -2,7 +2,7 @@
   <div class="dashboard">
     <el-row :gutter="20" class="stat-row">
       <el-col :xs="24" :sm="12" :md="6">
-        <div class="stat-card stat-card--primary">
+        <div class="stat-card stat-card--primary" tabindex="0" @keydown.enter="router.push('/products')">
           <div class="stat-card__icon"><el-icon><Goods /></el-icon></div>
           <div class="stat-card__content">
             <div class="stat-card__value">{{ stats.products }}</div>
@@ -11,7 +11,7 @@
         </div>
       </el-col>
       <el-col :xs="24" :sm="12" :md="6">
-        <div class="stat-card stat-card--success">
+        <div class="stat-card stat-card--success" tabindex="0" @keydown.enter="router.push('/orders')">
           <div class="stat-card__icon"><el-icon><ShoppingCart /></el-icon></div>
           <div class="stat-card__content">
             <div class="stat-card__value">{{ stats.orders }}</div>
@@ -20,7 +20,7 @@
         </div>
       </el-col>
       <el-col :xs="24" :sm="12" :md="6">
-        <div class="stat-card stat-card--warning">
+        <div class="stat-card stat-card--warning" tabindex="0" @keydown.enter="router.push('/users')">
           <div class="stat-card__icon"><el-icon><User /></el-icon></div>
           <div class="stat-card__content">
             <div class="stat-card__value">{{ stats.users }}</div>
@@ -29,7 +29,7 @@
         </div>
       </el-col>
       <el-col :xs="24" :sm="12" :md="6">
-        <div class="stat-card stat-card--danger">
+        <div class="stat-card stat-card--danger" tabindex="0" @keydown.enter="router.push('/orders')">
           <div class="stat-card__icon"><el-icon><TrendCharts /></el-icon></div>
           <div class="stat-card__content">
             <div class="stat-card__value">¥{{ formatNumber(stats.sales) }}</div>
@@ -68,8 +68,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import request from '../api/request'
 
+const router = useRouter()
 const stats = ref({ products: 0, orders: 0, users: 0, sales: 0 })
 const recentOrders = ref<any[]>([])
 const loading = ref(false)
@@ -143,6 +145,11 @@ const formatDate = (date: string) => new Date(date).toLocaleString('zh-CN')
 .stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:focus-visible {
+  outline: 2px solid var(--accent, #ff5777);
+  outline-offset: 2px;
 }
 
 .stat-card__icon {

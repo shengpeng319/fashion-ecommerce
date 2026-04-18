@@ -382,3 +382,77 @@ router.get('/dashboard/me', async (req: Request, res: Response) => {
 });
 
 export default router;
+
+// 股东注册（使用已有用户体系）
+router.post('/register', async (req: Request, res: Response) => {
+  try {
+    const { phone, password } = req.body
+    if (!phone || !password) {
+      res.status(400).json(err('手机号和密码必填'))
+      return
+    }
+    if (password.length < 6) {
+      res.status(400).json(err('密码至少6位'))
+      return
+    }
+    // 检查用户是否已存在（复用用户表）
+    const existingUser = await prisma.user.findUnique({ where: { phone } })
+    if (existingUser) {
+      res.status(400).json(err('账号已注册，请直接登录'))
+      return
+    }
+    const bcrypt = require('bcrypt')
+    const hashed = await bcrypt.hash(password, 10)
+    const user = await prisma.user.create({
+      data: { phone, password: hashed, nickname: phone.slice(-4) }
+    })
+    // 注册后自动登录，签发假 token（股东 portal 专用）
+    const token = `sh_token_${user.id}_${Date.now()}`
+    res.json(ok({ token, userId: user.id, phone: user.phone }))
+  } catch (e: any) {
+    res.status(500).json(err(e.message))
+  }
+})
+
+// 股东登录（使用已有用户体系）
+router.post('/login', async (req: Request, res: Response) => {
+  try {
+    const { phone, password } = req.body
+    if (!phone || !password) {
+      res.status(400).json(err('手机号和密码必填'))
+      return
+    }
+    const user = await prisma.user.findUnique({ where: { phone } })
+    if (!user) {
+      res.status(401).json(err('账号或密码错误'))
+      return
+    }
+    const bcrypt = require('bcrypt')
+    const valid = await bcrypt.compare(password, user.password)
+    if (!valid) {
+      res.status(401).json(err('账号或密码错误'))
+      return
+    }
+    // 查找对应的股东信息
+    const shareholder = await prisma.shareholder.findFirst({
+      where: { userId: user.id }
+    })
+    if (!shareholder) {
+      res.status(403).json(err('您还不是股东，请联系管理员'))
+      return
+    }
+    const token = `sh_token_${user.id}_${Date.now()}`
+    res.json(ok({
+      token,
+      shareholder: {
+        id: shareholder.id,
+        name: shareholder.name,
+        phone: shareholder.phone,
+        level: shareholder.level,
+        investmentAmount: Number(shareholder.totalInvestment)
+      }
+    }))
+  } catch (e: any) {
+    res.status(500).json(err(e.message))
+  }
+})

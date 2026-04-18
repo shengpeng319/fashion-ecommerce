@@ -154,7 +154,7 @@ const getTypeColor = (type: string) => {
 }
 
 .stat-card__label {
-  color: #909399;
+  color: #595959;
   font-size: 14px;
   margin-top: 4px;
 }

@@ -296,7 +296,7 @@ const handleDelete = async (id: string) => {
   margin-top: 8px;
 }
 .no-image {
-  color: #999;
+  color: #595959;
   font-size: 12px;
 }
 </style>

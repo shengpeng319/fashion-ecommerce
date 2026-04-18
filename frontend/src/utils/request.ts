@@ -1,4 +1,13 @@
-const BASE = 'http://192.168.101.50:3001/api/fashions'
+// #ifdef H5
+// H5 开发模式：通过 Vite proxy 走相对路径
+const BASE = '/api/fashions'
+// #endif
+
+// #ifndef H5
+// 微信小程序：使用环境变量配置的实际后端地址
+// 小程序后台需在「开发管理」→「开发设置」中添加合法域名」
+const BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api/fashions'
+// #endif
 
 export const request = (url: string, method: string = 'GET', data: any = null) => {
   return new Promise((resolve, reject) => {

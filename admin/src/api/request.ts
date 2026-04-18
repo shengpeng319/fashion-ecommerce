@@ -3,11 +3,10 @@ import { ElMessage } from 'element-plus'
 import router from '../router'
 
 const request = axios.create({
-  baseURL: 'http://192.168.101.50:3001/api/admin',
+  baseURL: '/api/admin',
   timeout: 10000
 })
 
-// 请求拦截器
 request.interceptors.request.use(config => {
   const token = localStorage.getItem('admin_token')
   if (token) {
@@ -16,7 +15,6 @@ request.interceptors.request.use(config => {
   return config
 })
 
-// 响应拦截器
 request.interceptors.response.use(
   response => response.data,
   error => {

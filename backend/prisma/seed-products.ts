@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-// 时尚女装商品数据 - 参考韩都衣舍、优衣库、ZARA风格
+// 时尚女装商品数据 - 使用真实图片
 const products = [
   // 上衣 - 6个
   {
@@ -10,10 +10,10 @@ const products = [
     subtitle: '早秋新款 气质米色',
     price: 229.00,
     originalPrice: 399.00,
-    categoryId: '', // 上衣
+    categoryId: '',
     stock: 85,
     sales: 126,
-    images: JSON.stringify(['https://img.yzcdn.cn/vant/apple-1.jpg']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=500&fit=crop']),
     description: '法式慵懒风针织开衫，早秋必备气质单品',
     detail: '<p>法式慵懒风针织开衫，精选优质针织面料，柔软舒适。早秋新款，气质米色，百搭款。</p>'
   },
@@ -25,7 +25,7 @@ const products = [
     categoryId: '',
     stock: 120,
     sales: 342,
-    images: JSON.stringify(['https://img.yzcdn.cn/vant/apple-2.jpg']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop']),
     description: '韩版宽松卫衣，休闲百搭',
     detail: '<p>韩版宽松字母印花卫衣，舒适面料，休闲百搭，学生党首选。</p>'
   },
@@ -37,7 +37,7 @@ const products = [
     categoryId: '',
     stock: 68,
     sales: 89,
-    images: JSON.stringify(['https://img.yzcdn.cn/vant/cat.jpeg']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1598554747436-c9293d6a588f?w=400&h=500&fit=crop']),
     description: '气质飘带真丝衬衫，职场通勤必备',
     detail: '<p>气质飘带真丝衬衫，选用优质真丝面料，飘带设计增添优雅气质。</p>'
   },
@@ -49,7 +49,7 @@ const products = [
     categoryId: '',
     stock: 76,
     sales: 167,
-    images: JSON.stringify(['https://placehold.co/400x500/pink/white?text=Ladies+Blouse']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1485968579169-71c86a4d2db5?w=400&h=500&fit=crop']),
     description: '复古波点雪纺上衣，法式优雅露肩设计',
     detail: '<p>复古波点雪纺上衣，露肩设计增添小性感，法式优雅风格。</p>'
   },
@@ -61,7 +61,7 @@ const products = [
     categoryId: '',
     stock: 200,
     sales: 523,
-    images: JSON.stringify(['https://placehold.co/400x500/beige/black?text=Camisole']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=500&fit=crop']),
     description: '高领修身纯棉打底衫，秋冬必备基础款',
     detail: '<p>高领修身纯棉打底衫，优质纯棉面料，贴身舒适，基础百搭款。</p>'
   },
@@ -73,7 +73,7 @@ const products = [
     categoryId: '',
     stock: 92,
     sales: 201,
-    images: JSON.stringify(['https://placehold.co/400x500/white/pink?text=Ladies+Top']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=500&fit=crop']),
     description: '荷叶边蕾丝短袖上衣，甜美公主风',
     detail: '<p>荷叶边蕾丝短袖上衣，甜美公主风设计，约会必备单品。</p>'
   },
@@ -83,10 +83,10 @@ const products = [
     subtitle: '显瘦百搭 春秋新款',
     price: 199.00,
     originalPrice: 329.00,
-    categoryId: '', // 裤装
+    categoryId: '',
     stock: 110,
     sales: 445,
-    images: JSON.stringify(['https://img.yzcdn.cn/vant/apple-3.jpg']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&h=500&fit=crop']),
     description: '高腰直筒九分牛仔裤，显瘦百搭',
     detail: '<p>高腰直筒九分牛仔裤，修饰腿型，显瘦百搭，春秋新款。</p>'
   },
@@ -98,7 +98,7 @@ const products = [
     categoryId: '',
     stock: 88,
     sales: 278,
-    images: JSON.stringify(['https://placehold.co/400x500/black/white?text=Wide+Leg+Pants']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop']),
     description: '阔腿裤休闲长裤，显高显瘦气场全开',
     detail: '<p>阔腿裤休闲长裤，高腰设计显高显瘦，气场全开。</p>'
   },
@@ -110,7 +110,7 @@ const products = [
     categoryId: '',
     stock: 130,
     sales: 367,
-    images: JSON.stringify(['https://placehold.co/400x500/navy/white?text=Pencil+Pants']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&h=500&fit=crop']),
     description: '修身小脚铅笔裤，职场通勤必备',
     detail: '<p>修身小脚铅笔裤，干练利落，职场通勤首选。</p>'
   },
@@ -122,7 +122,7 @@ const products = [
     categoryId: '',
     stock: 150,
     sales: 189,
-    images: JSON.stringify(['https://placehold.co/400x500/gray/white?text=Sport+Pants']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400&h=500&fit=crop']),
     description: '运动休闲束脚裤，舒适自在',
     detail: '<p>运动休闲束脚裤，舒适面料，自在运动，居家户外皆宜。</p>'
   },
@@ -134,7 +134,7 @@ const products = [
     categoryId: '',
     stock: 65,
     sales: 156,
-    images: JSON.stringify(['https://placehold.co/400x500/brown/white?text=Tartan+Pants']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop']),
     description: '复古格纹阔腿裤，英伦时尚',
     detail: '<p>复古格纹阔腿裤，英伦风格，时尚博主同款。</p>'
   },
@@ -146,7 +146,7 @@ const products = [
     categoryId: '',
     stock: 95,
     sales: 234,
-    images: JSON.stringify(['https://placehold.co/400x500/black/gold?text=Suit+Pants']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=500&fit=crop']),
     description: '西装烟管裤，职业干练气质',
     detail: '<p>西装烟管裤，干练气质，职业装首选。</p>'
   },
@@ -156,10 +156,10 @@ const products = [
     subtitle: '清新碎花 仙气飘飘',
     price: 268.00,
     originalPrice: 428.00,
-    categoryId: '', // 裙装
+    categoryId: '',
     stock: 78,
     sales: 412,
-    images: JSON.stringify(['https://img.yzcdn.cn/vant/apple-4.jpg']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=500&fit=crop']),
     description: '碎花雪纺连衣裙，清新仙气',
     detail: '<p>碎花雪纺连衣裙，轻盈面料，清新碎花设计，仙气飘飘。</p>'
   },
@@ -171,7 +171,7 @@ const products = [
     categoryId: '',
     stock: 55,
     sales: 289,
-    images: JSON.stringify(['https://placehold.co/400x500/pink/white?text=Tea+Dress']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop']),
     description: '法式复古茶歇裙，方领收腰优雅浪漫',
     detail: '<p>法式复古茶歇裙，方领设计，收腰剪裁，优雅浪漫。</p>'
   },
@@ -183,7 +183,7 @@ const products = [
     categoryId: '',
     stock: 62,
     sales: 178,
-    images: JSON.stringify(['https://placehold.co/400x500/camel/white?text=Knit+Dress']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop']),
     description: '针织气质连衣裙，知性优雅',
     detail: '<p>针织气质连衣裙，优质针织面料，秋冬新款，知性优雅。</p>'
   },
@@ -195,7 +195,7 @@ const products = [
     categoryId: '',
     stock: 105,
     sales: 356,
-    images: JSON.stringify(['https://placehold.co/400x500/white/black?text=A+Line+Skirt']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1583496661160-fb5886a0uj93?w=400&h=500&fit=crop']),
     description: 'A字高腰半身裙，显瘦百搭学院风',
     detail: '<p>A字高腰半身裙，高腰设计显瘦百搭，学院风格。</p>'
   },
@@ -207,7 +207,7 @@ const products = [
     categoryId: '',
     stock: 82,
     sales: 145,
-    images: JSON.stringify(['https://placehold.co/400x500/silver/white?text=Pleated+Skirt']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1589810635657-232948472d98?w=400&h=500&fit=crop']),
     description: '百褶网纱半身裙，轻盈飘逸',
     detail: '<p>百褶网纱半身裙，轻盈飘逸面料，晚礼服风格。</p>'
   },
@@ -219,11 +219,11 @@ const products = [
     categoryId: '',
     stock: 48,
     sales: 198,
-    images: JSON.stringify(['https://placehold.co/400x500/black/gold?text=Lace+Dress']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&h=500&fit=crop']),
     description: '蕾丝拼接吊带裙，性感迷人约会首选',
     detail: '<p>蕾丝拼接吊带裙，蕾丝设计增添性感魅力，约会首选。</p>'
   },
-  // 配饰 - 3个（放在上衣分类下作为补充）
+  // 配饰 - 3个
   {
     name: '韩版纯棉头巾发带',
     subtitle: '优雅发饰 减龄小心机',
@@ -232,7 +232,7 @@ const products = [
     categoryId: '',
     stock: 200,
     sales: 89,
-    images: JSON.stringify(['https://placehold.co/400x500/pink/white?text=Headband']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1585396873937-0f40dc6a8e69?w=400&h=500&fit=crop']),
     description: '韩版纯棉头巾发带，优雅发饰',
     detail: '<p>韩版纯棉头巾发带，优雅设计，减龄小心机。</p>'
   },
@@ -244,7 +244,7 @@ const products = [
     categoryId: '',
     stock: 75,
     sales: 234,
-    images: JSON.stringify(['https://placehold.co/400x500/brown/white?text=Handbag']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=500&fit=crop']),
     description: '通勤简约手提包，大容量职场首选',
     detail: '<p>通勤简约手提包，大容量设计，职场首选。</p>'
   },
@@ -256,7 +256,7 @@ const products = [
     categoryId: '',
     stock: 180,
     sales: 167,
-    images: JSON.stringify(['https://placehold.co/400x500/black/gold?text=Belt']),
+    images: JSON.stringify(['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop']),
     description: '细节点缀皮带腰带，精致扣头显瘦神器',
     detail: '<p>细节点缀皮带腰带，精致扣头设计，显瘦神器。</p>'
   }

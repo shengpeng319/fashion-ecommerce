@@ -117,7 +117,7 @@ const save = async () => {
 }
 
 .card-header__help {
-  color: #909399;
+  color: #595959;
   cursor: help;
 }
 
@@ -126,7 +126,7 @@ const save = async () => {
 }
 
 .config-hint {
-  color: #909399;
+  color: #595959;
   font-size: 13px;
 }
 
