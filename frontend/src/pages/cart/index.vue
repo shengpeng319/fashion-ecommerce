@@ -1,7 +1,7 @@
 <template>
   <view class="cart-page">
     <!-- Login Tip -->
-    <view class="login-tip" v-if="!hasLogin">
+    <view class="login-tip" v-if="!isLoggedIn">
       <text>登录后可查看购物车</text>
       <button class="login-btn" @tap="goLogin">登录</button>
     </view>
@@ -47,7 +47,7 @@
     </view>
 
     <!-- Bottom Bar -->
-    <view class="bottom-bar" v-if="hasLogin && cartItems.length > 0">
+    <view class="bottom-bar" v-if="isLoggedIn && cartItems.length > 0">
       <view class="select-all" @tap="toggleSelectAll">
         <checkbox :checked="isAllSelected" />
         <text class="select-text">全选</text>
@@ -66,19 +66,20 @@
   </view>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { request, getToken } from '@/utils/request'
+import { request } from '@/utils/request'
 
-const hasLogin = computed(() => !!getToken())
+const isLoggedIn = ref(false)
 const cartItems = ref<any[]>([])
 const selectedIds = ref<string[]>([])
 
-onShow(() => {
-  if (hasLogin.value) loadCart()
-})
+const checkLogin = () => {
+  isLoggedIn.value = !!uni.getStorageSync('token')
+}
 
 const loadCart = async () => {
+  if (!isLoggedIn.value) return
   try {
     cartItems.value = await request('/cart', 'GET')
     selectedIds.value = []
@@ -87,26 +88,31 @@ const loadCart = async () => {
   }
 }
 
+onShow(() => {
+  checkLogin()
+  if (isLoggedIn.value) loadCart()
+})
+
 const onSelectChange = (e: any) => {
   selectedIds.value = e.detail.value
 }
 
-const isAllSelected = computed(() => 
+const isAllSelected = () => 
   cartItems.value.length > 0 && selectedIds.value.length === cartItems.value.length
-)
 
 const toggleSelectAll = () => {
-  isAllSelected.value
-    ? selectedIds.value = []
-    : selectedIds.value = cartItems.value.map((i: any) => i.id)
+  if (isAllSelected()) {
+    selectedIds.value = []
+  } else {
+    selectedIds.value = cartItems.value.map((i: any) => i.id)
+  }
 }
 
-const total = computed(() => 
+const total = () => 
   cartItems.value
     .filter((i: any) => selectedIds.value.includes(i.id))
     .reduce((sum: number, i: any) => sum + Number(i.product?.price || 0) * i.quantity, 0)
     .toFixed(2)
-)
 
 const changeQty = async (item: any, delta: number) => {
   const newQty = item.quantity + delta

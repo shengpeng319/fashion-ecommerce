@@ -75,7 +75,7 @@
     </view>
 
     <!-- Logout -->
-    <view class="logout-btn" v-if="hasLogin" @tap="logout">
+    <view class="logout-btn" v-if="isLoggedIn" @tap="logout">
       <text>退出登录</text>
     </view>
   </view>
@@ -83,10 +83,8 @@
 <script setup lang="ts">
 import { onShow } from '@dcloudio/uni-app'
 import { ref } from 'vue'
-import { computed } from 'vue'
-import { getToken, clearToken } from '@/utils/request'
 
-const hasLogin = computed(() => !!getToken())
+const isLoggedIn = ref(false)
 const userInfo = ref<any>(null)
 const orderTabs = [
   { key: 'pending', name: '待付款', icon: '📋' },
@@ -95,16 +93,22 @@ const orderTabs = [
   { key: 'completed', name: '已完成', icon: '✅' }
 ]
 
-onShow(() => {
+const checkLogin = () => {
+  const token = uni.getStorageSync('token')
+  isLoggedIn.value = !!token
   userInfo.value = uni.getStorageSync('userInfo') || null
+}
+
+onShow(() => {
+  checkLogin()
 })
 
 const goLogin = () => {
-  if (!hasLogin.value) uni.navigateTo({ url: '/pages/user/login' })
+  if (!isLoggedIn.value) uni.navigateTo({ url: '/pages/user/login' })
 }
 
 const goOrders = (status?: string) => {
-  if (!hasLogin.value) {
+  if (!isLoggedIn.value) {
     uni.showToast({ title: '请先登录', icon: 'none' })
     return
   }
@@ -117,10 +121,11 @@ const goFavorites = () => { uni.showToast({ title: '功能开发中', icon: 'non
 const goSetting = () => { uni.showToast({ title: '功能开发中', icon: 'none' }) }
 
 const logout = () => {
-  clearToken()
+  uni.removeStorageSync('token')
   uni.removeStorageSync('userInfo')
+  isLoggedIn.value = false
   userInfo.value = null
-  uni.showToast({ title: '已退出登录' })
+  uni.showToast({ title: '已退出登录', icon: 'none' })
 }
 </script>
 <style lang="scss" scoped>
