@@ -159,7 +159,7 @@ const checkout = () => {
 .cart-page { 
   min-height: 100vh; 
   background: #f5f5f5; 
-  padding-bottom: 140rpx;
+  padding-bottom: 200rpx;
 }
 
 .login-tip {
@@ -302,7 +302,7 @@ const checkout = () => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 110rpx;
+  height: 100rpx; padding-bottom: constant(safe-area-inset-bottom); padding-bottom: env(safe-area-inset-bottom);
   background: #fff;
   border-top: 1rpx solid #eee;
   display: flex;
