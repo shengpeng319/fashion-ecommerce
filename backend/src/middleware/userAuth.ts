@@ -10,6 +10,7 @@ export interface UserRequest extends Request {
 export function userAuth(req: UserRequest, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.replace('Bearer ', '')
   if (!token) {
+    console.log(`[USER AUTH MW] 拦截: ${req.method} ${req.url} - 无token`)
     return res.status(401).json({ error: '请先登录' })
   }
   try {
@@ -17,6 +18,7 @@ export function userAuth(req: UserRequest, res: Response, next: NextFunction) {
     req.userId = decoded.userId
     next()
   } catch (e) {
+    console.log(`[USER AUTH MW] 拦截: ${req.method} ${req.url} - token无效: ${(e as Error).message}`)
     return res.status(401).json({ error: 'token无效' })
   }
 }

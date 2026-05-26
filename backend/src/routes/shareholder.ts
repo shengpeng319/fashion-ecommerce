@@ -16,6 +16,7 @@ router.get('/config', async (req: Request, res: Response) => {
     });
     res.json(ok(configs));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -49,6 +50,7 @@ router.put('/config', async (req: Request, res: Response) => {
     });
     res.json(ok(updated));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -100,6 +102,7 @@ router.get('/list', async (req: Request, res: Response) => {
 
     res.json(ok(result));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -132,6 +135,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     res.json(ok(shareholder));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -155,6 +159,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     res.json(ok(shareholder));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -171,6 +176,7 @@ router.get('/:id/investments', async (req: Request, res: Response) => {
 
     res.json(ok(investments));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -197,6 +203,7 @@ router.post('/:id/investments', async (req: Request, res: Response) => {
 
     res.json(ok(investment));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -213,6 +220,7 @@ router.get('/:id/dividends', async (req: Request, res: Response) => {
 
     res.json(ok(dividends));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -239,6 +247,7 @@ router.post('/:id/dividends', async (req: Request, res: Response) => {
 
     res.json(ok(dividend));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -255,6 +264,7 @@ router.get('/:id/costs', async (req: Request, res: Response) => {
 
     res.json(ok(costs));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -282,6 +292,7 @@ router.post('/:id/costs', async (req: Request, res: Response) => {
 
     res.json(ok(cost));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -377,6 +388,7 @@ router.get('/dashboard/me', async (req: Request, res: Response) => {
       }))
     }));
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message));
   }
 });
@@ -410,6 +422,7 @@ router.post('/register', async (req: Request, res: Response) => {
     const token = `sh_token_${user.id}_${Date.now()}`
     res.json(ok({ token, userId: user.id, phone: user.phone }))
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message))
   }
 })
@@ -453,6 +466,7 @@ router.post('/login', async (req: Request, res: Response) => {
       }
     }))
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json(err(e.message))
   }
 })

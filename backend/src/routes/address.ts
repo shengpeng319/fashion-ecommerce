@@ -27,6 +27,7 @@ router.get('/', auth, async (req: any, res: any) => {
     })
     res.json(addresses)
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -52,6 +53,7 @@ router.post('/', auth, async (req: any, res: any) => {
     })
     res.json(address)
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -81,6 +83,7 @@ router.put('/:id', auth, async (req: any, res: any) => {
     })
     res.json(address)
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -93,6 +96,7 @@ router.delete('/:id', auth, async (req: any, res: any) => {
     })
     res.json({ success: true })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -110,6 +114,7 @@ router.put('/:id/default', auth, async (req: any, res: any) => {
     })
     res.json({ success: true })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

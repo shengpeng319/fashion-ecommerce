@@ -33,6 +33,7 @@ router.get('/products', adminAuth, async (req: AdminRequest, res) => {
 
     res.json({ success: true, products, total, page: Number(page), pageSize: Number(pageSize) })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -49,6 +50,7 @@ router.get('/products/:id', adminAuth, async (req: AdminRequest, res) => {
     }
     res.json({ success: true, product })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -82,6 +84,7 @@ router.post('/products', adminAuth, async (req: AdminRequest, res) => {
     })
     res.json({ success: true, product })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -112,6 +115,7 @@ router.put('/products/:id', adminAuth, async (req: AdminRequest, res) => {
     })
     res.json({ success: true, product })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -122,6 +126,7 @@ router.delete('/products/:id', adminAuth, async (req: AdminRequest, res) => {
     await prisma.product.delete({ where: { id: req.params.id } })
     res.json({ success: true, message: '删除成功' })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -135,6 +140,7 @@ router.post('/upload', adminAuth, upload.single('image'), async (req: AdminReque
     const { image, thumbnail } = await processImage(req.file.filename)
     res.json({ success: true, image, thumbnail })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

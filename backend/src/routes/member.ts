@@ -12,6 +12,7 @@ router.get('/levels', async (_req, res) => {
     })
     res.json(levels)
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -30,6 +31,7 @@ router.get('/profile', userAuth, async (req: UserRequest, res) => {
     }
     res.json(member)
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -54,6 +56,7 @@ router.get('/transactions', userAuth, async (req: UserRequest, res) => {
     ])
     res.json({ transactions, total, page, limit })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -122,6 +125,7 @@ router.post('/upgrade', userAuth, async (req: UserRequest, res) => {
       bonusPoints: levelConfig.bonusPoints
     })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -181,6 +185,7 @@ router.post('/referral', userAuth, async (req: UserRequest, res) => {
 
     res.json({ success: true, message: '推荐关系已绑定' })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -194,6 +199,7 @@ router.get('/referrals', userAuth, async (req: UserRequest, res) => {
     })
     res.json(referrals)
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

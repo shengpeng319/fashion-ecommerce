@@ -12,6 +12,7 @@ router.get('/categories', adminAuth, async (req: AdminRequest, res) => {
     })
     res.json({ success: true, categories })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -28,6 +29,7 @@ router.post('/categories', adminAuth, async (req: AdminRequest, res) => {
     })
     res.json({ success: true, category })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -42,6 +44,7 @@ router.put('/categories/:id', adminAuth, async (req: AdminRequest, res) => {
     })
     res.json({ success: true, category })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -57,6 +60,7 @@ router.delete('/categories/:id', adminAuth, async (req: AdminRequest, res) => {
     await prisma.category.delete({ where: { id: req.params.id } })
     res.json({ success: true, message: '删除成功' })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

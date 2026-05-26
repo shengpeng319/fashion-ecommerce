@@ -15,7 +15,17 @@ export const prisma = new PrismaClient()
 app.use(cors())
 app.use(express.json())
 
-// 静态文件服务（上传的图片）
+app.use((req, _res, next) => {
+  const start = Date.now()
+  const ts = new Date().toISOString()
+  console.log(`[${ts}] --> ${req.method} ${req.url} ip=${req.ip}`)
+  _res.on('finish', () => {
+    const ms = Date.now() - start
+    console.log(`[${ts}] <-- ${req.method} ${req.url} ${_res.statusCode} ${ms}ms`)
+  })
+  next()
+})
+
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 
 app.get('/health', (req, res) => {

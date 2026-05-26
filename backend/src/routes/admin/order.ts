@@ -34,6 +34,7 @@ router.get('/orders', adminAuth, async (req: AdminRequest, res) => {
 
     res.json({ success: true, orders, total, page: Number(page), pageSize: Number(pageSize) })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -54,6 +55,7 @@ router.get('/orders/:id', adminAuth, async (req: AdminRequest, res) => {
     }
     res.json({ success: true, order })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -68,6 +70,7 @@ router.put('/orders/:id/status', adminAuth, async (req: AdminRequest, res) => {
     })
     res.json({ success: true, order })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

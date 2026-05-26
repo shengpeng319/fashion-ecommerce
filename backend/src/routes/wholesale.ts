@@ -17,6 +17,7 @@ router.get('/products', async (req, res) => {
     }))
     res.json({ data: wholesale, total: wholesale.length })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -30,6 +31,7 @@ router.post('/register', async (req, res) => {
     })
     res.json({ data: dealer })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(400).json({ error: e.message })
   }
 })
@@ -51,6 +53,7 @@ router.post('/orders', async (req, res) => {
     })
     res.json({ data: order })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -65,6 +68,7 @@ router.get('/orders', async (req, res) => {
     })
     res.json({ data: orders })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

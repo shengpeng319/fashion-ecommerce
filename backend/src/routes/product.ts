@@ -23,6 +23,7 @@ router.get('/', async (req, res) => {
     ])
     res.json({ data: products, total, limit: Number(limit), offset: Number(offset) })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -37,6 +38,7 @@ router.get('/:id', async (req, res) => {
     if (!product) return res.status(404).json({ error: '商品不存在' })
     res.json(product)
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

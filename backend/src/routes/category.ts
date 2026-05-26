@@ -12,6 +12,7 @@ router.get('/', async (req, res) => {
     })
     res.json(categories)
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

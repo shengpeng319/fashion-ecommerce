@@ -38,6 +38,7 @@ router.get('/members', adminAuth, async (req: AdminRequest, res) => {
 
     res.json({ members, total, page, limit })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -64,6 +65,7 @@ router.get('/members/:id', adminAuth, async (req: AdminRequest, res) => {
 
     res.json({ ...member, referrals })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -122,6 +124,7 @@ router.put('/members/:id', adminAuth, async (req: AdminRequest, res) => {
 
     res.json({ success: true, member: updated })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -148,6 +151,7 @@ router.get('/referrals', adminAuth, async (req: AdminRequest, res) => {
 
     res.json({ referrals, total, page, limit })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -171,6 +175,7 @@ router.put('/membership-levels/:key', adminAuth, async (req: AdminRequest, res) 
 
     res.json({ success: true, level })
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -183,6 +188,7 @@ router.get('/membership-levels', adminAuth, async (_req, res) => {
     })
     res.json(levels)
   } catch (e: any) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

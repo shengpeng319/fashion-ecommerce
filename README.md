@@ -248,7 +248,7 @@ npm -v    # >= 9.0.0
 
 # 方式 B: 手动 rsync
 rsync -avz --exclude 'node_modules' --exclude '.env' \
-  ./ user@your-server:/opt/fashion-ecommerce/
+  ./ root@8.163.77.169:/opt/fashion-ecommerce/
 
 # 方式 C: scp / ftp / 其他工具
 ```

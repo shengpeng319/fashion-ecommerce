@@ -11,6 +11,7 @@ export interface AdminRequest extends Request {
 export function adminAuth(req: AdminRequest, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.replace('Bearer ', '')
   if (!token) {
+    console.log(`[ADMIN AUTH MW] 拦截: ${req.method} ${req.url} - 无token`)
     return res.status(401).json({ error: '请先登录' })
   }
   try {
@@ -19,6 +20,7 @@ export function adminAuth(req: AdminRequest, res: Response, next: NextFunction) 
     req.adminRole = decoded.role
     next()
   } catch (e) {
+    console.log(`[ADMIN AUTH MW] 拦截: ${req.method} ${req.url} - token无效: ${(e as Error).message}`)
     return res.status(401).json({ error: 'token无效' })
   }
 }

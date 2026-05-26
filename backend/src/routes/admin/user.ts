@@ -38,6 +38,7 @@ router.get('/users', adminAuth, async (req: AdminRequest, res) => {
 
     res.json({ success: true, users, total, page: Number(page), pageSize: Number(pageSize) })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -64,6 +65,7 @@ router.get('/users/:id', adminAuth, async (req: AdminRequest, res) => {
     }
     res.json({ success: true, user })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })

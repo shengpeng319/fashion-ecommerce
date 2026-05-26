@@ -102,6 +102,7 @@ router.post('/', auth, async (req, res) => {
 
     res.json(order)
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -116,6 +117,7 @@ router.get('/', auth, async (req, res) => {
     })
     res.json(orders)
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -130,6 +132,7 @@ router.get('/:id', auth, async (req, res) => {
     if (!order) return res.status(404).json({ error: '订单不存在' })
     res.json(order)
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
@@ -229,6 +232,7 @@ router.post('/:id/pay', auth, async (req, res) => {
 
     res.json({ success: true, order: updated })
   } catch (e) {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, e)
     res.status(500).json({ error: e.message })
   }
 })
