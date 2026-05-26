@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { request } from '@/utils/request'
+import { request, setToken } from '@/utils/request'
 
 const phone = ref('')
 const password = ref('')
@@ -70,8 +70,10 @@ const register = async () => {
       nickname: nickname.value || phone.value.slice(-4)
     })
     if (res.success) {
-      uni.showToast({ title: '注册成功！请登录' })
-      setTimeout(() => uni.navigateTo({ url: '/pages/user/login' }), 1000)
+      setToken(res.token)
+      uni.setStorageSync('userInfo', res.user)
+      uni.showToast({ title: '注册成功', icon: 'success' })
+      setTimeout(() => uni.switchTab({ url: '/pages/index/index' }), 1000)
     }
   } catch (e: any) {
     uni.showToast({ title: e.error || '注册失败', icon: 'none' })
