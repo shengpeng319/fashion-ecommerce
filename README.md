@@ -35,10 +35,49 @@
 
 ## 环境要求
 
-- **Node.js** >= 18（推荐 LTS 版本）
-- **npm** >= 9
-- **rsync**（仅远程部署需要，macOS 自带，Ubuntu: `sudo apt install rsync`）
-- **SSH 访问**（仅远程部署需要）
+### 本地开发
+
+| 依赖 | 版本要求 | 安装方式 |
+|------|---------|---------|
+| **Node.js** | >= 18（推荐 LTS） | [nodejs.org](https://nodejs.org) 或见下方服务器安装 |
+| **npm** | >= 9 | 随 Node.js 自带 |
+| **Git** | 任意 | 系统包管理器 |
+
+### 服务器部署（Ubuntu/Debian）
+
+| 依赖 | 用途 | 安装命令 |
+|------|------|---------|
+| **Node.js** >= 18 | 运行后端 + 静态服务器 | 见下方 |
+| **npm** >= 9 | 安装 Node 依赖 | 随 Node.js 自带 |
+| **build-essential** | 编译 `bcrypt`、`sharp` 等原生模块 | `sudo apt install -y build-essential` |
+| **python3** | `node-gyp` 编译依赖 | `sudo apt install -y python3` |
+| **curl** | 健康检查、下载脚本 | `sudo apt install -y curl`（通常预装） |
+
+#### Ubuntu 服务器一键安装所有依赖
+
+```bash
+# 系统编译工具
+sudo apt update
+sudo apt install -y build-essential python3 curl git rsync
+
+# Node.js 20 LTS（推荐 NodeSource 方式）
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# 验证
+node -v   # >= v18.0.0
+npm -v    # >= 9.0.0
+```
+
+> **注意：** H5 商城和管理后台在**本地构建**后上传到服务器，服务器上不需要安装前端构建工具（uni-app、Vite 等）。服务器只需运行后端（`tsx`）和两个静态文件服务器（纯 Node.js）。
+
+### 本地开发机（用于一键远程部署）
+
+| 依赖 | 用途 |
+|------|------|
+| **Node.js** >= 18 | 构建前端产物 |
+| **rsync** | 传输文件到服务器（macOS 自带） |
+| **SSH** | 登录远程服务器 |
 
 ---
 
@@ -186,11 +225,15 @@ cd frontend && npm run build:mp-weixin
 ### 1. 服务器准备
 
 ```bash
-# 安装 Node.js 18+（Ubuntu 示例，使用 NodeSource）
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# 安装所有系统依赖（Ubuntu/Debian）
+sudo apt update
+sudo apt install -y build-essential python3 curl git rsync
+
+# 安装 Node.js 20 LTS
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
-# 验证版本
+# 验证
 node -v   # >= v18.0.0
 npm -v    # >= 9.0.0
 ```
@@ -225,9 +268,9 @@ cp .env.example .env
 nano backend/.env
 # 确认 DATABASE_URL 和 JWT_SECRET
 
-# 安装后端依赖
+# 安装后端依赖（含 devDependencies，因为运行时需要 tsx 和 prisma）
 cd backend
-npm install --production
+npm install
 npx prisma generate
 npx prisma db push
 npm run db:seed    # 首次部署时初始化数据
@@ -293,10 +336,10 @@ sudo firewall-cmd --reload
 
 ### 前提
 
-- 本机已安装 Node.js 18+ 和 rsync
-- ECS 已安装 Node.js 18+
-- 本机可通过 SSH 登录 ECS（推荐密钥登录）
-- ECS 安全组已开放 3001、8080、8081 端口
+- **本地开发机**：已安装 Node.js 18+、npm、rsync
+- **ECS 服务器**：已安装 Node.js 18+、build-essential、python3（见 [环境要求](#环境要求)）
+- **网络**：本机可通过 SSH 登录 ECS（推荐密钥登录）
+- **安全组**：ECS 安全组已开放 3001、8080、8081 端口
 
 ### 执行
 
@@ -418,6 +461,27 @@ fashion-ecommerce/
 ---
 
 ## 常见问题
+
+### Q: 服务器报错 `sh: tsx: not found` 或 `sh: prisma: not found`？
+
+后端运行需要 `tsx` 和 `prisma`，它们是 devDependencies。安装时**不要用** `npm install --production`，应使用：
+
+```bash
+cd backend && npm install
+```
+
+### Q: 服务器报错 `npm ERR! node-gyp` 或 `bcrypt`/`sharp` 编译失败？
+
+缺少 C++ 编译工具链：
+
+```bash
+sudo apt install -y build-essential python3
+cd backend && rm -rf node_modules && npm install
+```
+
+### Q: 服务器报错 `uni: not found`？
+
+`uni` 是前端构建工具，**不需要在服务器上安装**。H5 和管理后台在本地构建好后再上传。确保使用 `deploy-remote.sh`（自动本地构建）而非 `deploy.sh`（需要在本地运行）。
 
 ### Q: 访问服务器 IP 无法打开页面？
 

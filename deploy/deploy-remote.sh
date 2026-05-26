@@ -91,11 +91,14 @@ rsync -avz \
 echo ""
 
 # --- Step 3: 远程安装依赖 ---
-echo ">>> [3/4] 在 ECS 上安装后端依赖..."
+echo ">>> [3/4] 在 ECS 上安装系统依赖 + 后端依赖..."
 ssh "$SSH_TARGET" << 'REMOTE_INSTALL'
+# 安装编译工具（bcrypt/sharp 等原生模块需要）
+apt-get update -qq && apt-get install -y -qq build-essential python3 2>/dev/null || true
+
 cd /opt/fashion-ecommerce/backend
-npm install --production
-npm exec prisma generate
+npm install
+npx prisma generate
 REMOTE_INSTALL
 
 echo ""
