@@ -1,95 +1,82 @@
 <template>
-  <view class="detail-page">
-    <!-- Gallery -->
-    <view class="gallery-wrap">
-      <swiper class="gallery" indicator-dots autoplay circular
-        indicator-color="rgba(255,255,255,0.3)" indicator-active-color="#C9A96E">
+  <view class="detail">
+    <view class="detail-gallery">
+      <swiper class="gallery-swiper" indicator-dots circular
+        indicator-color="rgba(0,0,0,0.2)" indicator-active-color="#C8102E"
+        @change="onSwiperChange">
         <swiper-item v-for="(img, i) in images" :key="i">
           <image :src="img" mode="aspectFill" class="gallery-img" />
         </swiper-item>
       </swiper>
       <view class="gallery-counter" v-if="images.length > 1">
-        <text>{{ currentIdx + 1 }} / {{ images.length }}</text>
+        {{ currentImg + 1 }} / {{ images.length }}
       </view>
       <view class="nav-back" @tap="goBack">
-        <text>←</text>
+        <text class="nav-back-icon">‹</text>
       </view>
     </view>
 
-    <!-- Product Info -->
-    <view class="info-section" v-if="goods.id">
-      <view class="info-header">
-        <view class="price-block">
-          <text class="price-symbol">¥</text>
-          <text class="price-value">{{ goods.price }}</text>
-        </view>
-        <view class="discount-row" v-if="goods.originalPrice && goods.originalPrice > goods.price">
-          <text class="price-original">¥{{ goods.originalPrice }}</text>
-          <text class="discount-badge" v-if="discount">{{ discount }}折</text>
-        </view>
+    <view class="detail-info" v-if="goods.id">
+      <view class="info-price-row">
+        <PriceDisplay :price="goods.price" :original-price="goods.originalPrice" size="large" />
+        <view class="discount-tag" v-if="discount">-{{ discount }}%</view>
       </view>
+      <text class="info-name">{{ goods.name }}</text>
+      <text class="info-subtitle" v-if="goods.subtitle">{{ goods.subtitle }}</text>
 
-      <text class="product-name">{{ goods.name }}</text>
-      <text class="product-sub" v-if="goods.subtitle">{{ goods.subtitle }}</text>
-
-      <view class="meta-strip">
+      <view class="info-meta">
         <view class="meta-item">
-          <text class="meta-icon">◆</text>
-          <text>正品保证</text>
+          <text class="meta-dot">●</text>
+          <text class="meta-text">正品保证</text>
         </view>
         <view class="meta-item">
-          <text class="meta-icon">◆</text>
-          <text>7天退换</text>
+          <text class="meta-dot">●</text>
+          <text class="meta-text">7天退换</text>
         </view>
         <view class="meta-item" :class="{ out: goods.stock <= 0 }">
-          <text class="meta-icon">{{ goods.stock > 0 ? '◆' : '◇' }}</text>
-          <text>{{ goods.stock > 0 ? '有货' : '缺货' }}</text>
+          <text class="meta-dot">{{ goods.stock > 0 ? '●' : '○' }}</text>
+          <text class="meta-text">{{ goods.stock > 0 ? '有货' : '缺货' }}</text>
+        </view>
+        <view class="meta-item" v-if="goods.sales">
+          <text class="meta-text">已售 {{ goods.sales }}</text>
         </view>
       </view>
     </view>
 
-    <!-- Description -->
-    <view class="desc-section" v-if="goods.description">
-      <view class="desc-header">
-        <text class="desc-title">LA DESCRIZIONE</text>
-        <view class="desc-line"></view>
-      </view>
+    <view class="detail-desc" v-if="goods.description">
+      <view class="desc-divider"></view>
+      <text class="desc-label">商品描述</text>
       <text class="desc-text">{{ goods.description }}</text>
     </view>
 
-    <!-- Detail Content -->
-    <view class="detail-section" v-if="goods.detail">
-      <view class="desc-header">
-        <text class="desc-title">DETTAGLI</text>
-        <view class="desc-line"></view>
-      </view>
-      <rich-text :nodes="goods.detail" class="detail-content"></rich-text>
+    <view class="detail-content" v-if="goods.detail">
+      <view class="desc-divider"></view>
+      <text class="desc-label">商品详情</text>
+      <rich-text :nodes="goods.detail" class="rich-content"></rich-text>
     </view>
 
-    <!-- Spacer for bottom bar -->
-    <view style="height: 160rpx;"></view>
+    <view style="height: 140rpx;"></view>
 
-    <!-- Bottom Action Bar -->
     <view class="bottom-bar">
-      <view class="bottom-actions">
+      <view class="bottom-icons">
         <view class="bottom-icon" @tap="goHome">
-          <text class="bi-icon">⌂</text>
-          <text class="bi-label">首页</text>
+          <text class="b-icon">🏠</text>
+          <text class="b-label">首页</text>
         </view>
         <view class="bottom-icon" @tap="toggleFavorite">
-          <text class="bi-icon">{{ isFavorite ? '♥' : '♡' }}</text>
-          <text class="bi-label">收藏</text>
+          <text class="b-icon">{{ isFavorite ? '❤️' : '🤍' }}</text>
+          <text class="b-label">收藏</text>
         </view>
         <view class="bottom-icon" @tap="goCart">
-          <text class="bi-icon">□</text>
-          <text class="bi-label">购物袋</text>
+          <text class="b-icon">🛒</text>
+          <text class="b-label">购物车</text>
         </view>
       </view>
       <view class="bottom-btns">
-        <view class="btn-secondary" @tap="addCart" v-if="goods.stock > 0">
-          <text>加入购物袋</text>
+        <view class="btn-add" @tap="addCart" v-if="goods.stock > 0">
+          <text>加入购物车</text>
         </view>
-        <view class="btn-primary" @tap="buyNow" v-if="goods.stock > 0">
+        <view class="btn-buy" @tap="buyNow" v-if="goods.stock > 0">
           <text>立即购买</text>
         </view>
         <view class="btn-soldout" v-if="goods.stock <= 0">
@@ -104,10 +91,11 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
+import PriceDisplay from '@/components/PriceDisplay.vue'
 
 const goods = ref<any>({})
 const isFavorite = ref(false)
-const currentIdx = ref(0)
+const currentImg = ref(0)
 
 const images = computed(() => {
   if (!goods.value.images) return []
@@ -115,9 +103,11 @@ const images = computed(() => {
 })
 
 const discount = computed(() => {
-  if (!goods.value.price || !goods.value.originalPrice) return null
-  return Math.round((Number(goods.value.price) / Number(goods.value.originalPrice)) * 10)
+  if (!goods.value.price || !goods.value.originalPrice || goods.value.originalPrice <= goods.value.price) return null
+  return Math.round((1 - Number(goods.value.price) / Number(goods.value.originalPrice)) * 100)
 })
+
+const onSwiperChange = (e: any) => { currentImg.value = e.detail.current }
 
 onLoad(async (opt: any) => {
   if (opt.id) {
@@ -135,7 +125,7 @@ const goCart = () => uni.switchTab({ url: '/pages/cart/index' })
 
 const toggleFavorite = () => {
   isFavorite.value = !isFavorite.value
-  uni.showToast({ title: isFavorite.value ? '已收藏' : '已取消收藏', icon: 'none' })
+  uni.showToast({ title: isFavorite.value ? '已收藏' : '已取消', icon: 'none' })
 }
 
 const addCart = () => {
@@ -146,8 +136,8 @@ const addCart = () => {
     return
   }
   request('/cart', 'POST', { productId: goods.value.id, quantity: 1 })
-    .then(() => uni.showToast({ title: '已加入购物袋' }))
-    .catch(() => uni.showToast({ title: '失败', icon: 'none' }))
+    .then(() => uni.showToast({ title: '已加入购物车' }))
+    .catch(() => uni.showToast({ title: '添加失败', icon: 'none' }))
 }
 
 const buyNow = () => {
@@ -156,18 +146,17 @@ const buyNow = () => {
 </script>
 
 <style lang="scss" scoped>
-.detail-page {
+.detail {
   min-height: 100vh;
-  background: var(--color-bg);
+  background-color: #FFFFFF;
 }
 
-// Gallery
-.gallery-wrap {
+.detail-gallery {
   position: relative;
 }
-.gallery {
-  height: 1000rpx;
-  background: var(--color-dark);
+.gallery-swiper {
+  height: 750rpx;
+  background-color: #F5F5F5;
 }
 .gallery-img {
   width: 100%;
@@ -175,225 +164,173 @@ const buyNow = () => {
 }
 .gallery-counter {
   position: absolute;
-  bottom: 40rpx;
-  right: 32rpx;
-  background: rgba(26, 21, 20, 0.6);
-  padding: 8rpx 20rpx;
-  border-radius: 24rpx;
+  bottom: 24rpx;
+  right: 24rpx;
+  background: rgba(0,0,0,0.5);
+  color: #FFFFFF;
+  padding: 6rpx 20rpx;
+  border-radius: 20rpx;
   font-size: 22rpx;
-  color: #fff;
-  font-weight: 500;
 }
 .nav-back {
   position: absolute;
   top: 80rpx;
   left: 24rpx;
-  width: 64rpx;
-  height: 64rpx;
+  width: 72rpx;
+  height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(26, 21, 20, 0.5);
+  background: rgba(255,255,255,0.9);
   border-radius: 50%;
-  color: #fff;
-  font-size: 32rpx;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  &:active { transform: scale(0.9); }
+}
+.nav-back-icon {
+  font-size: 40rpx;
+  color: #1A1A1A;
+  font-weight: 300;
+  margin-top: -4rpx;
 }
 
-// Product Info
-.info-section {
-  background: var(--color-dark);
-  padding: 40rpx 32rpx 48rpx;
-  color: var(--color-text-inverse);
+.detail-info {
+  padding: 32rpx;
 }
-.info-header {
-  display: flex;
-  align-items: baseline;
-  gap: 20rpx;
-  margin-bottom: 24rpx;
-}
-.price-block {
-  display: flex;
-  align-items: baseline;
-}
-.price-symbol {
-  font-family: var(--font-display);
-  font-size: 32rpx;
-  color: var(--color-gold);
-  font-weight: 600;
-  margin-right: 4rpx;
-}
-.price-value {
-  font-family: var(--font-display);
-  font-size: 60rpx;
-  font-weight: 700;
-  color: var(--color-gold);
-  letter-spacing: 2rpx;
-}
-.discount-row {
+.info-price-row {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
 }
-.price-original {
-  font-family: var(--font-display);
-  font-size: 24rpx;
-  color: var(--color-text-muted);
-  text-decoration: line-through;
-}
-.discount-badge {
-  font-size: 20rpx;
-  color: var(--color-gold);
-  border: 1rpx solid var(--color-gold);
-  padding: 2rpx 12rpx;
-  border-radius: var(--radius-sm);
+.discount-tag {
+  background-color: #C8102E;
+  color: #FFFFFF;
+  font-size: 22rpx;
   font-weight: 500;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
 }
-
-.product-name {
+.info-name {
   display: block;
-  font-family: var(--font-display);
-  font-size: 38rpx;
+  font-size: 34rpx;
   font-weight: 600;
-  color: #fff;
-  line-height: 1.3;
+  color: #1A1A1A;
+  line-height: 1.4;
   margin-bottom: 8rpx;
 }
-.product-sub {
+.info-subtitle {
   display: block;
   font-size: 26rpx;
-  color: var(--color-text-muted);
-  font-weight: 300;
-  margin-bottom: 32rpx;
+  color: #999999;
+  margin-bottom: 24rpx;
 }
-
-.meta-strip {
+.info-meta {
   display: flex;
   gap: 32rpx;
   padding-top: 24rpx;
-  border-top: 1rpx solid rgba(255,255,255,0.1);
+  border-top: 1rpx solid #F0F0F0;
 }
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 8rpx;
-  font-size: 22rpx;
-  color: var(--color-text-muted);
-  font-weight: 400;
-  letter-spacing: 0.5rpx;
-  &.out { opacity: 0.5; }
+  gap: 6rpx;
+  &.out { opacity: 0.4; }
 }
-.meta-icon {
-  font-size: 16rpx;
-  color: var(--color-gold);
+.meta-dot {
+  font-size: 12rpx;
+  color: #C8102E;
+}
+.meta-text {
+  font-size: 22rpx;
+  color: #666666;
 }
 
-// Description
-.desc-section {
-  padding: 48rpx 32rpx 40rpx;
-  background: var(--color-card);
-  border-bottom: 1rpx solid var(--color-border-light);
+.detail-desc, .detail-content {
+  padding: 32rpx;
 }
-.desc-header {
-  text-align: center;
+.desc-divider {
+  height: 1rpx;
+  background-color: #F0F0F0;
   margin-bottom: 32rpx;
 }
-.desc-title {
-  font-family: var(--font-display);
+.desc-label {
+  display: block;
   font-size: 28rpx;
   font-weight: 600;
-  color: var(--color-text);
-  letter-spacing: 6rpx;
-}
-.desc-line {
-  width: 40rpx;
-  height: 2rpx;
-  background: var(--color-gold);
-  margin: 16rpx auto 0;
+  color: #1A1A1A;
+  margin-bottom: 16rpx;
 }
 .desc-text {
   display: block;
   font-size: 28rpx;
-  color: var(--color-text-secondary);
+  color: #333333;
   line-height: 1.8;
-  font-weight: 300;
 }
-
-// Detail
-.detail-section {
-  padding: 48rpx 32rpx 40rpx;
-  background: var(--color-card);
-}
-.detail-content {
+.rich-content {
   font-size: 26rpx;
-  color: var(--color-text-secondary);
+  color: #333333;
   line-height: 1.8;
 }
 
-// Bottom Bar
 .bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--color-dark);
-  padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: #FFFFFF;
+  padding: 12rpx 24rpx calc(12rpx + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
-  gap: 24rpx;
+  gap: 16rpx;
   z-index: 100;
-  border-top: 1rpx solid rgba(255,255,255,0.08);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.06);
 }
-.bottom-actions {
+.bottom-icons {
   display: flex;
-  gap: 28rpx;
+  gap: 24rpx;
 }
 .bottom-icon {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 2rpx;
+  &:active { opacity: 0.6; }
 }
-.bi-icon {
+.b-icon {
   font-size: 36rpx;
-  color: var(--color-text-muted);
 }
-.bi-label {
+.b-label {
   font-size: 18rpx;
-  color: var(--color-text-muted);
-  margin-top: 2rpx;
-  letter-spacing: 1rpx;
+  color: #999999;
 }
 .bottom-btns {
   flex: 1;
   display: flex;
-  gap: 16rpx;
+  gap: 12rpx;
 }
-.btn-primary, .btn-secondary, .btn-soldout {
+.btn-add, .btn-buy, .btn-soldout {
   flex: 1;
-  height: 72rpx;
+  height: 76rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
-  font-weight: 600;
-  letter-spacing: 3rpx;
-  transition: all var(--transition-base);
-  &:active { transform: scale(0.96); opacity: 0.9; }
+  border-radius: 40rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  &:active { transform: scale(0.96); }
 }
-.btn-secondary {
-  border: 1rpx solid var(--color-gold);
-  color: var(--color-gold);
-  background: transparent;
+.btn-add {
+  border: 1rpx solid #1A1A1A;
+  color: #1A1A1A;
+  background: #FFFFFF;
 }
-.btn-primary {
-  background: var(--color-gold);
-  color: var(--color-dark);
+.btn-buy {
+  background: #C8102E;
+  color: #FFFFFF;
 }
 .btn-soldout {
   flex: 2;
-  background: rgba(255,255,255,0.05);
-  color: var(--color-text-muted);
-  border: 1rpx solid rgba(255,255,255,0.1);
-  letter-spacing: 6rpx;
+  background: #F5F5F5;
+  color: #999999;
 }
 </style>

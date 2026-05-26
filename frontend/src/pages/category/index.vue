@@ -1,95 +1,172 @@
 <template>
   <view class="category-page">
-    <!-- Category Strip -->
-    <view class="cat-strip-wrap">
-      <scroll-view scroll-x class="cat-strip" :show-scrollbar="false">
-        <view class="cat-items">
-          <view v-for="cat in categories" :key="cat.id" class="cat-item"
-            :class="{ active: selectedId === cat.id }" @tap="selectCategory(cat)">
-            <text class="cat-name">{{ cat.name }}</text>
-          </view>
-        </view>
-      </scroll-view>
-      <view class="cat-strip-divider"></view>
+    <view class="category-page__chips">
+      <CategoryChips
+        :categories="categories"
+        :activeId="activeCategoryId"
+        @select="onCategorySelect"
+      />
     </view>
 
-    <!-- Goods Grid -->
-    <scroll-view class="goods-scroll" scroll-y @scrolltolower="loadMore">
-      <view class="goods-grid" v-if="goodsList.length > 0">
-        <view v-for="goods in goodsList" :key="goods.id" class="goods-card" @tap="goGoods(goods.id)">
-          <view class="goods-img-box">
-            <image :src="getImage(goods)" mode="aspectFill" class="goods-img" />
-            <view class="goods-tag" v-if="goods.originalPrice && goods.originalPrice > goods.price">
-              SALE
-            </view>
-          </view>
-          <view class="goods-meta">
-            <text class="goods-name">{{ goods.name }}</text>
-            <text class="goods-sub" v-if="goods.subtitle">{{ goods.subtitle }}</text>
-            <view class="goods-price-row">
-              <text class="goods-price">¥{{ goods.price }}</text>
-              <text class="goods-original" v-if="goods.originalPrice && goods.originalPrice > goods.price">
-                ¥{{ goods.originalPrice }}
-              </text>
-            </view>
-          </view>
+    <view class="category-page__sort">
+      <view
+        v-for="tab in sortTabs"
+        :key="tab.key"
+        class="category-page__sort-tab"
+        :class="{ 'category-page__sort-tab--active': sortKey === tab.key }"
+        @tap="onSort(tab.key)"
+      >
+        <text class="category-page__sort-label">{{ tab.label }}</text>
+        <view v-if="tab.key === 'price'" class="category-page__sort-arrows">
+          <text class="category-page__sort-arrow" :class="{ 'category-page__sort-arrow--active': sortKey === 'price' && sortOrder === 'asc' }">&#9650;</text>
+          <text class="category-page__sort-arrow" :class="{ 'category-page__sort-arrow--active': sortKey === 'price' && sortOrder === 'desc' }">&#9660;</text>
         </view>
       </view>
+    </view>
 
-      <view v-else class="empty-state">
-        <text class="empty-icon">◇</text>
-        <text class="empty-text">该分类暂无商品</text>
-        <text class="empty-hint">看看其他分类吧</text>
+    <scroll-view
+      class="category-page__scroll"
+      scroll-y
+      refresher-enabled
+      :refresher-triggered="refreshing"
+      @refresherrefresh="onRefresh"
+      @scrolltolower="onLoadMore"
+    >
+      <SkeletonGrid v-if="loading" :count="4" />
+
+      <template v-else>
+        <view v-if="displayProducts.length > 0" class="category-page__grid">
+          <ProductCard
+            v-for="product in displayProducts"
+            :key="product.id"
+            :product="product"
+            @click="goDetail"
+          />
+        </view>
+
+        <EmptyState
+          v-else
+          icon="🔍"
+          title="暂无商品"
+          description="该分类下暂无商品，换个分类看看"
+        />
+      </template>
+
+      <view v-if="!loading && displayProducts.length > 0 && noMore" class="category-page__nomore">
+        <text>— 没有更多了 —</text>
       </view>
     </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
+import CategoryChips from '@/components/CategoryChips.vue'
+import ProductCard from '@/components/ProductCard.vue'
+import EmptyState from '@/components/EmptyState.vue'
+import SkeletonGrid from '@/components/SkeletonGrid.vue'
 
 const categories = ref<any[]>([])
-const selectedId = ref('')
-const goodsList = ref<any[]>([])
+const activeCategoryId = ref('')
+const allProducts = ref<any[]>([])
+const loading = ref(false)
+const refreshing = ref(false)
+const sortKey = ref<'default' | 'price' | 'sales'>('default')
+const sortOrder = ref<'asc' | 'desc'>('desc')
+const pageSize = 20
+const currentPage = ref(1)
+const noMore = ref(false)
 
-const getImage = (goods: any) => {
-  try { return JSON.parse(goods.images)[0] } catch { return '' }
-}
+const sortTabs = [
+  { key: 'default', label: '综合排序' },
+  { key: 'price', label: '价格' },
+  { key: 'sales', label: '销量' }
+]
 
-onLoad(async (opt: any) => {
-  try {
-    const res: any = await request('/categories', 'GET')
-    categories.value = res || []
-    if (opt.categoryId) {
-      selectedId.value = opt.categoryId
-      loadGoods(opt.categoryId)
-    } else if (categories.value.length > 0) {
-      selectCategory(categories.value[0])
-    }
-  } catch (e) {
-    console.error('load error', e)
+const filteredProducts = computed(() => {
+  let list = allProducts.value
+  if (activeCategoryId.value) {
+    list = list.filter(p => String(p.categoryId) === String(activeCategoryId.value))
   }
+  return list
 })
 
-const selectCategory = async (cat: any) => {
-  selectedId.value = cat.id
-  await loadGoods(cat.id)
-}
+const sortedProducts = computed(() => {
+  const list = [...filteredProducts.value]
+  if (sortKey.value === 'price') {
+    list.sort((a, b) => sortOrder.value === 'asc' ? a.price - b.price : b.price - a.price)
+  } else if (sortKey.value === 'sales') {
+    list.sort((a, b) => (b.sales || 0) - (a.sales || 0))
+  }
+  return list
+})
 
-const loadGoods = async (categoryId: string) => {
+const displayProducts = computed(() => {
+  return sortedProducts.value.slice(0, currentPage.value * pageSize)
+})
+
+const fetchData = async () => {
+  loading.value = true
+  noMore.value = false
+  currentPage.value = 1
   try {
-    const res: any = await request(`/products?categoryId=${categoryId}`, 'GET')
-    goodsList.value = res.data || []
+    const [catRes, prodRes]: any[] = await Promise.all([
+      request('/categories', 'GET'),
+      request('/products', 'GET')
+    ])
+    categories.value = Array.isArray(catRes) ? catRes : (catRes?.data || [])
+    const prods = Array.isArray(prodRes) ? prodRes : (prodRes?.data || [])
+    allProducts.value = prods.map((p: any) => ({
+      ...p,
+      thumbnail: p.thumbnail || p.image
+    }))
   } catch (e) {
-    goodsList.value = []
+    allProducts.value = []
+  } finally {
+    loading.value = false
   }
 }
 
-const loadMore = () => {}
+onLoad(async () => {
+  await fetchData()
+})
 
-const goGoods = (id: string) => {
+const onCategorySelect = (id: string) => {
+  activeCategoryId.value = id
+  currentPage.value = 1
+  noMore.value = false
+}
+
+const onSort = (key: string) => {
+  if (key === 'price' && sortKey.value === 'price') {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key as any
+    sortOrder.value = key === 'sales' ? 'desc' : 'desc'
+  }
+  currentPage.value = 1
+  noMore.value = false
+}
+
+const onRefresh = async () => {
+  refreshing.value = true
+  await fetchData()
+  refreshing.value = false
+}
+
+const onLoadMore = () => {
+  if (loading.value || noMore.value) return
+  const total = sortedProducts.value.length
+  if (currentPage.value * pageSize >= total) {
+    noMore.value = true
+    return
+  }
+  currentPage.value++
+}
+
+const goDetail = (id: string | number) => {
   uni.navigateTo({ url: `/pages/goods/detail?id=${id}` })
 }
 </script>
@@ -99,160 +176,78 @@ const goGoods = (id: string) => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--color-bg);
-}
+  background: var(--bg-secondary);
 
-// Category Strip
-.cat-strip-wrap {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--color-card);
-}
-.cat-strip {
-  white-space: nowrap;
-}
-.cat-items {
-  display: inline-flex;
-  padding: 24rpx 20rpx;
-  gap: 12rpx;
-}
-.cat-item {
-  flex-shrink: 0;
-  padding: 12rpx 28rpx;
-  border-radius: 32rpx;
-  background: transparent;
-  border: 1rpx solid transparent;
-  transition: all var(--transition-base);
-  .cat-name {
+  &__chips {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-primary);
+  }
+
+  &__sort {
+    display: flex;
+    align-items: center;
+    background: var(--bg-primary);
+    border-bottom: 1rpx solid var(--border);
+    padding: 0 var(--space-4);
+  }
+
+  &__sort-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) 0;
+    margin-right: var(--space-6);
+    position: relative;
+
+    &--active {
+      .category-page__sort-label {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__sort-label {
     font-size: 26rpx;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-    letter-spacing: 0.5rpx;
-    transition: all var(--transition-base);
+    color: var(--text-tertiary);
+    font-weight: 400;
   }
-  &:active { opacity: 0.7; }
-  &.active {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    .cat-name { color: #fff; font-weight: 600; }
+
+  &__sort-arrows {
+    display: flex;
+    flex-direction: column;
+    margin-left: 6rpx;
+    line-height: 1;
   }
-}
-.cat-strip-divider {
-  height: 1rpx;
-  background: var(--color-border-light);
-}
 
-// Goods Scroll
-.goods-scroll {
-  flex: 1;
-}
+  &__sort-arrow {
+    font-size: 14rpx;
+    color: var(--text-quaternary);
+    line-height: 1;
 
-// Goods Grid
-.goods-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20rpx;
-  padding: 24rpx 20rpx;
-}
-.goods-card {
-  width: calc(50% - 10rpx);
-  background: var(--color-card);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-base);
-  &:active {
-    transform: translateY(2rpx);
-    box-shadow: var(--shadow-md);
+    &--active {
+      color: var(--accent);
+    }
   }
-}
-.goods-img-box {
-  position: relative;
-  aspect-ratio: 3/4;
-  overflow: hidden;
-  background: var(--color-surface);
-}
-.goods-img {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.goods-tag {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: var(--color-primary);
-  color: #fff;
-  font-size: 18rpx;
-  font-weight: 600;
-  letter-spacing: 2rpx;
-  padding: 6rpx 16rpx;
-}
-.goods-meta {
-  padding: 20rpx 16rpx 24rpx;
-}
-.goods-name {
-  display: block;
-  font-size: 26rpx;
-  color: var(--color-text);
-  font-weight: 500;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.goods-sub {
-  display: block;
-  font-size: 22rpx;
-  color: var(--color-text-muted);
-  margin-top: 4rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.goods-price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10rpx;
-  margin-top: 14rpx;
-}
-.goods-price {
-  font-family: var(--font-display);
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-.goods-original {
-  font-family: var(--font-display);
-  font-size: 20rpx;
-  color: var(--color-text-muted);
-  text-decoration: line-through;
-}
 
-// Empty State
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 200rpx 0;
-}
-.empty-icon {
-  font-size: 80rpx;
-  color: var(--color-text-muted);
-  margin-bottom: 24rpx;
-  opacity: 0.4;
-}
-.empty-text {
-  font-size: 28rpx;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-}
-.empty-hint {
-  font-size: 24rpx;
-  color: var(--color-text-muted);
-  margin-top: 8rpx;
-  font-weight: 300;
+  &__scroll {
+    flex: 1;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  &__nomore {
+    text-align: center;
+    padding: var(--space-6) 0 var(--space-8);
+    font-size: 24rpx;
+    color: var(--text-quaternary);
+  }
 }
 </style>
