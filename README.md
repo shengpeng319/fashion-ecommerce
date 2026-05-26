@@ -462,6 +462,24 @@ fashion-ecommerce/
 
 ## 常见问题
 
+### Q: 一键部署 `deploy-remote.sh` 具体做了什么？
+
+脚本分为 5 步自动执行：
+1. **本地构建** H5 和 Admin 产物
+2. **rsync 上传**到 ECS（不会覆盖已有的 `backend/.env` 和数据库）
+3. **远程环境准备**：安装系统依赖、创建 `backend/.env`（首次）、`npm install`、`prisma generate`、初始化数据库并 seed（首次）
+4. **重启服务**：先停旧服务（按端口杀进程兜底），再启动新服务
+5. **健康检查**：自动验证各服务是否正常响应
+
+### Q: 首次部署 vs 更新部署的区别？
+
+| | 首次部署 | 更新部署 |
+|--|---------|---------|
+| `backend/.env` | 自动创建（随机 JWT_SECRET） | 保留已有，不覆盖 |
+| 数据库 | 自动 `prisma db push` + `npm run db:seed` | 保留已有，仅同步 schema |
+| 商品图片 | seed 时自动下载到 `uploads/products/` | 保留已有 |
+| node_modules | 全新安装 | 全新安装 |
+
 ### Q: 服务器报错 `sh: tsx: not found` 或 `sh: prisma: not found`？
 
 后端运行需要 `tsx` 和 `prisma`，它们是 devDependencies。安装时**不要用** `npm install --production`，应使用：
@@ -469,6 +487,8 @@ fashion-ecommerce/
 ```bash
 cd backend && npm install
 ```
+
+> `deploy-remote.sh` 已自动处理此问题。
 
 ### Q: 服务器报错 `npm ERR! node-gyp` 或 `bcrypt`/`sharp` 编译失败？
 
@@ -479,9 +499,37 @@ sudo apt install -y build-essential python3
 cd backend && rm -rf node_modules && npm install
 ```
 
+> `deploy-remote.sh` 已自动安装 `build-essential` 和 `python3`。
+
 ### Q: 服务器报错 `uni: not found`？
 
 `uni` 是前端构建工具，**不需要在服务器上安装**。H5 和管理后台在本地构建好后再上传。确保使用 `deploy-remote.sh`（自动本地构建）而非 `deploy.sh`（需要在本地运行）。
+
+### Q: 管理员登录失败 / 提示账号或密码错误？
+
+确保数据库已正确 seed（包含管理员用户）：
+
+```bash
+cd /opt/fashion-ecommerce/backend
+npx tsx -e "
+import { PrismaClient } from '@prisma/client';
+const p = new PrismaClient();
+const count = await p.adminUser.count();
+console.log('Admin users:', count);
+await p.\$disconnect();
+"
+```
+
+如果输出 `0`，运行 `npm run db:seed` 重新 seed。
+
+### Q: 端口被占用 `EADDRINUSE`？
+
+```bash
+# 查看占用端口的进程
+lsof -i :3001
+# 或直接用停止脚本（已包含端口清理逻辑）
+bash deploy/remote-stop.sh
+```
 
 ### Q: 访问服务器 IP 无法打开页面？
 
@@ -518,15 +566,17 @@ npm run db:seed
 
 ```bash
 # 使用 nohup 启动时
-cat /opt/fashion-ecommerce/logs/backend.log
+tail -f /opt/fashion-ecommerce/logs/backend.log
 
 # 使用 systemd 时
 journalctl -u fashion-backend -f
 ```
 
+后端日志包含：请求日志（方法/URL/状态码/耗时）、认证日志（登录成功/失败）、错误堆栈。
+
 ### Q: 上传的图片存储在哪？
 
-`backend/uploads/` 目录，通过后端 API `/uploads/` 路径访问。
+`backend/uploads/` 目录，通过后端 API `/uploads/` 路径访问。商品图片存储在 `uploads/products/`。
 
 ### Q: 股东门户如何部署？
 
