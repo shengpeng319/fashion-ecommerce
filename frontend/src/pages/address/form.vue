@@ -1,47 +1,49 @@
 <template>
   <view class="form-page">
-    <view class="form-group">
-      <text class="fg-label">收件人</text>
-      <input v-model="form.name" placeholder="请输入姓名" placeholder-class="ph" class="fg-input" />
-    </view>
-    <view class="form-group">
-      <text class="fg-label">手机号</text>
-      <input v-model="form.phone" type="number" maxlength="11" placeholder="请输入手机号" placeholder-class="ph" class="fg-input" />
-    </view>
-    <view class="form-group">
-      <text class="fg-label">省份</text>
-      <picker :value="provinceIndex" :range="provinces" @change="onProvinceChange">
-        <view class="fg-picker">
-          <text :class="{ placeholder: !form.province }">{{ form.province || '请选择省份' }}</text>
-          <text class="fg-arrow">›</text>
-        </view>
-      </picker>
-    </view>
-    <view class="form-group" v-if="form.province">
-      <text class="fg-label">城市</text>
-      <picker :value="cityIndex" :range="cities" @change="onCityChange">
-        <view class="fg-picker">
-          <text :class="{ placeholder: !form.city }">{{ form.city || '请选择城市' }}</text>
-          <text class="fg-arrow">›</text>
-        </view>
-      </picker>
-    </view>
-    <view class="form-group" v-if="form.city">
-      <text class="fg-label">区/县</text>
-      <picker :value="districtIndex" :range="districts" @change="onDistrictChange">
-        <view class="fg-picker">
-          <text :class="{ placeholder: !form.district }">{{ form.district || '请选择区县' }}</text>
-          <text class="fg-arrow">›</text>
-        </view>
-      </picker>
-    </view>
-    <view class="form-group">
-      <text class="fg-label">详细地址</text>
-      <input v-model="form.detail" placeholder="街道、楼栋、门牌号" placeholder-class="ph" class="fg-input" />
-    </view>
-    <view class="form-group fg-switch">
-      <text class="fg-label">设为默认地址</text>
-      <switch :checked="form.isDefault" @change="form.isDefault = $event.detail.value" color="#6B1D2F" />
+    <view class="form-card">
+      <view class="form-group">
+        <text class="fg-label">收件人</text>
+        <input v-model="form.name" placeholder="请输入姓名" placeholder-class="ph" class="fg-input" />
+      </view>
+      <view class="form-group">
+        <text class="fg-label">手机号</text>
+        <input v-model="form.phone" type="number" maxlength="11" placeholder="请输入手机号" placeholder-class="ph" class="fg-input" />
+      </view>
+      <view class="form-group">
+        <text class="fg-label">省份</text>
+        <picker :value="provinceIndex" :range="provinces" @change="onProvinceChange">
+          <view class="fg-picker">
+            <text :class="{ placeholder: !form.province }">{{ form.province || '请选择省份' }}</text>
+            <text class="fg-arrow">></text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-group" v-if="form.province">
+        <text class="fg-label">城市</text>
+        <picker :value="cityIndex" :range="cities" @change="onCityChange">
+          <view class="fg-picker">
+            <text :class="{ placeholder: !form.city }">{{ form.city || '请选择城市' }}</text>
+            <text class="fg-arrow">></text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-group" v-if="form.city">
+        <text class="fg-label">区/县</text>
+        <picker :value="districtIndex" :range="districts" @change="onDistrictChange">
+          <view class="fg-picker">
+            <text :class="{ placeholder: !form.district }">{{ form.district || '请选择区县' }}</text>
+            <text class="fg-arrow">></text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-group">
+        <text class="fg-label">详细地址</text>
+        <input v-model="form.detail" placeholder="街道、楼栋、门牌号" placeholder-class="ph" class="fg-input" />
+      </view>
+      <view class="form-group fg-switch">
+        <text class="fg-label">设为默认地址</text>
+        <switch :checked="form.isDefault" @change="form.isDefault = $event.detail.value" color="#C8102E" />
+      </view>
     </view>
 
     <view class="save-btn" @tap="saveAddress">
@@ -115,46 +117,89 @@ const saveAddress = async () => {
 </script>
 
 <style lang="scss" scoped>
-.form-page { padding: 24rpx; background: var(--color-bg); min-height: 100vh; }
-.form-group {
-  background: var(--color-card);
-  border-radius: var(--radius-lg);
-  padding: 24rpx 28rpx;
-  margin-bottom: 16rpx;
+.form-page {
+  padding: 20rpx 24rpx;
+  background: #F5F5F5;
+  min-height: 100vh;
 }
+
+.form-card {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.form-group {
+  padding: 24rpx 28rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
 .fg-label {
   display: block;
-  font-size: 20rpx;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: 3rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  color: #999999;
   margin-bottom: 14rpx;
 }
+
 .fg-input {
   font-size: 30rpx;
-  color: var(--color-text);
-  font-family: var(--font-body);
+  color: #1A1A1A;
 }
-.ph { color: var(--color-text-muted); font-size: 28rpx; }
+
+.ph {
+  color: #999999;
+  font-size: 28rpx;
+}
+
 .fg-picker {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 30rpx;
-  color: var(--color-text);
-  .placeholder { color: var(--color-text-muted); }
+  color: #1A1A1A;
+
+  .placeholder {
+    color: #999999;
+  }
 }
-.fg-arrow { font-size: 32rpx; color: var(--color-text-muted); }
-.fg-switch { display: flex; justify-content: space-between; align-items: center; .fg-label { margin-bottom: 0; } }
+
+.fg-arrow {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.fg-switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .fg-label {
+    margin-bottom: 0;
+  }
+}
+
 .save-btn {
   height: 88rpx;
-  background: var(--color-primary);
+  background: #C8102E;
+  border-radius: 44rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 40rpx;
-  border-radius: var(--radius-sm);
-  &:active { opacity: 0.85; }
-  text { font-size: 28rpx; font-weight: 600; color: #fff; letter-spacing: 4rpx; }
+
+  &:active {
+    opacity: 0.85;
+  }
+
+  text {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #FFFFFF;
+  }
 }
 </style>

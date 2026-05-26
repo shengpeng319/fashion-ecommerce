@@ -1,13 +1,11 @@
 <template>
   <view class="upgrade-page">
-    <!-- Current Level -->
     <view class="current-card">
       <text class="cc-label">当前等级</text>
       <text class="cc-name">{{ currentLevel?.name || '轻会员' }}</text>
       <text class="cc-points">{{ memberData?.points || 0 }} 积分</text>
     </view>
 
-    <!-- Level Options -->
     <view class="level-list">
       <view v-for="level in upgradableLevels" :key="level.key" class="level-card"
         :class="{ selected: selectedLevel === level.key }" @tap="selectLevel(level.key)">
@@ -20,7 +18,7 @@
           <text>到账 {{ level.bonusPoints }} 积分</text>
         </view>
         <view class="lc-benefits" v-if="level.benefits">
-          <text v-for="(b, i) in parseBenefits(level.benefits)" :key="i" class="lc-b-item">◆ {{ b }}</text>
+          <text v-for="(b, i) in parseBenefits(level.benefits)" :key="i" class="lc-b-item">{{ b }}</text>
         </view>
         <view class="lc-bottom">
           <text class="lc-refundable" v-if="level.isRefundable">余额可退</text>
@@ -32,14 +30,12 @@
       </view>
     </view>
 
-    <!-- Upgrade Button -->
     <view class="btn-area">
       <view class="btn-upgrade" :class="{ disabled: !selectedLevel || loading }" @tap="handleUpgrade">
-        <text>{{ loading ? '处理中...' : '确认升级' }}</text>
+        <text>{{ loading ? '处理中...' : '立即升级' }}</text>
       </view>
     </view>
 
-    <!-- Payment Popup -->
     <PaymentPopup
       :visible="showPayment"
       title="升级支付"
@@ -129,47 +125,171 @@ const doUpgrade = async () => {
 <style lang="scss" scoped>
 .upgrade-page {
   min-height: 100vh;
-  background: var(--color-bg);
+  background: #F5F5F5;
   padding-bottom: 140rpx;
 }
 
 .current-card {
-  background: var(--color-dark);
+  background: #FFFFFF;
   padding: 48rpx 32rpx;
   text-align: center;
 }
-.cc-label { font-size: 22rpx; color: var(--color-text-muted); letter-spacing: 4rpx; display: block; margin-bottom: 8rpx; }
-.cc-name { font-family: var(--font-display); font-size: 40rpx; font-weight: 700; color: var(--color-gold); display: block; margin-bottom: 8rpx; }
-.cc-points { font-size: 24rpx; color: var(--color-text-muted); display: block; }
 
-.level-list { padding: 24rpx; display: flex; flex-direction: column; gap: 20rpx; }
+.cc-label {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.cc-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.cc-points {
+  font-size: 24rpx;
+  color: #666666;
+  display: block;
+}
+
+.level-list {
+  padding: 20rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
 
 .level-card {
-  background: var(--color-card);
-  border-radius: var(--radius-xl);
-  padding: 32rpx 28rpx;
-  border: 2rpx solid transparent;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  border: 2rpx solid #EEEEEE;
   transition: all 0.2s;
-  &.selected { border-color: var(--color-gold); background: rgba(201,169,110,0.04); }
-}
-.lc-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12rpx; }
-.lc-name { font-family: var(--font-display); font-size: 32rpx; font-weight: 600; color: var(--color-text); }
-.lc-deposit { font-family: var(--font-display); font-size: 36rpx; font-weight: 700; color: var(--color-primary); }
-.lc-deposit.free { color: var(--color-accent); font-size: 28rpx; }
-.lc-bonus { margin-bottom: 16rpx; }
-.lc-bonus text { font-size: 24rpx; color: var(--color-gold); font-weight: 500; }
-.lc-benefits { display: flex; flex-wrap: wrap; gap: 8rpx; margin-bottom: 20rpx; }
-.lc-b-item { font-size: 22rpx; color: var(--color-text-muted); line-height: 1.6; flex-basis: calc(50% - 4rpx); }
-.lc-bottom { display: flex; justify-content: space-between; align-items: center; }
-.lc-refundable { font-size: 20rpx; color: var(--color-accent); }
-.lc-not-refundable { font-size: 20rpx; color: var(--color-text-muted); }
-.lc-radio { width: 40rpx; height: 40rpx; border-radius: 50%; border: 2rpx solid var(--color-border); display: flex; align-items: center; justify-content: center; transition: all 0.2s;
-  &.on { background: var(--color-gold); border-color: var(--color-gold); text { color: #fff; font-size: 24rpx; } }
+
+  &.selected {
+    border-color: #C8102E;
+  }
 }
 
-.btn-area { position: fixed; bottom: 0; left: 0; right: 0; padding: 20rpx 24rpx; background: var(--color-card); }
-.btn-upgrade { height: 88rpx; background: var(--color-primary); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;
-  text { font-size: 28rpx; font-weight: 600; color: #fff; letter-spacing: 4rpx; }
-  &.disabled { opacity: 0.5; }
+.lc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12rpx;
+}
+
+.lc-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.lc-deposit {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #C8102E;
+}
+
+.lc-deposit.free {
+  color: #43A047;
+  font-size: 26rpx;
+}
+
+.lc-bonus {
+  margin-bottom: 12rpx;
+}
+
+.lc-bonus text {
+  font-size: 24rpx;
+  color: #C8102E;
+  font-weight: 500;
+}
+
+.lc-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.lc-b-item {
+  font-size: 22rpx;
+  color: #999999;
+  line-height: 1.6;
+  flex-basis: calc(50% - 4rpx);
+}
+
+.lc-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lc-refundable {
+  font-size: 20rpx;
+  color: #43A047;
+}
+
+.lc-not-refundable {
+  font-size: 20rpx;
+  color: #999999;
+}
+
+.lc-radio {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #EEEEEE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &.on {
+    background: #C8102E;
+    border-color: #C8102E;
+
+    text {
+      color: #FFFFFF;
+      font-size: 24rpx;
+    }
+  }
+}
+
+.btn-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 24rpx;
+  background: #FFFFFF;
+  border-top: 1rpx solid #EEEEEE;
+}
+
+.btn-upgrade {
+  height: 88rpx;
+  background: #C8102E;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #FFFFFF;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+  }
+
+  &:active:not(.disabled) {
+    opacity: 0.85;
+  }
 }
 </style>

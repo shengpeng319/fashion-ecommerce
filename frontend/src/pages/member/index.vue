@@ -1,50 +1,50 @@
 <template>
   <view class="member-page">
-    <!-- Header Card -->
     <view class="member-header" v-if="memberData">
-      <view class="mh-badge-wrap">
-        <view class="mh-badge">{{ memberData.levelName || '轻会员' }}</view>
-      </view>
-      <view class="mh-points-row">
-        <text class="mh-points-value">{{ memberData.points || 0 }}</text>
-        <text class="mh-points-label">积分余额</text>
+      <view class="mh-level">{{ memberData.levelName || '轻会员' }}</view>
+      <view class="mh-stats-row">
+        <view class="mh-stat">
+          <text class="mh-stat-value">{{ memberData.points || 0 }}</text>
+          <text class="mh-stat-label">积分余额</text>
+        </view>
+        <view class="mh-stat">
+          <text class="mh-stat-value">{{ memberData.totalSpent || 0 }}</text>
+          <text class="mh-stat-label">累计消费</text>
+        </view>
       </view>
       <text class="mh-desc">1积分=1元，抵扣无上限</text>
     </view>
 
-    <!-- Upgradable Info -->
-    <view class="upgrade-cta" v-if="showUpgrade" @tap="goUpgrade">
-      <text class="ucta-text">升级会员，解锁更多权益</text>
-      <text class="ucta-arrow">→</text>
+    <view class="upgrade-banner" v-if="showUpgrade" @tap="goUpgrade">
+      <text class="ub-text">升级会员，解锁更多权益</text>
+      <text class="ub-arrow">></text>
     </view>
 
-    <!-- Level Card -->
     <view class="section-card" v-if="levelConfig">
       <view class="sc-title">当前权益</view>
       <view class="benefit-list">
         <view v-for="b in currentBenefits" :key="b" class="benefit-item">
-          <text class="benefit-icon">◆</text>
+          <text class="benefit-dot">·</text>
           <text class="benefit-text">{{ b }}</text>
         </view>
       </view>
     </view>
 
-    <!-- Quick Actions -->
     <view class="section-card actions-card">
+      <view class="action-item" @tap="goUpgrade">
+        <text class="action-icon">⬆️</text>
+        <text class="action-label">会员升级</text>
+        <text class="action-arrow">></text>
+      </view>
       <view class="action-item" @tap="goTransactions">
-        <text class="action-icon">▦</text>
+        <text class="action-icon">📊</text>
         <text class="action-label">积分明细</text>
-        <text class="action-arrow">›</text>
+        <text class="action-arrow">></text>
       </view>
       <view class="action-item" @tap="goReferral">
-        <text class="action-icon">☆</text>
+        <text class="action-icon">👥</text>
         <text class="action-label">邀请好友</text>
-        <text class="action-arrow">›</text>
-      </view>
-      <view class="action-item" @tap="goUpgrade">
-        <text class="action-icon">◆</text>
-        <text class="action-label">会员升级</text>
-        <text class="action-arrow">›</text>
+        <text class="action-arrow">></text>
       </view>
     </view>
   </view>
@@ -85,7 +85,6 @@ const loadData = async () => {
     allLevels.value = levels || []
     const currentLevelKey = member.level || 'LIGHT'
     levelConfig.value = allLevels.value.find((l: any) => l.key === currentLevelKey)
-    // Add level name
     if (levelConfig.value) {
       memberData.value.levelName = levelConfig.value.name
     }
@@ -104,94 +103,94 @@ const goReferral = () => uni.navigateTo({ url: '/pages/member/referral' })
 <style lang="scss" scoped>
 .member-page {
   min-height: 100vh;
-  background: var(--color-bg);
+  background: #F5F5F5;
   padding-bottom: 40rpx;
 }
 
 .member-header {
-  background: linear-gradient(135deg, var(--color-dark), #2D1A1F);
-  padding: 64rpx 32rpx 48rpx;
+  background: #FFFFFF;
+  padding: 40rpx 32rpx;
   text-align: center;
-  position: relative;
-  overflow: hidden;
-  &::after {
-    content: '◆ ◆ ◆';
-    position: absolute;
-    top: 20rpx;
-    right: 32rpx;
-    font-size: 20rpx;
-    color: rgba(201,169,110,0.12);
-    letter-spacing: 8rpx;
-  }
-}
-.mh-badge-wrap {
-  margin-bottom: 28rpx;
-}
-.mh-badge {
-  display: inline-block;
-  padding: 8rpx 28rpx;
-  border: 1rpx solid var(--color-gold);
-  border-radius: 24rpx;
-  font-size: 24rpx;
-  color: var(--color-gold);
-  font-weight: 500;
-  letter-spacing: 4rpx;
-}
-.mh-points-row {
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-  margin-bottom: 20rpx;
-}
-.mh-points-value {
-  font-family: var(--font-display);
-  font-size: 72rpx;
-  font-weight: 700;
-  color: white;
-  letter-spacing: 2rpx;
-}
-.mh-points-label {
-  font-size: 22rpx;
-  color: var(--color-text-muted);
-  letter-spacing: 4rpx;
-}
-.mh-desc {
-  font-size: 22rpx;
-  color: rgba(255,255,255,0.3);
 }
 
-.upgrade-cta {
-  margin: 24rpx;
-  padding: 28rpx;
-  background: var(--color-card);
-  border-radius: var(--radius-lg);
+.mh-level {
+  display: inline-block;
+  padding: 8rpx 28rpx;
+  background: #FFF0F0;
+  color: #C8102E;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  margin-bottom: 32rpx;
+}
+
+.mh-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.mh-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mh-stat-value {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.mh-stat-label {
+  font-size: 22rpx;
+  color: #999999;
+  margin-top: 4rpx;
+}
+
+.mh-desc {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.upgrade-banner {
+  margin: 20rpx 24rpx 0;
+  padding: 24rpx 28rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1rpx solid rgba(201,169,110,0.2);
-  &:active { opacity: 0.7; }
+  border: 1rpx solid #EEEEEE;
+
+  &:active {
+    background: #FAFAFA;
+  }
 }
-.ucta-text {
+
+.ub-text {
   font-size: 28rpx;
-  color: var(--color-primary);
+  color: #C8102E;
   font-weight: 500;
 }
-.ucta-arrow {
-  font-size: 32rpx;
-  color: var(--color-gold);
+
+.ub-arrow {
+  font-size: 28rpx;
+  color: #999999;
 }
 
 .section-card {
-  background: var(--color-card);
-  margin: 0 24rpx 24rpx;
-  border-radius: var(--radius-xl);
+  background: #FFFFFF;
+  margin: 20rpx 24rpx 0;
+  border-radius: 16rpx;
   padding: 28rpx;
 }
+
 .sc-title {
-  font-family: var(--font-display);
   font-size: 30rpx;
   font-weight: 600;
-  color: var(--color-text);
+  color: #1A1A1A;
   margin-bottom: 24rpx;
 }
 
@@ -200,46 +199,58 @@ const goReferral = () => uni.navigateTo({ url: '/pages/member/referral' })
   flex-wrap: wrap;
   gap: 16rpx;
 }
+
 .benefit-item {
   display: flex;
   align-items: center;
   gap: 8rpx;
   flex-basis: calc(50% - 8rpx);
 }
-.benefit-icon {
-  font-size: 16rpx;
-  color: var(--color-gold);
+
+.benefit-dot {
+  font-size: 24rpx;
+  color: #C8102E;
+  font-weight: 700;
 }
+
 .benefit-text {
   font-size: 24rpx;
-  color: var(--color-text-secondary);
+  color: #666666;
 }
 
 .actions-card {
   padding: 0;
   overflow: hidden;
 }
+
 .action-item {
   display: flex;
   align-items: center;
-  padding: 32rpx 28rpx;
-  border-bottom: 1rpx solid var(--color-divider);
-  &:last-child { border-bottom: none; }
-  &:active { background: var(--color-surface); }
+  padding: 28rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background: #FAFAFA;
+  }
 }
+
 .action-icon {
   font-size: 28rpx;
-  color: var(--color-gold);
   margin-right: 20rpx;
 }
+
 .action-label {
   flex: 1;
   font-size: 28rpx;
-  color: var(--color-text);
-  font-weight: 400;
+  color: #1A1A1A;
 }
+
 .action-arrow {
   font-size: 28rpx;
-  color: var(--color-text-muted);
+  color: #999999;
 }
 </style>

@@ -1,13 +1,11 @@
 <template>
   <view class="referral-page">
-    <!-- Share Banner -->
     <view class="share-banner">
-      <text class="sb-icon">☆</text>
-      <text class="sb-title">邀请好友加入美学共创</text>
+      <text class="sb-icon">🎁</text>
+      <text class="sb-title">邀请好友得积分</text>
       <text class="sb-desc">好友成为共创员/共创官并完成首单消费，您将获得积分返利</text>
     </view>
 
-    <!-- Input referral code -->
     <view class="input-card" v-if="!hasReferrer">
       <text class="ic-label">绑定推荐人</text>
       <view class="ic-row">
@@ -24,7 +22,11 @@
       <text class="bc-text">已绑定推荐关系</text>
     </view>
 
-    <!-- My Referrals -->
+    <view class="section-card" v-if="memberData?.user?.referrerId">
+      <text class="sc-title">我的推荐人</text>
+      <text class="info-text">您已通过推荐人加入，首单消费后推荐人将获得积分奖励</text>
+    </view>
+
     <view class="section-card" v-if="referrals.length > 0">
       <text class="sc-title">我的邀请记录</text>
       <view v-for="r in referrals" :key="r.id" class="ref-item">
@@ -38,12 +40,6 @@
           <text class="ref-time">{{ formatTime(r.createdAt) }}</text>
         </view>
       </view>
-    </view>
-
-    <!-- My referrer info -->
-    <view class="section-card" v-if="memberData?.user?.referrerId">
-      <text class="sc-title">我的推荐人</text>
-      <text class="info-text">您已通过推荐人加入，首单消费后推荐人将获得积分奖励</text>
     </view>
   </view>
 </template>
@@ -97,66 +93,169 @@ const submitReferral = async () => {
 <style lang="scss" scoped>
 .referral-page {
   min-height: 100vh;
-  background: var(--color-bg);
+  background: #F5F5F5;
   padding-bottom: 40rpx;
 }
 
 .share-banner {
-  background: linear-gradient(135deg, var(--color-dark), #3D2025);
-  padding: 56rpx 32rpx;
+  background: #FFFFFF;
+  padding: 48rpx 32rpx;
   text-align: center;
 }
-.sb-icon { font-size: 48rpx; color: var(--color-gold); display: block; margin-bottom: 16rpx; }
-.sb-title { font-family: var(--font-display); font-size: 32rpx; font-weight: 600; color: #fff; display: block; margin-bottom: 12rpx; }
-.sb-desc { font-size: 24rpx; color: var(--color-text-muted); line-height: 1.5; }
+
+.sb-icon {
+  font-size: 48rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.sb-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.sb-desc {
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.5;
+}
 
 .input-card {
-  margin: 24rpx;
+  margin: 20rpx 24rpx 0;
   padding: 28rpx;
-  background: var(--color-card);
-  border-radius: var(--radius-xl);
+  background: #FFFFFF;
+  border-radius: 16rpx;
 }
-.ic-label { font-size: 26rpx; font-weight: 600; color: var(--color-text); margin-bottom: 16rpx; display: block; }
-.ic-row { display: flex; gap: 16rpx; }
+
+.ic-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.ic-row {
+  display: flex;
+  gap: 16rpx;
+}
+
 .ic-input {
   flex: 1;
   height: 80rpx;
-  background: var(--color-surface);
-  border-radius: var(--radius-sm);
+  background: #F5F5F5;
+  border-radius: 8rpx;
   padding: 0 20rpx;
   font-size: 28rpx;
-  color: var(--color-text);
+  color: #1A1A1A;
 }
-.ph { color: var(--color-text-muted); font-size: 26rpx; }
-.ic-btn { padding: 0 36rpx; height: 80rpx; background: var(--color-primary); border-radius: var(--radius-sm); display: flex; align-items: center;
-  text { font-size: 26rpx; font-weight: 600; color: #fff; }
-}
-.ic-hint { font-size: 20rpx; color: var(--color-text-muted); margin-top: 16rpx; display: block; }
 
-.badge-card { text-align: center; padding: 48rpx; }
-.bc-check { font-size: 48rpx; color: var(--color-accent); display: block; margin-bottom: 12rpx; }
-.bc-text { font-size: 28rpx; color: var(--color-text); font-weight: 500; }
+.ph {
+  color: #999999;
+  font-size: 26rpx;
+}
+
+.ic-btn {
+  padding: 0 36rpx;
+  height: 80rpx;
+  background: #C8102E;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+
+  text {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: #FFFFFF;
+  }
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.ic-hint {
+  font-size: 20rpx;
+  color: #999999;
+  margin-top: 16rpx;
+  display: block;
+}
+
+.badge-card {
+  text-align: center;
+  padding: 48rpx;
+}
+
+.bc-check {
+  font-size: 48rpx;
+  color: #43A047;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.bc-text {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+}
 
 .section-card {
-  margin: 0 24rpx 24rpx;
+  margin: 20rpx 24rpx 0;
   padding: 28rpx;
-  background: var(--color-card);
-  border-radius: var(--radius-xl);
+  background: #FFFFFF;
+  border-radius: 16rpx;
 }
-.sc-title { font-family: var(--font-display); font-size: 28rpx; font-weight: 600; color: var(--color-text); margin-bottom: 20rpx; }
+
+.sc-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 20rpx;
+}
 
 .ref-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid var(--color-divider);
-  &:last-child { border-bottom: none; }
-}
-.ref-status { font-size: 24rpx; padding: 4rpx 16rpx; border-radius: 16rpx; color: var(--color-text-muted); background: var(--color-surface); }
-.ref-status.COMPLETED { color: var(--color-accent); background: rgba(67,160,71,0.1); }
-.ref-points { font-family: var(--font-display); font-size: 26rpx; font-weight: 600; color: var(--color-gold); display: block; }
-.ref-time { font-size: 20rpx; color: var(--color-text-muted); }
+  border-bottom: 1rpx solid #F0F0F0;
 
-.info-text { font-size: 24rpx; color: var(--color-text-muted); line-height: 1.6; }
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.ref-status {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  color: #999999;
+  background: #F5F5F5;
+}
+
+.ref-status.COMPLETED {
+  color: #43A047;
+  background: #F0F8F0;
+}
+
+.ref-points {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #C8102E;
+  display: block;
+}
+
+.ref-time {
+  font-size: 20rpx;
+  color: #999999;
+}
+
+.info-text {
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.6;
+}
 </style>
