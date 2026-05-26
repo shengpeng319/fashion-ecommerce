@@ -1,59 +1,74 @@
 <template>
-  <view class="index-page">
-    <!-- Search Bar -->
-    <view class="search-bar">
-      <view class="search-inner">
-        <text class="search-icon">🔍</text>
-        <input placeholder="搜索时尚单品" v-model="keyword" @confirm="search" />
-      </view>
-    </view>
-
-    <!-- Banner -->
-    <swiper class="banner" indicator-dots autoplay circular indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#ff5777">
-      <swiper-item v-for="item in banners" :key="item.id">
-        <image :src="item.image" mode="aspectFill" />
+  <view class="home">
+    <!-- Hero Banner -->
+    <swiper class="hero" indicator-dots autoplay circular interval="5000"
+      indicator-color="rgba(255,255,255,0.3)" indicator-active-color="#C9A96E">
+      <swiper-item v-for="(item, idx) in banners" :key="idx" @tap="goGoods(item.goodsId)" v-if="item.goodsId">
+        <image :src="item.image" mode="aspectFill" class="hero-img" />
       </swiper-item>
     </swiper>
 
-    <!-- Categories -->
-    <view class="categories">
-      <view v-for="(cat, idx) in categories" :key="cat.id" class="cat-item" @tap="goCategory(cat.id)">
-        <view class="cat-icon">{{ categoryIcons[idx] || '👗' }}</view>
-        <text class="cat-name">{{ cat.name }}</text>
+    <!-- Brand Statement -->
+    <view class="brand">
+      <view class="brand-diamond">◆</view>
+      <text class="brand-title">NUOVA COLLEZIONE</text>
+      <text class="brand-sub">Spring / Summer 2026</text>
+      <view class="brand-line"></view>
+      <text class="brand-desc">Italian craftsmanship meets contemporary elegance</text>
+    </view>
+
+    <!-- Category Ribbon -->
+    <scroll-view scroll-x class="cat-scroll" :show-scrollbar="false">
+      <view class="cat-ribbon">
+        <view v-for="cat in categories" :key="cat.id" class="cat-chip"
+          @tap="goCategory(cat.id)">
+          <text class="cat-chip-text">{{ cat.name }}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- Featured Hero Product -->
+    <view class="featured" v-if="featuredGoods" @tap="goGoods(featuredGoods.id)">
+      <image :src="getImage(featuredGoods)" mode="aspectFill" class="featured-img" />
+      <view class="featured-overlay">
+        <text class="featured-label">编辑精选</text>
+        <text class="featured-name">{{ featuredGoods.name }}</text>
+        <text class="featured-price">¥{{ featuredGoods.price }}</text>
       </view>
     </view>
 
-    <!-- Hot Products -->
+    <!-- New Arrivals -->
     <view class="section">
       <view class="section-header">
-        <view class="section-title">
-          <text class="title-text">热门推荐</text>
-          <text class="title-sub">HOT</text>
-        </view>
-        <view class="more" @tap="goCategory('')">
-          <text>查看更多</text>
-          <text class="arrow">›</text>
-        </view>
+        <text class="section-title">新品上市</text>
+        <text class="section-more" @tap="goCategory('')">查看全部 →</text>
       </view>
       <view class="goods-grid">
-        <view v-for="goods in hotGoods" :key="goods.id" class="goods-card" @tap="goGoods(goods.id)">
-          <view class="goods-img-wrap">
-            <image :src="JSON.parse(goods.images)[0]" mode="aspectFill" class="goods-img" />
-            <view class="goods-tag" v-if="goods.originalPrice">特惠</view>
+        <view v-for="goods in newArrivals" :key="goods.id" class="goods-card" @tap="goGoods(goods.id)">
+          <view class="goods-img-box">
+            <image :src="getImage(goods)" mode="aspectFill" class="goods-img" />
+            <view class="goods-tag" v-if="goods.originalPrice && goods.originalPrice > goods.price">
+              折扣
+            </view>
           </view>
-          <view class="goods-info">
+          <view class="goods-meta">
             <text class="goods-name">{{ goods.name }}</text>
-            <text class="goods-sub">{{ goods.subtitle }}</text>
-            <view class="goods-bottom">
-              <view class="price-wrap">
-                <text class="price">¥{{ goods.price }}</text>
-                <text class="original" v-if="goods.originalPrice">¥{{ goods.originalPrice }}</text>
-              </view>
-              <text class="sales">已售{{ goods.sales }}</text>
+            <text class="goods-sub" v-if="goods.subtitle">{{ goods.subtitle }}</text>
+            <view class="goods-price-row">
+              <text class="goods-price">¥{{ goods.price }}</text>
+              <text class="goods-original" v-if="goods.originalPrice && goods.originalPrice > goods.price">
+                ¥{{ goods.originalPrice }}
+              </text>
             </view>
           </view>
         </view>
       </view>
+    </view>
+
+    <!-- Footer -->
+    <view class="footer">
+      <text class="footer-brand">FASHION</text>
+      <text class="footer-tagline">Milano · Paris · Shanghai</text>
     </view>
   </view>
 </template>
@@ -63,35 +78,37 @@ import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
 
-const categoryIcons = ['👚', '👖', '👗', '🧥', '👠', '👜', '🎒', '💍']
-
-const keyword = ref('')
-const banners = ref<any[]>([
-  { id: 1, image: 'https://img.yzcdn.cn/vant/apple-1.jpg' },
-  { id: 2, image: 'https://img.yzcdn.cn/vant/apple-2.jpg' }
-])
+const banners = ref<any[]>([])
 const categories = ref<any[]>([])
-const hotGoods = ref<any[]>([])
+const featuredGoods = ref<any>(null)
+const newArrivals = ref<any[]>([])
+
+const getImage = (goods: any) => {
+  try { return JSON.parse(goods.images)[0] } catch { return '' }
+}
 
 onLoad(async () => {
   try {
     const res: any = await request('/products', 'GET')
-    hotGoods.value = res.data || []
+    const all = res.data || res || []
+    newArrivals.value = all.slice(0, 6)
+    if (all.length > 0) {
+      featuredGoods.value = all[0]
+      // Use product images as banners
+      banners.value = all.slice(0, 3).map((g: any) => ({
+        image: getImage(g),
+        goodsId: g.id
+      }))
+    }
     const catRes: any = await request('/categories', 'GET')
-    categories.value = catRes || []
+    categories.value = (catRes || []).slice(0, 8)
   } catch (e) {
     console.error('load error', e)
   }
 })
 
-const search = () => {
-  if (keyword.value) {
-    uni.navigateTo({ url: `/pages/goods/detail?keyword=${keyword.value}` })
-  }
-}
-
 const goCategory = (id: string) => {
-  uni.switchTab({ url: `/pages/category/index?categoryId=${id}` })
+  uni.switchTab({ url: `/pages/category/index?categoryId=${id || ''}` })
 }
 
 const goGoods = (id: string) => {
@@ -100,200 +117,266 @@ const goGoods = (id: string) => {
 </script>
 
 <style lang="scss" scoped>
-.index-page { min-height: 100vh; background: #f5f5f5; }
-
-// Search Bar
-.search-bar {
-  padding: 20rpx 24rpx;
-  background: linear-gradient(135deg, #ff5777, #ff8a9a);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.search-inner {
-  display: flex;
-  align-items: center;
-  background: rgba(255,255,255,0.98);
-  border-radius: 40rpx;
-  padding: 0 28rpx;
-  height: 72rpx;
-  box-shadow: 0 4rpx 20rpx rgba(255, 87, 119, 0.2);
-}
-.search-icon {
-  font-size: 28rpx;
-  margin-right: 12rpx;
-}
-.search-inner input {
-  flex: 1;
-  font-size: 28rpx;
-  color: #333;
+.home {
+  min-height: 100vh;
+  background: var(--color-bg);
 }
 
-// Banner
-.banner {
-  height: 320rpx;
-  margin-bottom: 0;
-  image { width: 100%; height: 100%; }
-}
-
-// Categories - Clean 2-row grid with smaller icons
-.categories {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 24rpx 20rpx 20rpx;
-  background: #fff;
-  margin-bottom: 16rpx;
-  .cat-item {
-    width: 25%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20rpx;
-    .cat-icon {
-      width: 100rpx;
-      height: 100rpx;
-      background: linear-gradient(145deg, #fff5f7 0%, #fff 100%);
-      border-radius: 24rpx;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 56rpx;
-      margin-bottom: 10rpx;
-      box-shadow: 0 4rpx 16rpx rgba(255, 87, 119, 0.1);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    &:active .cat-icon {
-      transform: scale(0.88);
-      box-shadow: 0 2rpx 8rpx rgba(255, 87, 119, 0.08);
-    }
-    .cat-name {
-      font-size: 24rpx;
-      color: #555;
-      font-weight: 500;
-    }
+// Hero Banner
+.hero {
+  height: 900rpx;
+  .hero-img {
+    width: 100%;
+    height: 100%;
   }
+}
+
+// Brand Statement
+.brand {
+  padding: 60rpx 40rpx 48rpx;
+  text-align: center;
+  background: var(--color-dark);
+  color: var(--color-text-inverse);
+}
+.brand-diamond {
+  font-size: 24rpx;
+  color: var(--color-gold);
+  margin-bottom: 20rpx;
+  letter-spacing: 24rpx;
+}
+.brand-title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: 8rpx;
+  color: var(--color-text-inverse);
+  margin-bottom: 12rpx;
+}
+.brand-sub {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 24rpx;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-gold-light);
+  letter-spacing: 4rpx;
+  margin-bottom: 32rpx;
+}
+.brand-line {
+  width: 60rpx;
+  height: 2rpx;
+  background: var(--color-gold);
+  margin: 0 auto 24rpx;
+}
+.brand-desc {
+  display: block;
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  letter-spacing: 2rpx;
+  font-weight: 300;
+}
+
+// Category Ribbon
+.cat-scroll {
+  background: var(--color-card);
+  border-bottom: 1rpx solid var(--color-border-light);
+}
+.cat-ribbon {
+  display: flex;
+  padding: 28rpx 24rpx;
+  gap: 16rpx;
+}
+.cat-chip {
+  flex-shrink: 0;
+  padding: 14rpx 32rpx;
+  border: 1rpx solid var(--color-border);
+  border-radius: 40rpx;
+  background: transparent;
+  transition: all var(--transition-base);
+  &:active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    .cat-chip-text { color: #fff; }
+  }
+}
+.cat-chip-text {
+  font-size: 26rpx;
+  color: var(--color-text);
+  font-weight: 500;
+  font-family: var(--font-body);
+  letter-spacing: 0.5rpx;
+}
+
+// Featured Hero Product
+.featured {
+  position: relative;
+  margin: 32rpx 24rpx;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  &:active { transform: scale(0.98); }
+}
+.featured-img {
+  width: 100%;
+  height: 520rpx;
+  display: block;
+}
+.featured-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 60rpx 32rpx 32rpx;
+  background: linear-gradient(to top, rgba(26,21,20,0.85), transparent);
+}
+.featured-label {
+  display: block;
+  font-size: 20rpx;
+  color: var(--color-gold);
+  letter-spacing: 4rpx;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+.featured-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12rpx;
+}
+.featured-price {
+  font-family: var(--font-display);
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--color-gold);
 }
 
 // Section
 .section {
-  background: #fff;
-  padding-bottom: 24rpx;
+  padding: 0 24rpx 40rpx;
 }
 .section-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 28rpx 24rpx 20rpx;
+  align-items: baseline;
+  padding: 40rpx 0 24rpx;
 }
 .section-title {
-  display: flex;
-  align-items: baseline;
-  gap: 12rpx;
-  .title-text {
-    font-size: 32rpx;
-    font-weight: 600;
-    color: #333;
-  }
-  .title-sub {
-    font-size: 20rpx;
-    color: #ff5777;
-    font-weight: bold;
-    letter-spacing: 2rpx;
-  }
+  font-family: var(--font-display);
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 2rpx;
 }
-.more {
-  display: flex;
-  align-items: center;
+.section-more {
   font-size: 24rpx;
-  color: #999;
-  .arrow { font-size: 28rpx; margin-left: 4rpx; }
+  color: var(--color-text-muted);
+  font-weight: 400;
 }
 
-// Goods Grid - Commercial grade card design
+// Goods Grid
 .goods-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20rpx;
-  padding: 0 20rpx;
+  gap: 24rpx;
 }
 .goods-card {
-  width: calc(50% - 10rpx);
-  background: #fff;
-  border-radius: 20rpx;
+  width: calc(50% - 12rpx);
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
   &:active {
-    transform: translateY(4rpx) scale(0.98);
-    box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+    transform: translateY(2rpx);
+    box-shadow: var(--shadow-md);
   }
 }
-.goods-img-wrap {
+.goods-img-box {
   position: relative;
+  aspect-ratio: 3/4;
   overflow: hidden;
-  .goods-img {
-    width: 100%;
-    height: 360rpx;
-    display: block;
-    transition: transform 0.3s;
-  }
-  .goods-tag {
-    position: absolute;
-    top: 16rpx;
-    left: 0;
-    background: linear-gradient(135deg, #ff5777, #ff8a9a);
-    color: #fff;
-    font-size: 22rpx;
-    padding: 6rpx 16rpx;
-    border-radius: 0 24rpx 24rpx 0;
-    box-shadow: 0 4rpx 12rpx rgba(255, 87, 119, 0.3);
-  }
+  background: var(--color-surface);
 }
-.goods-info {
-  padding: 20rpx;
+.goods-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.goods-tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  padding: 6rpx 16rpx;
+}
+.goods-meta {
+  padding: 20rpx 16rpx 24rpx;
 }
 .goods-name {
   display: block;
-  font-size: 28rpx;
-  color: #333;
+  font-size: 26rpx;
+  color: var(--color-text);
   font-weight: 500;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.4;
 }
 .goods-sub {
   display: block;
   font-size: 22rpx;
-  color: #999;
-  margin-top: 6rpx;
+  color: var(--color-text-muted);
+  margin-top: 4rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.goods-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 14rpx;
-}
-.price-wrap {
+.goods-price-row {
   display: flex;
   align-items: baseline;
-  gap: 8rpx;
+  gap: 10rpx;
+  margin-top: 14rpx;
 }
-.price {
-  color: #ff5777;
-  font-size: 34rpx;
-  font-weight: bold;
+.goods-price {
+  font-family: var(--font-display);
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-primary);
 }
-.original {
-  color: #ccc;
+.goods-original {
+  font-family: var(--font-display);
   font-size: 22rpx;
+  color: var(--color-text-muted);
   text-decoration: line-through;
 }
-.sales {
-  color: #bbb;
+
+// Footer
+.footer {
+  padding: 64rpx 40rpx 80rpx;
+  text-align: center;
+  background: var(--color-dark);
+}
+.footer-brand {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 8rpx;
+  margin-bottom: 12rpx;
+}
+.footer-tagline {
   font-size: 20rpx;
+  color: var(--color-text-muted);
+  letter-spacing: 4rpx;
 }
 </style>

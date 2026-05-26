@@ -1,0 +1,14 @@
+[Unit]
+Description=FashionEcommerce Backend API
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/fashion-ecommerce/backend
+EnvironmentFile=/opt/fashion-ecommerce/.env
+ExecStart=/usr/bin/npx tsx src/index.ts
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

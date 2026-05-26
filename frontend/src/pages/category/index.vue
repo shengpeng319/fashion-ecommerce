@@ -1,46 +1,45 @@
 <template>
   <view class="category-page">
-    <!-- Top Tab Navigation -->
-    <view class="tab-bar">
-      <view 
-        v-for="cat in categories" 
-        :key="cat.id" 
-        class="tab-item" 
-        :class="{ active: selectedId === cat.id }"
-        @tap="selectCategory(cat)"
-      >
-        <text class="tab-text">{{ cat.name }}</text>
-        <view class="tab-line" v-if="selectedId === cat.id"></view>
-      </view>
+    <!-- Category Strip -->
+    <view class="cat-strip-wrap">
+      <scroll-view scroll-x class="cat-strip" :show-scrollbar="false">
+        <view class="cat-items">
+          <view v-for="cat in categories" :key="cat.id" class="cat-item"
+            :class="{ active: selectedId === cat.id }" @tap="selectCategory(cat)">
+            <text class="cat-name">{{ cat.name }}</text>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="cat-strip-divider"></view>
     </view>
 
     <!-- Goods Grid -->
     <scroll-view class="goods-scroll" scroll-y @scrolltolower="loadMore">
       <view class="goods-grid" v-if="goodsList.length > 0">
-        <view v-for="goods in goodsList" :key="goods.id" 
-              class="goods-item" 
-              @tap="goGoods(goods.id)">
-          <view class="goods-img-wrap">
-            <image :src="JSON.parse(goods.images)[0]" mode="aspectFill" class="goods-img" />
-            <view class="goods-tag" v-if="goods.originalPrice">特惠</view>
+        <view v-for="goods in goodsList" :key="goods.id" class="goods-card" @tap="goGoods(goods.id)">
+          <view class="goods-img-box">
+            <image :src="getImage(goods)" mode="aspectFill" class="goods-img" />
+            <view class="goods-tag" v-if="goods.originalPrice && goods.originalPrice > goods.price">
+              SALE
+            </view>
           </view>
-          <view class="goods-info">
+          <view class="goods-meta">
             <text class="goods-name">{{ goods.name }}</text>
-            <text class="goods-sub">{{ goods.subtitle }}</text>
-            <view class="goods-bottom">
-              <view class="price-wrap">
-                <text class="price">¥{{ goods.price }}</text>
-                <text class="original" v-if="goods.originalPrice">¥{{ goods.originalPrice }}</text>
-              </view>
-              <text class="sales">已售{{ goods.sales }}</text>
+            <text class="goods-sub" v-if="goods.subtitle">{{ goods.subtitle }}</text>
+            <view class="goods-price-row">
+              <text class="goods-price">¥{{ goods.price }}</text>
+              <text class="goods-original" v-if="goods.originalPrice && goods.originalPrice > goods.price">
+                ¥{{ goods.originalPrice }}
+              </text>
             </view>
           </view>
         </view>
       </view>
+
       <view v-else class="empty-state">
-        <text class="empty-icon">🛍️</text>
+        <text class="empty-icon">◇</text>
         <text class="empty-text">该分类暂无商品</text>
-        <text class="empty-hint">看看其他分类吧~</text>
+        <text class="empty-hint">看看其他分类吧</text>
       </view>
     </scroll-view>
   </view>
@@ -54,6 +53,10 @@ import { request } from '@/utils/request'
 const categories = ref<any[]>([])
 const selectedId = ref('')
 const goodsList = ref<any[]>([])
+
+const getImage = (goods: any) => {
+  try { return JSON.parse(goods.images)[0] } catch { return '' }
+}
 
 onLoad(async (opt: any) => {
   try {
@@ -84,9 +87,7 @@ const loadGoods = async (categoryId: string) => {
   }
 }
 
-const loadMore = () => {
-  // Future pagination support
-}
+const loadMore = () => {}
 
 const goGoods = (id: string) => {
   uni.navigateTo({ url: `/pages/goods/detail?id=${id}` })
@@ -98,164 +99,135 @@ const goGoods = (id: string) => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
 }
 
-// Top Tab Bar - Taobao style
-.tab-bar {
-  display: flex;
-  background: #fff;
-  padding: 0 8rpx;
+// Category Strip
+.cat-strip-wrap {
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
-  
-  .tab-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 28rpx 0;
-    position: relative;
-    transition: all 0.25s;
-    
-    .tab-text {
-      font-size: 28rpx;
-      color: #666;
-      font-weight: 500;
-      transition: all 0.25s;
-    }
-    
-    .tab-line {
-      position: absolute;
-      bottom: 0;
-      width: 48rpx;
-      height: 6rpx;
-      background: linear-gradient(135deg, #ff5777, #ff8a9a);
-      border-radius: 3rpx;
-    }
-    
-    &.active {
-      .tab-text {
-        color: #ff5777;
-        font-weight: 600;
-        font-size: 30rpx;
-      }
-    }
-    
-    &:active {
-      background: rgba(255, 87, 119, 0.05);
-    }
+  background: var(--color-card);
+}
+.cat-strip {
+  white-space: nowrap;
+}
+.cat-items {
+  display: inline-flex;
+  padding: 24rpx 20rpx;
+  gap: 12rpx;
+}
+.cat-item {
+  flex-shrink: 0;
+  padding: 12rpx 28rpx;
+  border-radius: 32rpx;
+  background: transparent;
+  border: 1rpx solid transparent;
+  transition: all var(--transition-base);
+  .cat-name {
+    font-size: 26rpx;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.5rpx;
+    transition: all var(--transition-base);
+  }
+  &:active { opacity: 0.7; }
+  &.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    .cat-name { color: #fff; font-weight: 600; }
   }
 }
-
-// Goods Scroll Area
-.goods-scroll {
-  flex: 1;
-  overflow-y: auto;
-  background: #f5f5f5;
+.cat-strip-divider {
+  height: 1rpx;
+  background: var(--color-border-light);
 }
 
-// Goods Grid - Commercial grade cards
+// Goods Scroll
+.goods-scroll {
+  flex: 1;
+}
+
+// Goods Grid
 .goods-grid {
-  padding: 20rpx;
   display: flex;
   flex-wrap: wrap;
   gap: 20rpx;
+  padding: 24rpx 20rpx;
 }
-
-.goods-item {
+.goods-card {
   width: calc(50% - 10rpx);
-  background: #fff;
-  border-radius: 20rpx;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
   &:active {
-    transform: translateY(4rpx) scale(0.98);
-    box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+    transform: translateY(2rpx);
+    box-shadow: var(--shadow-md);
   }
 }
-
-.goods-img-wrap {
+.goods-img-box {
   position: relative;
+  aspect-ratio: 3/4;
   overflow: hidden;
-  
-  .goods-img {
-    width: 100%;
-    height: 340rpx;
-    display: block;
-    transition: transform 0.3s;
-  }
-  
-  .goods-tag {
-    position: absolute;
-    top: 14rpx;
-    left: 0;
-    background: linear-gradient(135deg, #ff5777, #ff8a9a);
-    color: #fff;
-    font-size: 20rpx;
-    padding: 4rpx 14rpx;
-    border-radius: 0 20rpx 20rpx 0;
-    box-shadow: 0 4rpx 12rpx rgba(255, 87, 119, 0.3);
-  }
+  background: var(--color-surface);
 }
-
-.goods-info {
-  padding: 18rpx;
+.goods-img {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
-
+.goods-tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  padding: 6rpx 16rpx;
+}
+.goods-meta {
+  padding: 20rpx 16rpx 24rpx;
+}
 .goods-name {
   display: block;
-  font-size: 28rpx;
-  color: #333;
+  font-size: 26rpx;
+  color: var(--color-text);
   font-weight: 500;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.4;
 }
-
 .goods-sub {
   display: block;
   font-size: 22rpx;
-  color: #999;
+  color: var(--color-text-muted);
   margin-top: 4rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.goods-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 12rpx;
-}
-
-.price-wrap {
+.goods-price-row {
   display: flex;
   align-items: baseline;
-  gap: 6rpx;
+  gap: 10rpx;
+  margin-top: 14rpx;
 }
-
-.price {
-  color: #ff5777;
-  font-size: 32rpx;
-  font-weight: bold;
+.goods-price {
+  font-family: var(--font-display);
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-primary);
 }
-
-.original {
-  color: #ccc;
+.goods-original {
+  font-family: var(--font-display);
   font-size: 20rpx;
+  color: var(--color-text-muted);
   text-decoration: line-through;
-}
-
-.sales {
-  color: #bbb;
-  font-size: 20rpx;
 }
 
 // Empty State
@@ -264,24 +236,23 @@ const goGoods = (id: string) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 160rpx 0;
-  
-  .empty-icon {
-    font-size: 120rpx;
-    margin-bottom: 24rpx;
-    opacity: 0.8;
-  }
-  
-  .empty-text {
-    font-size: 30rpx;
-    color: #666;
-    font-weight: 500;
-  }
-  
-  .empty-hint {
-    font-size: 24rpx;
-    color: #999;
-    margin-top: 12rpx;
-  }
+  padding: 200rpx 0;
+}
+.empty-icon {
+  font-size: 80rpx;
+  color: var(--color-text-muted);
+  margin-bottom: 24rpx;
+  opacity: 0.4;
+}
+.empty-text {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+.empty-hint {
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  margin-top: 8rpx;
+  font-weight: 300;
 }
 </style>

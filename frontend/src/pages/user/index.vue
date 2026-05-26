@@ -1,96 +1,92 @@
 <template>
-  <view class="user-center">
+  <view class="user-page">
     <!-- Header -->
     <view class="user-header" @tap="goLogin">
-      <image class="avatar" :src="userInfo?.avatar ? userInfo.avatar : '/static/images/default-avatar.png'" />
-      <view class="user-info">
-        <text class="nickname">{{ userInfo?.nickname || '点击登录' }}</text>
-        <text class="phone" v-if="userInfo">{{ userInfo.phone }}</text>
-        <text class="login-tip" v-else>登录后享受更多权益</text>
-      </view>
-      <view class="arrow-icon">›</view>
-    </view>
-
-    <!-- VIP Card -->
-    <view class="vip-card" v-if="userInfo">
-      <view class="vip-left">
-        <text class="vip-icon">👑</text>
-        <view class="vip-info">
-          <text class="vip-name">VIP会员</text>
-          <text class="vip-desc">享受专属优惠</text>
+      <view class="header-bg"></view>
+      <view class="header-content">
+        <view class="avatar-circle" :class="{ logged: isLoggedIn }">
+          <text class="avatar-letter">{{ isLoggedIn ? (userInfo?.nickname || 'U').charAt(0).toUpperCase() : '?' }}</text>
         </view>
-      </view>
-      <view class="vip-right">
-        <text class="vip-btn">立即开通</text>
+        <view class="header-info">
+          <text class="header-name">{{ userInfo?.nickname || '请登录' }}</text>
+          <text class="header-sub">{{ userInfo?.phone || '发现独家精品系列' }}</text>
+        </view>
+        <view class="header-badge" v-if="isLoggedIn && memberData" @tap.stop="goMember">{{ memberData.levelName || '会员' }}</view>
+        <text class="header-arrow">›</text>
       </view>
     </view>
 
-    <!-- Order Section -->
-    <view class="order-section">
-      <view class="section-header">
-        <text class="section-title">我的订单</text>
-        <view class="more" @tap="goOrders()">
-          <text>全部订单</text>
-          <text class="arrow">›</text>
+    <!-- Member Card -->
+    <view class="vip-card" v-if="isLoggedIn" @tap="goMember">
+      <view class="vip-pattern">◆ ◆ ◆ ◆ ◆</view>
+      <view class="vip-body">
+        <view class="vip-left">
+          <text class="vip-tier">{{ memberData?.levelName || '轻会员' }}</text>
+          <text class="vip-tier-sub">{{ memberData?.points || 0 }} 积分 · 点击查看详情</text>
         </view>
-      </view>
-      <view class="order-tabs">
-        <view v-for="tab in orderTabs" :key="tab.key" class="tab-item" @tap="goOrders(tab.key)">
-          <text class="tab-icon">{{ tab.icon }}</text>
-          <text class="tab-name">{{ tab.name }}</text>
+        <view class="vip-right">
+          <text class="vip-cta">会员中心</text>
         </view>
       </view>
     </view>
 
-    <!-- Menu List -->
-    <view class="menu-section">
-      <view class="menu-item" @tap="goAddress">
-        <view class="menu-left">
-          <text class="menu-icon">📍</text>
-          <text class="menu-text">收货地址</text>
+    <!-- Orders -->
+    <view class="section-card">
+      <view class="sc-header" @tap="goOrders()">
+        <text class="sc-title">我的订单</text>
+        <view class="sc-more">
+          <text>查看全部</text>
+          <text class="sc-arrow">→</text>
         </view>
-        <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" @tap="goMember">
-        <view class="menu-left">
-          <text class="menu-icon">🎫</text>
-          <text class="menu-text">优惠券</text>
+      <view class="order-icons">
+        <view v-for="tab in orderTabs" :key="tab.key" class="oi-item" @tap="goOrders(tab.key)">
+          <text class="oi-icon">{{ tab.icon }}</text>
+          <text class="oi-label">{{ tab.label }}</text>
         </view>
-        <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" @tap="goFavorites">
-        <view class="menu-left">
-          <text class="menu-icon">❤️</text>
-          <text class="menu-text">我的收藏</text>
-        </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="goSetting">
-        <view class="menu-left">
-          <text class="menu-icon">⚙️</text>
-          <text class="menu-text">设置</text>
-        </view>
+    </view>
+
+    <!-- Menu -->
+    <view class="section-card menu-list">
+      <view v-for="item in menuItems" :key="item.key" class="menu-item" @tap="item.action">
+        <text class="menu-icon">{{ item.icon }}</text>
+        <text class="menu-label">{{ item.label }}</text>
         <text class="menu-arrow">›</text>
       </view>
     </view>
 
     <!-- Logout -->
-    <view class="logout-btn" v-if="isLoggedIn" @tap="logout">
-      <text>退出登录</text>
+    <view class="logout-area" v-if="isLoggedIn">
+      <view class="logout-btn" @tap="logout">
+        <text>退出登录</text>
+      </view>
     </view>
   </view>
 </template>
+
 <script setup lang="ts">
-import { onShow } from '@dcloudio/uni-app'
 import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { request } from '@/utils/request'
 
 const isLoggedIn = ref(false)
 const userInfo = ref<any>(null)
+const memberData = ref<any>(null)
+
 const orderTabs = [
-  { key: 'pending', name: '待付款', icon: '📋' },
-  { key: 'paid', name: '待发货', icon: '📦' },
-  { key: 'shipped', name: '待收货', icon: '🚚' },
-  { key: 'completed', name: '已完成', icon: '✅' }
+  { key: 'pending', label: '待付款', icon: '●' },
+  { key: 'paid', label: '待发货', icon: '◐' },
+  { key: 'shipped', label: '运输中', icon: '◑' },
+  { key: 'completed', label: '已完成', icon: '○' }
+]
+
+const menuItems = [
+  { key: 'member', label: '会员中心', icon: '◆', action: () => goPage('/pages/member/index') },
+  { key: 'address', label: '收货地址', icon: '▣', action: () => goPage('/pages/address/list') },
+  { key: 'coupon', label: '优惠券', icon: '▢', action: () => goPage('/pages/address/list') },
+  { key: 'fav', label: '心愿单', icon: '♡', action: () => goPage('/pages/address/list') },
+  { key: 'settings', label: '设置', icon: '◎', action: () => goPage('/pages/address/list') }
 ]
 
 const checkLogin = () => {
@@ -99,12 +95,32 @@ const checkLogin = () => {
   userInfo.value = uni.getStorageSync('userInfo') || null
 }
 
+const loadMember = async () => {
+  if (!isLoggedIn.value) return
+  try {
+    const [member, levels] = await Promise.all([
+      request('/member/profile', 'GET'),
+      request('/member/levels', 'GET')
+    ])
+    memberData.value = member
+    const levelConfig = (levels || []).find((l: any) => l.key === member.level)
+    if (levelConfig) {
+      memberData.value.levelName = levelConfig.name
+    }
+  } catch (e) {}
+}
+
 onShow(() => {
   checkLogin()
+  if (isLoggedIn.value) loadMember()
 })
 
 const goLogin = () => {
   if (!isLoggedIn.value) uni.navigateTo({ url: '/pages/user/login' })
+}
+
+const goMember = () => {
+  uni.navigateTo({ url: '/pages/member/index' })
 }
 
 const goOrders = (status?: string) => {
@@ -115,10 +131,13 @@ const goOrders = (status?: string) => {
   uni.navigateTo({ url: `/pages/order/list${status ? '?status=' + status : ''}` })
 }
 
-const goAddress = () => { uni.navigateTo({ url: '/pages/address/list' }) }
-const goMember = () => { uni.navigateTo({ url: '/pages/address/list' }) }
-const goFavorites = () => { uni.navigateTo({ url: '/pages/address/list' }) }
-const goSetting = () => { uni.navigateTo({ url: '/pages/address/list' }) }
+const goPage = (url: string) => {
+  if (!isLoggedIn.value) {
+    uni.showToast({ title: '请先登录', icon: 'none' })
+    return
+  }
+  uni.navigateTo({ url })
+}
 
 const logout = () => {
   uni.removeStorageSync('token')
@@ -128,132 +147,235 @@ const logout = () => {
   uni.showToast({ title: '已退出登录', icon: 'none' })
 }
 </script>
+
 <style lang="scss" scoped>
-.user-center { min-height: 100vh; background: #f5f5f5; padding-bottom: 40rpx; }
+.user-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding-bottom: 40rpx;
+}
 
+// Header
 .user-header {
-  display: flex;
-  align-items: center;
-  padding: 48rpx 32rpx;
-  background: linear-gradient(135deg, #ff5777, #ff8a9a);
-  .avatar { 
-    width: 120rpx; 
-    height: 120rpx; 
-    border-radius: 60rpx; 
-    border: 4rpx solid rgba(255,255,255,0.4);
-    background: #fff;
-  }
-  .user-info {
-    flex: 1;
-    margin-left: 28rpx;
-    .nickname { 
-      display: block; 
-      font-size: 38rpx; 
-      font-weight: bold; 
-      color: #fff;
-    }
-    .phone { 
-      display: block; 
-      font-size: 24rpx; 
-      color: rgba(255,255,255,0.85); 
-      margin-top: 8rpx;
-    }
-    .login-tip {
-      display: block;
-      font-size: 24rpx;
-      color: rgba(255,255,255,0.8);
-      margin-top: 8rpx;
-    }
-  }
-  .arrow-icon { 
-    font-size: 48rpx; 
-    color: rgba(255,255,255,0.6);
-  }
-}
-
-.vip-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
-  margin: -20rpx 24rpx 16rpx;
-  padding: 28rpx 28rpx;
-  border-radius: 16rpx;
   position: relative;
-  z-index: 10;
+  overflow: hidden;
 }
-.vip-left {
+.header-bg {
+  height: 320rpx;
+  background: var(--color-dark);
+}
+.header-content {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  .vip-icon { font-size: 48rpx; }
-  .vip-name { display: block; font-size: 30rpx; color: #ffd700; font-weight: bold; }
-  .vip-desc { display: block; font-size: 22rpx; color: #bbb; margin-top: 4rpx; }
+  padding: 0 32rpx;
+  margin-top: -180rpx;
 }
-.vip-right {
-  .vip-btn {
-    background: linear-gradient(135deg, #ffd700, #ffb700);
-    color: #1a1a1a;
-    font-size: 24rpx;
-    font-weight: bold;
-    padding: 12rpx 24rpx;
-    border-radius: 24rpx;
-  }
+.avatar-circle {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-dark));
+  border: 4rpx solid rgba(201, 169, 110, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &.logged { background: var(--color-gold); }
+}
+.avatar-letter {
+  font-family: var(--font-display);
+  font-size: 52rpx;
+  color: #fff;
+  font-weight: 600;
+}
+.header-info {
+  flex: 1;
+  margin-left: 28rpx;
+  padding-bottom: 40rpx;
+}
+.header-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--color-text-inverse);
+  margin-top: 80rpx;
+}
+.header-sub {
+  display: block;
+  font-size: 22rpx;
+  color: var(--color-text-muted);
+  margin-top: 8rpx;
+  font-weight: 300;
+}
+.header-arrow {
+  font-size: 48rpx;
+  color: var(--color-text-muted);
+  padding-bottom: 40rpx;
 }
 
-.order-section {
-  background: #fff;
-  margin: 0 24rpx 16rpx;
-  border-radius: 16rpx;
-  padding: 24rpx;
+.header-badge {
+  background: var(--color-gold);
+  color: var(--color-dark);
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  margin-right: 12rpx;
+  margin-bottom: 40rpx;
+  letter-spacing: 1rpx;
 }
-.section-header {
+
+// VIP Card
+.vip-card {
+  margin: -20rpx 24rpx 24rpx;
+  padding: 32rpx 28rpx;
+  background: linear-gradient(135deg, var(--color-dark), var(--color-dark-surface));
+  border: 1rpx solid rgba(201, 169, 110, 0.15);
+  border-radius: var(--radius-xl);
+  position: relative;
+  z-index: 5;
+  overflow: hidden;
+}
+.vip-pattern {
+  position: absolute;
+  top: 8rpx;
+  right: 24rpx;
+  font-size: 20rpx;
+  color: rgba(201, 169, 110, 0.15);
+  letter-spacing: 4rpx;
+}
+.vip-body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24rpx;
-  .section-title { font-size: 32rpx; font-weight: 600; color: #333; }
-  .more { display: flex; align-items: center; font-size: 24rpx; color: #999; .arrow { font-size: 28rpx; margin-left: 4rpx; } }
+  position: relative;
+  z-index: 1;
 }
-.order-tabs { display: flex; justify-content: space-around; }
-.tab-item {
+.vip-tier {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-gold);
+  letter-spacing: 3rpx;
+}
+.vip-tier-sub {
+  display: block;
+  font-size: 20rpx;
+  color: var(--color-text-muted);
+  margin-top: 4rpx;
+}
+.vip-cta {
+  font-size: 20rpx;
+  color: var(--color-gold);
+  border: 1rpx solid var(--color-gold);
+  padding: 10rpx 24rpx;
+  border-radius: 24rpx;
+  font-weight: 500;
+  letter-spacing: 2rpx;
+}
+
+// Section Card
+.section-card {
+  background: var(--color-card);
+  margin: 0 24rpx 24rpx;
+  border-radius: var(--radius-xl);
+  padding: 28rpx;
+}
+.sc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+.sc-title {
+  font-family: var(--font-display);
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.sc-more {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+}
+.sc-arrow {
+  color: var(--color-primary);
+  font-size: 24rpx;
+}
+
+// Order Icons
+.order-icons {
+  display: flex;
+  justify-content: space-around;
+}
+.oi-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8rpx;
-  .tab-icon { font-size: 44rpx; }
-  .tab-name { font-size: 24rpx; color: #666; }
+  gap: 12rpx;
+}
+.oi-icon {
+  font-size: 40rpx;
+  color: var(--color-text);
+}
+.oi-label {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+  font-weight: 400;
 }
 
-.menu-section {
-  background: #fff;
-  margin: 0 24rpx 16rpx;
-  border-radius: 16rpx;
-  overflow: hidden;
+// Menu List
+.menu-list {
+  padding: 0;
 }
 .menu-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 32rpx 24rpx;
-  border-bottom: 1rpx solid #f5f5f5;
+  padding: 32rpx 28rpx;
+  border-bottom: 1rpx solid var(--color-divider);
   &:last-child { border-bottom: none; }
 }
-.menu-left {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  .menu-icon { font-size: 36rpx; }
-  .menu-text { font-size: 28rpx; color: #333; }
-}
-.menu-arrow { color: #ccc; font-size: 32rpx; }
-
-.logout-btn {
-  background: #fff;
-  margin: 0 24rpx;
-  border-radius: 16rpx;
-  padding: 32rpx;
+.menu-icon {
+  font-size: 28rpx;
+  color: var(--color-primary);
+  width: 48rpx;
   text-align: center;
-  text { font-size: 28rpx; color: #ff5777; }
+}
+.menu-label {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--color-text);
+  font-weight: 400;
+}
+.menu-arrow {
+  font-size: 32rpx;
+  color: var(--color-text-muted);
+  font-weight: 300;
+}
+
+// Logout
+.logout-area {
+  padding: 40rpx 24rpx;
+}
+.logout-btn {
+  border: 1rpx solid var(--color-border);
+  padding: 24rpx;
+  text-align: center;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+  &:active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    text { color: #fff; }
+  }
+  text {
+    font-size: 26rpx;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    letter-spacing: 4rpx;
+  }
 }
 </style>

@@ -21,7 +21,7 @@ const auth = (req, res, next) => {
 // POST /api/fashions/orders
 router.post('/', auth, async (req, res) => {
   try {
-    const { addressId, items, remark } = req.body
+    const { addressId, items, remark, pointsUsed } = req.body
     if (!items || items.length === 0) {
       return res.status(400).json({ error: '订单商品不能为空' })
     }
@@ -50,19 +50,56 @@ router.post('/', auth, async (req, res) => {
       })
     }
     
+    // 处理积分抵扣
+    let finalPointsUsed = 0
+    let payAmount = totalAmount
+    
+    if (pointsUsed && pointsUsed > 0) {
+      const member = await prisma.member.findUnique({ where: { userId: req.userId } })
+      if (!member || member.points < pointsUsed) {
+        return res.status(400).json({ error: '积分不足' })
+      }
+      finalPointsUsed = Math.min(pointsUsed, Math.floor(totalAmount)) // 1积分=1元
+      payAmount = totalAmount - finalPointsUsed
+      if (payAmount < 0) payAmount = 0
+    }
+    
     const order = await prisma.order.create({
       data: {
         orderNo: 'ORD' + uniqid(),
         userId: req.userId,
         status: 'pending',
         totalAmount,
-        payAmount: totalAmount,
+        payAmount,
+        pointsUsed: finalPointsUsed,
         addressId,
         remark,
         items: { create: orderItems }
       },
       include: { items: true, address: true }
     })
+
+    // 如果使用了积分，先预扣
+    if (finalPointsUsed > 0) {
+      const member = await prisma.member.findUnique({ where: { userId: req.userId } })
+      if (member) {
+        await prisma.member.update({
+          where: { id: member.id },
+          data: { points: { decrement: finalPointsUsed } }
+        })
+        await prisma.pointsTransaction.create({
+          data: {
+            memberId: member.id,
+            type: 'REDEEM',
+            amount: -finalPointsUsed,
+            balance: member.points - finalPointsUsed,
+            description: `订单${order.orderNo}抵扣积分`,
+            orderId: order.id
+          }
+        })
+      }
+    }
+
     res.json(order)
   } catch (e) {
     res.status(500).json({ error: e.message })
@@ -115,6 +152,81 @@ router.post('/:id/pay', auth, async (req, res) => {
       where: { id: req.params.id },
       data: { status: 'paid', payTime: new Date() }
     })
+
+    // 支付成功后发放积分 (消费1元=1积分)
+    const member = await prisma.member.findUnique({ where: { userId: req.userId } })
+    if (member) {
+      const earnedPoints = Math.floor(Number(order.payAmount))
+      if (earnedPoints > 0) {
+        const newBalance = member.points + earnedPoints
+        await prisma.member.update({
+          where: { id: member.id },
+          data: {
+            points: { increment: earnedPoints },
+            totalSpent: { increment: Number(order.payAmount) }
+          }
+        })
+        await prisma.pointsTransaction.create({
+          data: {
+            memberId: member.id,
+            type: 'EARN',
+            amount: earnedPoints,
+            balance: newBalance,
+            description: `订单${order.orderNo}消费赠送积分`,
+            orderId: order.id
+          }
+        })
+      }
+
+      // 处理推荐返利
+      const user = await prisma.user.findUnique({ where: { id: req.userId } })
+      if (user?.referrerId) {
+        const referral = await prisma.referral.findFirst({
+          where: {
+            referrerUserId: user.referrerId,
+            referredUserId: req.userId,
+            status: 'PENDING'
+          }
+        })
+        if (referral) {
+          const referrerMember = await prisma.member.findUnique({
+            where: { userId: user.referrerId }
+          })
+          if (referrerMember) {
+            let referralBonus = 0
+            if (referrerMember.level === 'CREATOR') referralBonus = 15000
+            else if (referrerMember.level === 'OFFICER') referralBonus = 50000
+
+            if (referralBonus > 0) {
+              const newRefBalance = referrerMember.points + referralBonus
+              await prisma.member.update({
+                where: { id: referrerMember.id },
+                data: { points: { increment: referralBonus } }
+              })
+              await prisma.pointsTransaction.create({
+                data: {
+                  memberId: referrerMember.id,
+                  type: 'REFERRAL',
+                  amount: referralBonus,
+                  balance: newRefBalance,
+                  description: `推荐会员完成首单消费，返利${referralBonus}积分`
+                }
+              })
+
+              await prisma.referral.update({
+                where: { id: referral.id },
+                data: {
+                  status: 'COMPLETED',
+                  pointsAwarded: referralBonus,
+                  completedAt: new Date()
+                }
+              })
+            }
+          }
+        }
+      }
+    }
+
     res.json({ success: true, order: updated })
   } catch (e) {
     res.status(500).json({ error: e.message })

@@ -1,37 +1,34 @@
 <template>
-  <view class="address-page">
-    <view class="address-list" v-if="addresses.length > 0">
-      <view v-for="item in addresses" :key="item.id" class="address-item">
-        <view class="address-info" @tap="selectAddress(item)">
-          <view class="name-row">
-            <text class="name">{{ item.name }}</text>
-            <text class="phone">{{ item.phone }}</text>
-            <view class="default-tag" v-if="item.isDefault">默认</view>
-          </view>
-          <text class="detail">{{ item.province }}{{ item.city }}{{ item.district }}{{ item.detail }}</text>
+  <view class="addr-page">
+    <view class="addr-list" v-if="addresses.length > 0">
+      <view v-for="item in addresses" :key="item.id" class="addr-card" @tap="selectAddress(item)">
+        <view class="addr-header">
+          <text class="addr-name">{{ item.name }}</text>
+          <text class="addr-phone">{{ item.phone }}</text>
+          <text class="addr-default" v-if="item.isDefault">默认</text>
         </view>
-        <view class="address-actions">
-          <view class="action-edit" @tap="editAddress(item)">
-            <text>编辑</text>
-          </view>
-          <view class="action-delete" @tap="deleteAddress(item.id)">
-            <text>删除</text>
-          </view>
+        <text class="addr-body">{{ item.province }} {{ item.city }} {{ item.district }} {{ item.detail }}</text>
+        <view class="addr-actions" @tap.stop>
+          <text class="addr-action" @tap="editAddress(item)">编辑</text>
+          <text class="addr-action danger" @tap="deleteAddress(item.id)">删除</text>
         </view>
       </view>
     </view>
-    
-    <view class="empty-state" v-else>
-      <text class="empty-icon">📍</text>
-      <text class="empty-title">暂无收货地址</text>
+
+    <view class="empty" v-else>
+      <text class="empty-icon">▣</text>
+      <text class="empty-title">暂无地址</text>
       <text class="empty-sub">添加收货地址以便下单</text>
     </view>
-    
-    <view class="add-btn-wrap">
-      <button class="add-btn" @tap="addAddress">+ 添加新地址</button>
+
+    <view class="add-bar">
+      <view class="add-btn" @tap="addAddress">
+        <text>+ 添加新地址</text>
+      </view>
     </view>
   </view>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue'; import { onShow } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
@@ -41,17 +38,12 @@ const mode = ref<'select' | 'manage'>('manage')
 
 onShow(() => {
   const pages = getCurrentPages()
-  const currentPage = pages[pages.length - 1]
-  mode.value = currentPage.options?.mode as any || 'manage'
+  mode.value = (pages[pages.length - 1].options?.mode as any) || 'manage'
   loadAddresses()
 })
 
 const loadAddresses = async () => {
-  try {
-    addresses.value = await request('/addresses', 'GET')
-  } catch (e) {
-    console.error('load addresses error', e)
-  }
+  try { addresses.value = await request('/addresses', 'GET') } catch (e) {}
 }
 
 const selectAddress = (item: any) => {
@@ -61,95 +53,81 @@ const selectAddress = (item: any) => {
   }
 }
 
-const addAddress = () => {
-  uni.navigateTo({ url: '/pages/address/form' })
-}
-
-const editAddress = (item: any) => {
-  uni.navigateTo({ url: `/pages/address/form?id=${item.id}` })
-}
+const addAddress = () => uni.navigateTo({ url: '/pages/address/form' })
+const editAddress = (item: any) => uni.navigateTo({ url: `/pages/address/form?id=${item.id}` })
 
 const deleteAddress = async (id: string) => {
-  uni.showModal({
-    title: '确认删除',
-    content: '确定要删除这个地址吗？',
-    success: async (res) => {
-      if (res.confirm) {
-        try {
-          await request(`/addresses/${id}`, 'DELETE')
-          uni.showToast({ title: '已删除', icon: 'none' })
-          loadAddresses()
-        } catch (e) {
-          uni.showToast({ title: '删除失败', icon: 'none' })
-        }
-      }
+  uni.showModal({ title: '删除', content: '确定删除该地址？', success: async (res) => {
+    if (res.confirm) {
+      try { await request(`/addresses/${id}`, 'DELETE'); loadAddresses() } catch (e) {}
     }
-  })
+  }})
 }
 </script>
-<style lang="scss" scoped>
-.address-page { min-height: 100vh; background: #f5f5f5; padding: 16rpx 24rpx 140rpx; }
 
-.address-item {
-  background: #fff;
-  border-radius: 16rpx;
+<style lang="scss" scoped>
+.addr-page { min-height: 100vh; background: var(--color-bg); padding: 24rpx 24rpx 140rpx; }
+
+.addr-card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
   padding: 28rpx;
   margin-bottom: 16rpx;
+  box-shadow: var(--shadow-sm);
 }
-.address-info { border-bottom: 1rpx solid #f5f5f5; padding-bottom: 20rpx; }
-.name-row {
+.addr-header {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  .name { font-size: 32rpx; font-weight: bold; }
-  .phone { font-size: 28rpx; color: #666; }
-  .default-tag {
-    background: #ff5777;
-    color: #fff;
-    font-size: 20rpx;
-    padding: 4rpx 12rpx;
-    border-radius: 8rpx;
-  }
+  margin-bottom: 12rpx;
 }
-.detail { font-size: 26rpx; color: #999; margin-top: 8rpx; display: block; }
-
-.address-actions {
+.addr-name {
+  font-family: var(--font-display);
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.addr-phone { font-size: 26rpx; color: var(--color-text-secondary); }
+.addr-default {
+  font-size: 18rpx;
+  color: var(--color-gold);
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  border: 1rpx solid var(--color-gold);
+  padding: 2rpx 12rpx;
+  border-radius: var(--radius-sm);
+}
+.addr-body { font-size: 26rpx; color: var(--color-text-muted); line-height: 1.5; display: block; }
+.addr-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 32rpx;
   padding-top: 20rpx;
-  view { font-size: 26rpx; color: #666; }
+  margin-top: 16rpx;
+  border-top: 1rpx solid var(--color-divider);
 }
+.addr-action { font-size: 24rpx; color: var(--color-text-secondary); }
+.addr-action.danger { color: var(--color-error); }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 120rpx 0;
-  .empty-icon { font-size: 100rpx; }
-  .empty-title { font-size: 32rpx; color: #333; font-weight: 600; margin-top: 24rpx; }
-  .empty-sub { font-size: 26rpx; color: #999; margin-top: 12rpx; }
-}
+.empty { text-align: center; padding: 200rpx 0; }
+.empty-icon { font-size: 64rpx; color: var(--color-text-muted); opacity: 0.4; }
+.empty-title { display: block; font-size: 28rpx; color: var(--color-text-secondary); margin-top: 24rpx; }
+.empty-sub { display: block; font-size: 24rpx; color: var(--color-text-muted); margin-top: 8rpx; }
 
-.add-btn-wrap {
+.add-bar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   padding: 20rpx 24rpx;
-  background: #fff;
-  border-top: 1rpx solid #eee;
+  background: var(--color-card);
+  border-top: 1rpx solid var(--color-border-light);
 }
 .add-btn {
-  width: 100%;
   height: 88rpx;
-  background: linear-gradient(135deg, #ff5777, #ff8a9a);
-  border-radius: 44rpx;
-  color: #fff;
-  font-size: 32rpx;
-  border: none;
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  &:active { opacity: 0.85; }
+  text { font-size: 28rpx; font-weight: 600; color: #fff; letter-spacing: 2rpx; }
 }
 </style>

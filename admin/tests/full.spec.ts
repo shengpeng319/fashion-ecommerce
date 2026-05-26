@@ -13,12 +13,13 @@ test.describe('管理后台全面测试', () => {
     const errors: string[] = []
     page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()) })
     
-    // 验证标题
-    await expect(page.locator('h2')).toContainText('时尚女装管理后台')
+    // 验证品牌标题
+    await expect(page.locator('.brand-name')).toContainText('FASHION')
+    await expect(page.locator('.brand-sub')).toContainText('ADMINISTRATION')
     
     // 验证表单元素
-    await expect(page.locator('input[placeholder="手机号"]')).toBeVisible()
-    await expect(page.locator('input[placeholder="密码"]')).toBeVisible()
+    await expect(page.locator('input[placeholder="请输入手机号"]')).toBeVisible()
+    await expect(page.locator('input[placeholder="请输入密码"]')).toBeVisible()
     await expect(page.locator('button:has-text("登录")')).toBeVisible()
     
     // 验证测试提示
@@ -29,8 +30,8 @@ test.describe('管理后台全面测试', () => {
   })
 
   test('登录功能 - 成功登录', async ({ page }) => {
-    await page.fill('input[placeholder="手机号"]', '13800138001')
-    await page.fill('input[placeholder="密码"]', 'admin123')
+    await page.fill('input[placeholder="请输入手机号"]', '13800138001')
+    await page.fill('input[placeholder="请输入密码"]', 'admin123')
     await page.click('button:has-text("登录")')
     
     // 等待跳转
@@ -44,8 +45,8 @@ test.describe('Dashboard 首页测试', () => {
     // 先登录
     await page.goto('/#/login')
     await page.waitForLoadState('networkidle')
-    await page.fill('input[placeholder="手机号"]', '13800138001')
-    await page.fill('input[placeholder="密码"]', 'admin123')
+    await page.fill('input[placeholder="请输入手机号"]', '13800138001')
+    await page.fill('input[placeholder="请输入密码"]', 'admin123')
     await page.click('button:has-text("登录")')
     await page.waitForURL('**/dashboard', { timeout: 5000 })
   })
@@ -73,8 +74,8 @@ test.describe('Layout 布局测试', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#/login')
     await page.waitForLoadState('networkidle')
-    await page.fill('input[placeholder="手机号"]', '13800138001')
-    await page.fill('input[placeholder="密码"]', 'admin123')
+    await page.fill('input[placeholder="请输入手机号"]', '13800138001')
+    await page.fill('input[placeholder="请输入密码"]', 'admin123')
     await page.click('button:has-text("登录")')
     await page.waitForURL('**/dashboard', { timeout: 5000 })
   })
@@ -83,8 +84,8 @@ test.describe('Layout 布局测试', () => {
     await page.waitForLoadState('networkidle')
     
     // 验证侧边栏文字
-    await expect(page.locator('text=时尚女装')).toBeVisible()
-    await expect(page.locator('.el-menu-item:has-text("首页")')).toBeVisible()
+    await expect(page.locator('.logo-text')).toContainText('FASHION')
+    await expect(page.locator('.el-menu-item:has-text("仪表盘")')).toBeVisible()
     await expect(page.locator('.el-menu-item:has-text("商品管理")')).toBeVisible()
     await expect(page.locator('.el-menu-item:has-text("订单管理")')).toBeVisible()
     await expect(page.locator('.el-menu-item:has-text("股东管理")')).toBeVisible()
@@ -115,8 +116,8 @@ test.describe('Products 商品管理测试', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#/login')
     await page.waitForLoadState('networkidle')
-    await page.fill('input[placeholder="手机号"]', '13800138001')
-    await page.fill('input[placeholder="密码"]', 'admin123')
+    await page.fill('input[placeholder="请输入手机号"]', '13800138001')
+    await page.fill('input[placeholder="请输入密码"]', 'admin123')
     await page.click('button:has-text("登录")')
     await page.waitForURL('**/dashboard', { timeout: 5000 })
     await page.click('.el-menu-item:has-text("商品管理")')
@@ -151,8 +152,8 @@ test.describe('Orders 订单管理测试', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#/login')
     await page.waitForLoadState('networkidle')
-    await page.fill('input[placeholder="手机号"]', '13800138001')
-    await page.fill('input[placeholder="密码"]', 'admin123')
+    await page.fill('input[placeholder="请输入手机号"]', '13800138001')
+    await page.fill('input[placeholder="请输入密码"]', 'admin123')
     await page.click('button:has-text("登录")')
     await page.waitForURL('**/dashboard', { timeout: 5000 })
     await page.click('.el-menu-item:has-text("订单管理")')

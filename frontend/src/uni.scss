@@ -1,8 +1,34 @@
-$uni-primary: #ff5777;
-$uni-success: #07c160;
-$uni-warning: #ffb700;
-$uni-error: #dc0000;
-$uni-text-color: #333333;
-$uni-text-color-grey: #999999;
-$uni-bg-color: #f8f8f8;
-$uni-border-color: #e5e5e5;
+// ========================================
+// FASHION — Italian Luxury Design Tokens
+// ========================================
+
+// Colors
+$uni-primary:        #6B1D2F;  // Borgogna — deep burgundy
+$uni-success:        #1B4D3E;  // Emerald green
+$uni-warning:        #C9A96E;  // Gold
+$uni-error:          #8B0000;  // Dark red
+$uni-text-color:     #1A1514;  // Deep brown-black
+$uni-text-color-grey:#8C8279;  // Warm grey
+$uni-bg-color:       #F5F0EB;  // Ivory cream
+$uni-border-color:   #E0D8CF;  // Warm border
+$uni-shadow-color:   rgba(26, 21, 20, 0.08);
+
+// Spacing
+$spacing-xs:  8rpx;
+$spacing-sm:  16rpx;
+$spacing-md:  24rpx;
+$spacing-lg:  32rpx;
+$spacing-xl:  40rpx;
+$spacing-2xl: 48rpx;
+$spacing-3xl: 64rpx;
+
+// Font
+$font-display: 'Playfair Display', 'Times New Roman', serif;
+$font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+// Radius
+$radius-sm:   8rpx;
+$radius-md:   12rpx;
+$radius-lg:   16rpx;
+$radius-xl:   24rpx;
+$radius-full: 50%;

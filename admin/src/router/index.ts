@@ -44,6 +44,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '用户管理' }
       },
       {
+        path: 'members',
+        name: 'Members',
+        component: () => import('../views/Members.vue'),
+        meta: { title: '会员管理' }
+      },
+      {
         path: 'shareholder/list',
         name: 'ShareholderList',
         component: () => import('../views/shareholder/ShareholderList.vue'),

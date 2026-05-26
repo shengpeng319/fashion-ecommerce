@@ -1,85 +1,105 @@
 <template>
-  <view class="goods-detail">
-    <!-- Image Gallery -->
-    <swiper class="gallery" indicator-dots autoplay v-if="images.length" indicator-color="rgba(255,255,255,0.4)" indicator-active-color="#ff5777">
-      <swiper-item v-for="(img, i) in images" :key="i">
-        <image :src="img" mode="aspectFill" class="gallery-img" />
-      </swiper-item>
-    </swiper>
+  <view class="detail-page">
+    <!-- Gallery -->
+    <view class="gallery-wrap">
+      <swiper class="gallery" indicator-dots autoplay circular
+        indicator-color="rgba(255,255,255,0.3)" indicator-active-color="#C9A96E">
+        <swiper-item v-for="(img, i) in images" :key="i">
+          <image :src="img" mode="aspectFill" class="gallery-img" />
+        </swiper-item>
+      </swiper>
+      <view class="gallery-counter" v-if="images.length > 1">
+        <text>{{ currentIdx + 1 }} / {{ images.length }}</text>
+      </view>
+      <view class="nav-back" @tap="goBack">
+        <text>←</text>
+      </view>
+    </view>
 
     <!-- Product Info -->
     <view class="info-section" v-if="goods.id">
-      <view class="price-row">
-        <view class="price-main">
-          <text class="currency">¥</text>
-          <text class="price">{{ goods.price }}</text>
+      <view class="info-header">
+        <view class="price-block">
+          <text class="price-symbol">¥</text>
+          <text class="price-value">{{ goods.price }}</text>
         </view>
-        <view class="price-orig" v-if="goods.originalPrice">
-          <text class="orig-text">¥{{ goods.originalPrice }}</text>
-          <view class="discount-tag" v-if="discount">
-            <text>{{ discount }}折</text>
-          </view>
+        <view class="discount-row" v-if="goods.originalPrice && goods.originalPrice > goods.price">
+          <text class="price-original">¥{{ goods.originalPrice }}</text>
+          <text class="discount-badge" v-if="discount">{{ discount }}折</text>
         </view>
       </view>
 
-      <view class="name-row">
-        <text class="name">{{ goods.name }}</text>
-      </view>
-      <view class="subtitle" v-if="goods.subtitle">{{ goods.subtitle }}</view>
+      <text class="product-name">{{ goods.name }}</text>
+      <text class="product-sub" v-if="goods.subtitle">{{ goods.subtitle }}</text>
 
-      <view class="tags-row">
-        <view class="tag" v-if="goods.stock > 0"><text class="tag-text">有货</text></view>
-        <view class="tag" v-else><text class="tag-text out">缺货</text></view>
-        <view class="tag"><text class="tag-text">正品保证</text></view>
-        <view class="tag"><text class="tag-text">7天退换</text></view>
+      <view class="meta-strip">
+        <view class="meta-item">
+          <text class="meta-icon">◆</text>
+          <text>正品保证</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-icon">◆</text>
+          <text>7天退换</text>
+        </view>
+        <view class="meta-item" :class="{ out: goods.stock <= 0 }">
+          <text class="meta-icon">{{ goods.stock > 0 ? '◆' : '◇' }}</text>
+          <text>{{ goods.stock > 0 ? '有货' : '缺货' }}</text>
+        </view>
       </view>
     </view>
 
     <!-- Description -->
     <view class="desc-section" v-if="goods.description">
-      <view class="section-title">
-        <text>商品介绍</text>
+      <view class="desc-header">
+        <text class="desc-title">LA DESCRIZIONE</text>
+        <view class="desc-line"></view>
       </view>
-      <view class="desc-content">
-        <text>{{ goods.description }}</text>
-      </view>
+      <text class="desc-text">{{ goods.description }}</text>
     </view>
 
-    <!-- Detail -->
+    <!-- Detail Content -->
     <view class="detail-section" v-if="goods.detail">
-      <view class="section-title">
-        <text>详情描述</text>
+      <view class="desc-header">
+        <text class="desc-title">DETTAGLI</text>
+        <view class="desc-line"></view>
       </view>
-      <rich-text :nodes="goods.detail"></rich-text>
+      <rich-text :nodes="goods.detail" class="detail-content"></rich-text>
     </view>
 
-    <!-- Bottom Action -->
+    <!-- Spacer for bottom bar -->
+    <view style="height: 160rpx;"></view>
+
+    <!-- Bottom Action Bar -->
     <view class="bottom-bar">
-      <view class="action-icons">
-        <view class="icon-item" @tap="goHome">
-          <text class="icon">🏠</text>
-          <text class="icon-label">首页</text>
+      <view class="bottom-actions">
+        <view class="bottom-icon" @tap="goHome">
+          <text class="bi-icon">⌂</text>
+          <text class="bi-label">首页</text>
         </view>
-        <view class="icon-item" @tap="toggleFavorite">
-          <text class="icon">{{ isFavorite ? '❤️' : '🤍' }}</text>
-          <text class="icon-label">收藏</text>
+        <view class="bottom-icon" @tap="toggleFavorite">
+          <text class="bi-icon">{{ isFavorite ? '♥' : '♡' }}</text>
+          <text class="bi-label">收藏</text>
         </view>
-        <view class="icon-item" @tap="goCart">
-          <text class="icon">🛒</text>
-          <text class="icon-label">购物车</text>
+        <view class="bottom-icon" @tap="goCart">
+          <text class="bi-icon">□</text>
+          <text class="bi-label">购物袋</text>
         </view>
       </view>
-      <view class="action-btns">
-        <view class="btn-cart" @tap="addCart">
-          <text>加入购物车</text>
+      <view class="bottom-btns">
+        <view class="btn-secondary" @tap="addCart" v-if="goods.stock > 0">
+          <text>加入购物袋</text>
         </view>
-        <view class="btn-buy" @tap="buyNow">
+        <view class="btn-primary" @tap="buyNow" v-if="goods.stock > 0">
           <text>立即购买</text>
+        </view>
+        <view class="btn-soldout" v-if="goods.stock <= 0">
+          <text>已售罄</text>
         </view>
       </view>
     </view>
   </view>
 </template>
+
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
@@ -87,10 +107,13 @@ import { request } from '@/utils/request'
 
 const goods = ref<any>({})
 const isFavorite = ref(false)
+const currentIdx = ref(0)
+
 const images = computed(() => {
   if (!goods.value.images) return []
   try { return JSON.parse(goods.value.images) } catch { return [] }
 })
+
 const discount = computed(() => {
   if (!goods.value.price || !goods.value.originalPrice) return null
   return Math.round((Number(goods.value.price) / Number(goods.value.originalPrice)) * 10)
@@ -106,12 +129,13 @@ onLoad(async (opt: any) => {
   }
 })
 
-const goHome = () => { uni.switchTab({ url: '/pages/index/index' }) }
-const goCart = () => { uni.switchTab({ url: '/pages/cart/index' }) }
+const goBack = () => uni.navigateBack()
+const goHome = () => uni.switchTab({ url: '/pages/index/index' })
+const goCart = () => uni.switchTab({ url: '/pages/cart/index' })
 
 const toggleFavorite = () => {
   isFavorite.value = !isFavorite.value
-  uni.showToast({ title: isFavorite.value ? '已收藏' : '取消收藏', icon: 'none' })
+  uni.showToast({ title: isFavorite.value ? '已收藏' : '已取消收藏', icon: 'none' })
 }
 
 const addCart = () => {
@@ -122,129 +146,254 @@ const addCart = () => {
     return
   }
   request('/cart', 'POST', { productId: goods.value.id, quantity: 1 })
-    .then(() => uni.showToast({ title: '已加入购物车' }))
-    .catch(() => uni.showToast({ title: '添加失败', icon: 'none' }))
+    .then(() => uni.showToast({ title: '已加入购物袋' }))
+    .catch(() => uni.showToast({ title: '失败', icon: 'none' }))
 }
 
 const buyNow = () => {
   uni.navigateTo({ url: `/pages/order/create?productId=${goods.value.id}` })
 }
 </script>
+
 <style lang="scss" scoped>
-.goods-detail { 
-  padding-bottom: 120rpx; 
-  background: #f5f5f5; 
+.detail-page {
+  min-height: 100vh;
+  background: var(--color-bg);
 }
 
-.gallery { 
-  height: 750rpx; 
-  background: #fff;
-  .gallery-img { 
-    width: 100%; 
-    height: 100%; 
-  } 
+// Gallery
+.gallery-wrap {
+  position: relative;
+}
+.gallery {
+  height: 1000rpx;
+  background: var(--color-dark);
+}
+.gallery-img {
+  width: 100%;
+  height: 100%;
+}
+.gallery-counter {
+  position: absolute;
+  bottom: 40rpx;
+  right: 32rpx;
+  background: rgba(26, 21, 20, 0.6);
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 22rpx;
+  color: #fff;
+  font-weight: 500;
+}
+.nav-back {
+  position: absolute;
+  top: 80rpx;
+  left: 24rpx;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 21, 20, 0.5);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 32rpx;
+  backdrop-filter: blur(10px);
 }
 
+// Product Info
 .info-section {
-  background: #fff;
-  padding: 28rpx 24rpx;
-  margin-bottom: 16rpx;
+  background: var(--color-dark);
+  padding: 40rpx 32rpx 48rpx;
+  color: var(--color-text-inverse);
 }
-
-.price-row {
+.info-header {
   display: flex;
   align-items: baseline;
-  gap: 16rpx;
+  gap: 20rpx;
+  margin-bottom: 24rpx;
 }
-.price-main {
+.price-block {
   display: flex;
   align-items: baseline;
-  .currency { font-size: 28rpx; color: #ff5777; font-weight: bold; }
-  .price { font-size: 52rpx; color: #ff5777; font-weight: bold; }
 }
-.price-orig {
+.price-symbol {
+  font-family: var(--font-display);
+  font-size: 32rpx;
+  color: var(--color-gold);
+  font-weight: 600;
+  margin-right: 4rpx;
+}
+.price-value {
+  font-family: var(--font-display);
+  font-size: 60rpx;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 2rpx;
+}
+.discount-row {
   display: flex;
   align-items: center;
   gap: 12rpx;
-  .orig-text { font-size: 26rpx; color: #bbb; text-decoration: line-through; }
-  .discount-tag {
-    background: #fff0f3;
-    padding: 4rpx 10rpx;
-    border-radius: 6rpx;
-    text { font-size: 20rpx; color: #ff5777; }
-  }
+}
+.price-original {
+  font-family: var(--font-display);
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+.discount-badge {
+  font-size: 20rpx;
+  color: var(--color-gold);
+  border: 1rpx solid var(--color-gold);
+  padding: 2rpx 12rpx;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
 }
 
-.name-row {
-  margin-top: 20rpx;
-  .name { font-size: 34rpx; font-weight: 600; color: #222; line-height: 1.4; }
+.product-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 38rpx;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.3;
+  margin-bottom: 8rpx;
 }
-.subtitle { font-size: 26rpx; color: #888; margin-top: 10rpx; }
+.product-sub {
+  display: block;
+  font-size: 26rpx;
+  color: var(--color-text-muted);
+  font-weight: 300;
+  margin-bottom: 32rpx;
+}
 
-.tags-row {
+.meta-strip {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 20rpx;
-  .tag {
-    background: #f8f8f8;
-    padding: 6rpx 16rpx;
-    border-radius: 20rpx;
-    .tag-text { font-size: 22rpx; color: #666; }
-    .tag-text.out { color: #ff5777; }
-  }
+  gap: 32rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid rgba(255,255,255,0.1);
+}
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 22rpx;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  letter-spacing: 0.5rpx;
+  &.out { opacity: 0.5; }
+}
+.meta-icon {
+  font-size: 16rpx;
+  color: var(--color-gold);
 }
 
-.desc-section, .detail-section {
-  background: #fff;
-  margin-bottom: 16rpx;
+// Description
+.desc-section {
+  padding: 48rpx 32rpx 40rpx;
+  background: var(--color-card);
+  border-bottom: 1rpx solid var(--color-border-light);
 }
-.section-title {
-  padding: 28rpx 24rpx;
-  border-bottom: 1rpx solid #f5f5f5;
-  text { font-size: 30rpx; font-weight: 600; color: #333; }
+.desc-header {
+  text-align: center;
+  margin-bottom: 32rpx;
 }
-.desc-content {
-  padding: 24rpx;
-  text { font-size: 28rpx; color: #666; line-height: 1.6; }
+.desc-title {
+  font-family: var(--font-display);
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 6rpx;
+}
+.desc-line {
+  width: 40rpx;
+  height: 2rpx;
+  background: var(--color-gold);
+  margin: 16rpx auto 0;
+}
+.desc-text {
+  display: block;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  font-weight: 300;
 }
 
+// Detail
+.detail-section {
+  padding: 48rpx 32rpx 40rpx;
+  background: var(--color-card);
+}
+.detail-content {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+}
+
+// Bottom Bar
 .bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 100rpx;
-  background: #fff;
-  border-top: 1rpx solid #eee;
+  background: var(--color-dark);
+  padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
-  padding: 0 24rpx;
+  gap: 24rpx;
   z-index: 100;
+  border-top: 1rpx solid rgba(255,255,255,0.08);
 }
-
-.action-icons {
+.bottom-actions {
   display: flex;
-  gap: 32rpx;
+  gap: 28rpx;
 }
-.icon-item {
+.bottom-icon {
   display: flex;
   flex-direction: column;
   align-items: center;
-  .icon { font-size: 40rpx; }
-  .icon-label { font-size: 20rpx; color: #888; margin-top: 2rpx; }
 }
-
-.action-btns {
+.bi-icon {
+  font-size: 36rpx;
+  color: var(--color-text-muted);
+}
+.bi-label {
+  font-size: 18rpx;
+  color: var(--color-text-muted);
+  margin-top: 2rpx;
+  letter-spacing: 1rpx;
+}
+.bottom-btns {
   flex: 1;
   display: flex;
-  margin-left: 24rpx;
+  gap: 16rpx;
+}
+.btn-primary, .btn-secondary, .btn-soldout {
+  flex: 1;
   height: 72rpx;
-  border-radius: 36rpx;
-  overflow: hidden;
-  margin-right: 8rpx;
-  view { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 28rpx; font-weight: 500; }
-  .btn-cart { background: #ff9500; color: #fff; }
-  .btn-buy { background: linear-gradient(135deg, #ff5777, #ff8a9a); color: #fff; }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  letter-spacing: 3rpx;
+  transition: all var(--transition-base);
+  &:active { transform: scale(0.96); opacity: 0.9; }
+}
+.btn-secondary {
+  border: 1rpx solid var(--color-gold);
+  color: var(--color-gold);
+  background: transparent;
+}
+.btn-primary {
+  background: var(--color-gold);
+  color: var(--color-dark);
+}
+.btn-soldout {
+  flex: 2;
+  background: rgba(255,255,255,0.05);
+  color: var(--color-text-muted);
+  border: 1rpx solid rgba(255,255,255,0.1);
+  letter-spacing: 6rpx;
 }
 </style>

@@ -3,25 +3,34 @@
     {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "时尚女装"
+        "navigationBarTitleText": "FASHION",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#1A1514"
       }
     },
     {
       "path": "pages/category/index",
       "style": {
-        "navigationBarTitleText": "分类"
+        "navigationBarTitleText": "全部分类",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#1A1514"
       }
     },
     {
       "path": "pages/cart/index",
       "style": {
-        "navigationBarTitleText": "购物车"
+        "navigationBarTitleText": "购物车",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#1A1514"
       }
     },
     {
       "path": "pages/goods/detail",
       "style": {
-        "navigationBarTitleText": "商品详情"
+        "navigationBarTitleText": "",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "transparent",
+        "navigationStyle": "custom"
       }
     }
   ],
@@ -32,13 +41,17 @@
         {
           "path": "list",
           "style": {
-            "navigationBarTitleText": "收货地址"
+            "navigationBarTitleText": "地址管理",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
           }
         },
         {
           "path": "form",
           "style": {
-            "navigationBarTitleText": "编辑地址"
+            "navigationBarTitleText": "编辑地址",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
           }
         }
       ]
@@ -49,19 +62,25 @@
         {
           "path": "create",
           "style": {
-            "navigationBarTitleText": "提交订单"
+            "navigationBarTitleText": "确认订单",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
           }
         },
         {
           "path": "list",
           "style": {
-            "navigationBarTitleText": "我的订单"
+            "navigationBarTitleText": "我的订单",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
           }
         },
         {
           "path": "detail",
           "style": {
-            "navigationBarTitleText": "订单详情"
+            "navigationBarTitleText": "订单详情",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
           }
         }
       ]
@@ -72,19 +91,28 @@
         {
           "path": "index",
           "style": {
-            "navigationBarTitleText": "个人中心"
+            "navigationBarTitleText": "",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "transparent",
+            "navigationStyle": "custom"
           }
         },
         {
           "path": "login",
           "style": {
-            "navigationBarTitleText": "登录"
+            "navigationBarTitleText": "",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "transparent",
+            "navigationStyle": "custom"
           }
         },
         {
           "path": "register",
           "style": {
-            "navigationBarTitleText": "注册"
+            "navigationBarTitleText": "",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "transparent",
+            "navigationStyle": "custom"
           }
         }
       ]
@@ -95,28 +123,72 @@
         {
           "path": "index",
           "style": {
-            "navigationBarTitleText": "批发采购"
+            "navigationBarTitleText": "批发商城",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
           }
         },
         {
           "path": "order",
           "style": {
-            "navigationBarTitleText": "批量下单"
+            "navigationBarTitleText": "批发下单",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
           }
         },
         {
           "path": "orders",
           "style": {
-            "navigationBarTitleText": "批发订单"
+            "navigationBarTitleText": "批发订单",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages/member",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "会员中心",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
+          }
+        },
+        {
+          "path": "upgrade",
+          "style": {
+            "navigationBarTitleText": "会员升级",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
+          }
+        },
+        {
+          "path": "transactions",
+          "style": {
+            "navigationBarTitleText": "积分明细",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
+          }
+        },
+        {
+          "path": "referral",
+          "style": {
+            "navigationBarTitleText": "邀请好友",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#1A1514"
           }
         }
       ]
     }
   ],
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#ff5777",
-    "backgroundColor": "#ffffff",
+    "color": "#8C8279",
+    "selectedColor": "#6B1D2F",
+    "backgroundColor": "#FAF7F2",
+    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
@@ -128,7 +200,7 @@
       },
       {
         "pagePath": "pages/cart/index",
-        "text": "购物车"
+        "text": "购物袋"
       },
       {
         "pagePath": "pages/user/index",
@@ -137,9 +209,9 @@
     ]
   },
   "globalStyle": {
-    "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "时尚女装",
-    "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#f8f8f8"
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "FASHION",
+    "navigationBarBackgroundColor": "#1A1514",
+    "backgroundColor": "#F5F0EB"
   }
 }

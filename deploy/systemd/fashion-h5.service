@@ -1,0 +1,14 @@
+[Unit]
+Description=FashionEcommerce H5 Website
+After=network.target fashion-backend.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/fashion-ecommerce
+EnvironmentFile=/opt/fashion-ecommerce/.env
+ExecStart=/usr/bin/node /opt/fashion-ecommerce/deploy/serve-h5.mjs
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

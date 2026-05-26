@@ -1,17 +1,20 @@
 <template>
   <el-container class="layout-container">
-    <el-aside width="200px" class="aside">
-      <div class="logo">时尚女装</div>
-      <el-menu 
-        :default-active="activeMenu" 
-        router 
-        background-color="#304156" 
-        text-color="#bfcbd9" 
-        active-text-color="#ff5777"
+    <!-- Sidebar -->
+    <el-aside width="220px" class="aside">
+      <div class="logo" @click="router.push('/dashboard')">
+        <text class="logo-icon">◆</text>
+        <text class="logo-text">FASHION</text>
+        <text class="logo-sub">ADMIN</text>
+      </div>
+      <el-menu
+        :default-active="activeMenu"
+        router
+        class="sidebar-menu"
       >
         <el-menu-item index="/dashboard">
           <el-icon><HomeFilled /></el-icon>
-          <span>首页</span>
+          <span>仪表盘</span>
         </el-menu-item>
         <el-menu-item index="/products">
           <el-icon><Goods /></el-icon>
@@ -29,19 +32,25 @@
           <el-icon><User /></el-icon>
           <span>用户管理</span>
         </el-menu-item>
+        <el-menu-item index="/members">
+          <el-icon><Star /></el-icon>
+          <span>会员管理</span>
+        </el-menu-item>
         <el-menu-item index="/shareholder/list">
           <el-icon><Coin /></el-icon>
           <span>股东管理</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
+
+    <!-- Right Content -->
     <el-container>
-      <el-header>
+      <!-- Header -->
+      <el-header class="header">
         <div class="header-left">
-          <!-- 面包屑导航 -->
-          <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item v-if="pageTitle !== '首页'">{{ pageTitle }}</el-breadcrumb-item>
+          <el-breadcrumb separator="·">
+            <el-breadcrumb-item :to="{ path: '/dashboard' }">仪表盘</el-breadcrumb-item>
+            <el-breadcrumb-item v-if="pageTitle && pageTitle !== '首页'">{{ pageTitle }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div class="header-right">
@@ -53,13 +62,15 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="password">修改密码</el-dropdown-item>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </div>
       </el-header>
-      <el-main>
+
+      <!-- Main -->
+      <el-main class="main-content">
         <router-view />
       </el-main>
     </el-container>
@@ -67,44 +78,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { HomeFilled, Goods, FolderOpened, Document, User, Coin, ArrowDown } from '@element-plus/icons-vue'
-import { authApi } from '../api/auth'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const route = useRoute()
-const adminUser = ref<any>(null)
 
 const activeMenu = computed(() => route.path)
-const pageTitle = computed(() => (route.meta.title as string) || route.name as string || '首页')
+const pageTitle = computed(() => route.meta.title as string)
 
-onMounted(() => {
-  const userStr = localStorage.getItem('admin_user')
-  if (userStr) {
-    adminUser.value = JSON.parse(userStr)
-  }
-})
+const adminUser = ref<any>(null)
+try {
+  const stored = localStorage.getItem('admin_user')
+  if (stored) adminUser.value = JSON.parse(stored)
+} catch (e) {}
 
-const handleCommand = async (command: string) => {
-  if (command === 'logout') {
+const handleCommand = async (cmd: string) => {
+  if (cmd === 'logout') {
     localStorage.removeItem('admin_token')
     localStorage.removeItem('admin_user')
     router.push('/login')
-  } else if (command === 'password') {
-    ElMessageBox.prompt('请输入新密码', '修改密码', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消'
-    }).then(async ({ value }) => {
-      if (!value) return
-      try {
-        await authApi.changePassword({ oldPassword: 'admin123', newPassword: value })
-        ElMessage.success('密码修改成功')
-      } catch (e) {
-        // error handled by interceptor
-      }
-    }).catch(() => {})
+  } else if (cmd === 'password') {
+    // Placeholder for password change
+    ElMessage.info('修改密码功能开发中')
   }
 }
 </script>
@@ -113,63 +110,104 @@ const handleCommand = async (command: string) => {
 .layout-container {
   height: 100vh;
 }
+
+/* Sidebar */
 .aside {
-  background: #304156;
+  background: var(--fashion-dark);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
+
 .logo {
-  height: 60px;
-  line-height: 60px;
-  text-align: center;
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  background: #263445;
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--fashion-dark);
+  border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+  cursor: pointer;
 }
-.el-menu {
-  border: none;
+.logo-icon {
+  font-size: 12px;
+  color: var(--fashion-gold);
+  margin-bottom: 2px;
 }
-.el-menu-item {
+.logo-text {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fashion-gold);
+  letter-spacing: 4px;
+  line-height: 1;
+}
+.logo-sub {
+  font-size: 9px;
+  color: var(--fashion-text-muted);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.sidebar-menu {
+  border: none !important;
+}
+
+.sidebar-menu :deep(.el-menu-item) {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-size: 14px;
+  height: 48px;
+  margin: 2px 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
 }
-.el-menu-item .el-icon {
-  margin-right: 0;
+
+.sidebar-menu :deep(.el-menu-item .el-icon) {
+  font-size: 18px;
 }
-.el-header {
+
+.sidebar-menu :deep(.el-menu-item.is-active) {
+  background: rgba(201, 169, 110, 0.12);
+  color: var(--fashion-gold);
+}
+
+.sidebar-menu :deep(.el-menu-item:hover) {
+  background: rgba(255,255,255,0.04);
+  color: var(--fashion-text-inverse);
+}
+
+/* Header */
+.header {
+  height: 56px !important;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  border-bottom: 1px solid #E0D8CF;
+  padding: 0 24px;
 }
+
 .header-left {
   display: flex;
   align-items: center;
 }
+
 .user-info {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: #333;
-}
-.el-main {
-  background: #f5f7fa;
+  gap: 6px;
+  color: var(--fashion-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
 }
 
-/* Focus visible 样式 - 可访问性 */
-:deep(.el-menu-item:focus),
-:deep(.el-menu-item:hover) {
-  background-color: #263445 !important;
-  outline: none;
-}
-:deep(.el-button:focus-visible) {
-  outline: 2px solid #ff5777;
-  outline-offset: 2px;
-}
-:deep(.el-dropdown-menu__item:focus-visible) {
-  outline: 2px solid #ff5777;
-  outline-offset: -2px;
+/* Main */
+.main-content {
+  background: var(--fashion-bg);
+  padding: 24px;
 }
 </style>

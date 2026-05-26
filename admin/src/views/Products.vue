@@ -17,10 +17,10 @@
           <template #default="{ row }">
             <el-image 
               v-if="row.image" 
-              :src="'http://192.168.101.50:3001' + row.image" 
+              :src="row.image" 
               style="width:60px;height:60px" 
               fit="cover"
-              :preview-src-list="['http://192.168.101.50:3001' + row.image]"
+              :preview-src-list="[row.image]"
               preview-teleported
             />
             <span v-else class="no-image">暂无图片</span>
@@ -98,7 +98,7 @@
             :before-upload="beforeUpload"
             :http-request="handleUpload"
           >
-            <img v-if="form.image" :src="'http://192.168.101.50:3001' + form.image" class="avatar" />
+            <img v-if="form.image" :src="form.image" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
           <div class="upload-tip">点击上传图片，自动生成缩略图</div>

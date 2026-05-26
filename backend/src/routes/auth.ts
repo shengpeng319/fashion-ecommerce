@@ -21,7 +21,28 @@ router.post('/register', async (req, res) => {
     const user = await prisma.user.create({
       data: { phone, password: hashed, nickname: nickname || phone.slice(-4) }
     })
-    res.json({ success: true, userId: user.id, phone: user.phone })
+
+    // 自动创建轻会员记录
+    await prisma.member.create({
+      data: {
+        userId: user.id,
+        level: 'LIGHT',
+        points: 0,
+        depositAmount: 0
+      }
+    })
+
+    // 生成 token
+    const token = jwt.sign({ userId: user.id, phone: user.phone }, JWT_SECRET, { expiresIn: '7d' })
+
+    res.json({
+      success: true,
+      userId: user.id,
+      phone: user.phone,
+      token,
+      user: { id: user.id, phone: user.phone, nickname: user.nickname, avatar: user.avatar },
+      member: { level: 'LIGHT', points: 0 }
+    })
   } catch (e) {
     res.status(500).json({ error: e.message })
   }
@@ -31,7 +52,10 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { phone, password } = req.body
-    const user = await prisma.user.findUnique({ where: { phone } })
+    const user = await prisma.user.findUnique({
+      where: { phone },
+      include: { member: true }
+    })
     if (!user) {
       return res.status(401).json({ error: '手机号或密码错误' })
     }
@@ -39,11 +63,30 @@ router.post('/login', async (req, res) => {
     if (!valid) {
       return res.status(401).json({ error: '手机号或密码错误' })
     }
+
+    // 如果没有member记录，创建一个轻会员
+    if (!user.member) {
+      await prisma.member.create({
+        data: {
+          userId: user.id,
+          level: 'LIGHT',
+          points: 0,
+          depositAmount: 0
+        }
+      })
+    }
+
     const token = jwt.sign({ userId: user.id, phone: user.phone }, JWT_SECRET, { expiresIn: '7d' })
-    res.json({ 
-      success: true, 
-      token, 
-      user: { id: user.id, phone: user.phone, nickname: user.nickname, avatar: user.avatar } 
+    const freshUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { member: true }
+    })
+
+    res.json({
+      success: true,
+      token,
+      user: { id: user.id, phone: user.phone, nickname: user.nickname, avatar: user.avatar },
+      member: freshUser?.member || { level: 'LIGHT', points: 0 }
     })
   } catch (e) {
     res.status(500).json({ error: e.message })

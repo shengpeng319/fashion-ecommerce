@@ -1,9 +1,11 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const playwrightPort = process.env.PLAYWRIGHT_PORT || '3002'
+
 export default defineConfig({
   testDir: './tests',
   use: {
-    baseURL: 'http://localhost:3002',
+    baseURL: `http://localhost:${playwrightPort}`,
   },
   projects: [
     {
@@ -12,8 +14,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev -- --port 3002',
-    port: 3002,
+    command: `npm run dev -- --port ${playwrightPort}`,
+    port: parseInt(playwrightPort),
     reuseExistingServer: true,
   },
 })

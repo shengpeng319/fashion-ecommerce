@@ -22,21 +22,24 @@ model AdminUser {
 // ============ 用户体系 ============
 
 model User {
-  id        String   @id @default(uuid())
-  phone     String   @unique
-  password  String
-  nickname  String?
-  avatar    String?
-  gender    String   @default("unknown")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid())
+  phone      String   @unique
+  password   String
+  nickname   String?
+  avatar     String?
+  gender     String   @default("unknown")
+  referrerId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  addresses Address[]
-  member    Member?
-  cartItems CartItem[]
-  orders    Order[]
-  dealer      Dealer?
-  shareholder Shareholder?
+  addresses    Address[]
+  member       Member?
+  cartItems    CartItem[]
+  orders       Order[]
+  dealer       Dealer?
+  shareholder  Shareholder?
+  referrer     User?    @relation("ReferralRelation", fields: [referrerId], references: [id])
+  referrals    User[]   @relation("ReferralRelation")
 }
 
 // ============ 收货地址 ============
@@ -61,16 +64,53 @@ model Address {
 // ============ 会员体系 ============
 
 model Member {
-  id           String   @id @default(uuid())
-  userId       String   @unique
-  level        Int      @default(1)
-  points       Int      @default(0)
-  totalSpent   Decimal  @default(0)
-  discountRate Decimal  @default(1.0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  level         String   @default("LIGHT")
+  points        Int      @default(0)
+  totalSpent    Decimal  @default(0)
+  depositAmount Decimal  @default(0)
+  birthday      String?
+  joinedAt      DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions PointsTransaction[]
+}
+
+model MembershipLevel {
+  id           String  @id @default(uuid())
+  name         String  // 等级中文名
+  key          String  @unique // LIGHT/PREMIUM/LUXURY/SELECT/CREATOR/OFFICER
+  minDeposit   Int     // 入会门槛金额(元)
+  bonusPoints  Int     // 到账积分
+  isRefundable Boolean // 预存款是否可退
+  sortOrder    Int     // 排序
+  benefits     String? // JSON格式权益描述
+}
+
+model PointsTransaction {
+  id          String   @id @default(uuid())
+  memberId    String
+  type        String   // EARN/REDEEM/REFUND/REFERRAL/GIFT
+  amount      Int      // 正数为获得，负数为消耗
+  balance     Int      // 变化后余额
+  description String
+  orderId     String?
+  createdAt   DateTime @default(now())
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model Referral {
+  id             String    @id @default(uuid())
+  referrerUserId String
+  referredUserId String
+  pointsAwarded  Int       @default(0)
+  status         String    @default("PENDING") // PENDING/COMPLETED
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
 }
 
 // ============ 商品体系 ============
@@ -164,6 +204,7 @@ model Order {
   status         String
   totalAmount    Decimal
   discountAmount Decimal   @default(0)
+  pointsUsed     Int       @default(0)
   payAmount      Decimal
   payType        String?
   payTime        DateTime?

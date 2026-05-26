@@ -1,81 +1,52 @@
 <template>
   <view class="login-page">
-    <!-- Logo -->
-    <view class="logo-section">
-      <text class="logo-text">Fashion</text>
-      <text class="logo-sub">时尚女装精选</text>
-    </view>
-
-    <!-- Form -->
-    <view class="form-section">
-      <view class="form-item">
-        <view class="form-label">
-          <text class="label-icon">📱</text>
-          <text class="label-text">手机号</text>
-        </view>
-        <input 
-          class="form-input" 
-          v-model="phone" 
-          type="number" 
-          maxlength="11" 
-          placeholder="请输入手机号" 
-          placeholder-class="input-placeholder"
-        />
+    <view class="login-bg"></view>
+    <view class="login-card">
+      <view class="logo-area">
+        <text class="logo-text">FASHION</text>
+        <view class="logo-line"></view>
+        <text class="logo-sub">Milano</text>
       </view>
 
-      <view class="form-item">
-        <view class="form-label">
-          <text class="label-icon">🔒</text>
-          <text class="label-text">密码</text>
+      <view class="form-area">
+        <view class="input-group">
+          <text class="input-label">手机号</text>
+          <input class="input-field" v-model="phone" type="number" maxlength="11" placeholder="请输入手机号" placeholder-class="ph" />
         </view>
-        <input 
-          class="form-input" 
-          v-model="password" 
-          :type="showPassword ? 'text' : 'password'" 
-          placeholder="请输入密码"
-          placeholder-class="input-placeholder"
-        />
-        <view class="password-toggle" @tap="showPassword = !showPassword">
-          <text>{{ showPassword ? '🙈' : '👁️' }}</text>
+        <view class="input-group">
+          <text class="input-label">密码</text>
+          <input class="input-field" v-model="password" type="password" placeholder="请输入密码" placeholder-class="ph" />
         </view>
-      </view>
 
-      <button class="btn-login" @tap="login">登 录</button>
+        <view class="btn-login" @tap="login">
+          <text>登录</text>
+        </view>
 
-      <view class="form-footer">
-        <text class="link-text" @tap="goRegister">注册账号</text>
-        <text class="divider">|</text>
-        <text class="link-text" @tap="forgotPassword">忘记密码</text>
+        <view class="form-links">
+          <text class="link" @tap="goRegister">创建账号</text>
+          <text class="link-divider">·</text>
+          <text class="link">忘记密码</text>
+        </view>
       </view>
     </view>
 
-    <!-- Other Login -->
-    <view class="other-login">
-      <view class="divider-line">
-        <view class="line"></view>
-        <text class="divider-text">其他登录方式</text>
-        <view class="line"></view>
-      </view>
-      <view class="other-icons">
-        <view class="icon-item">
-          <text class="icon">微</text>
-          <text class="icon-label">微信</text>
-        </view>
-      </view>
+    <!-- Back link -->
+    <view class="back-link" @tap="goBack">
+      <text>← 返回</text>
     </view>
   </view>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue'
 import { request, setToken } from '@/utils/request'
 
 const phone = ref('')
 const password = ref('')
-const showPassword = ref(false)
 
 const login = async () => {
   if (!phone.value || !password.value) {
-    uni.showToast({ title: '请填写完整', icon: 'none' })
+    uni.showToast({ title: '请填写所有字段', icon: 'none' })
     return
   }
   if (!/^1\d{10}$/.test(phone.value)) {
@@ -87,7 +58,7 @@ const login = async () => {
     if (res.success) {
       setToken(res.token)
       uni.setStorageSync('userInfo', res.user)
-      uni.showToast({ title: '登录成功', icon: 'success' })
+      uni.showToast({ title: '欢迎回来', icon: 'success' })
       setTimeout(() => uni.navigateBack(), 800)
     }
   } catch (e: any) {
@@ -95,138 +66,116 @@ const login = async () => {
   }
 }
 
-const goRegister = () => {
-  uni.showToast({ title: '请联系管理员注册', icon: 'none' })
-}
-
-const forgotPassword = () => {
-  uni.showToast({ title: '请联系客服找回', icon: 'none' })
-}
+const goRegister = () => uni.navigateTo({ url: '/pages/user/register' })
+const goBack = () => uni.navigateBack()
 </script>
+
 <style lang="scss" scoped>
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #fff5f7 0%, #ffffff 50%, #f8f8f8 100%);
-  padding: 80rpx 48rpx 0;
-}
-
-.logo-section {
-  text-align: center;
-  margin-bottom: 80rpx;
-  .logo-text {
-    display: block;
-    font-size: 72rpx;
-    font-weight: bold;
-    background: linear-gradient(135deg, #ff5777, #ff8a9a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 4rpx;
-  }
-  .logo-sub {
-    display: block;
-    font-size: 26rpx;
-    color: #bbb;
-    margin-top: 12rpx;
-    letter-spacing: 2rpx;
-  }
-}
-
-.form-section {
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 48rpx 36rpx;
-  box-shadow: 0 8rpx 40rpx rgba(255, 87, 119, 0.1);
-}
-
-.form-item {
-  margin-bottom: 40rpx;
   position: relative;
 }
-
-.form-label {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  margin-bottom: 16rpx;
-  .label-icon { font-size: 28rpx; }
-  .label-text { font-size: 28rpx; color: #666; font-weight: 500; }
+.login-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55vh;
+  background: var(--color-dark);
+}
+.login-card {
+  position: relative;
+  z-index: 1;
+  padding-top: 120rpx;
+  margin: 0 40rpx;
 }
 
-.form-input {
+.logo-area {
+  text-align: center;
+  margin-bottom: 64rpx;
+}
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 64rpx;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 12rpx;
+}
+.logo-line {
+  width: 48rpx;
+  height: 2rpx;
+  background: var(--color-gold);
+  margin: 24rpx auto;
+}
+.logo-sub {
+  font-family: var(--font-display);
+  font-size: 24rpx;
+  font-style: italic;
+  color: var(--color-text-muted);
+  letter-spacing: 8rpx;
+}
+
+.form-area {
+  background: var(--color-card);
+  border-radius: var(--radius-xl);
+  padding: 48rpx 36rpx;
+  box-shadow: var(--shadow-lg);
+}
+.input-group {
+  margin-bottom: 36rpx;
+}
+.input-label {
+  display: block;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 3rpx;
+  margin-bottom: 12rpx;
+}
+.input-field {
   height: 88rpx;
-  background: #f8f8f8;
-  border-radius: 12rpx;
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-border-light);
+  border-radius: var(--radius-sm);
   padding: 0 24rpx;
   font-size: 30rpx;
-  color: #333;
+  color: var(--color-text);
+  font-family: var(--font-body);
 }
-
-.input-placeholder {
-  color: #bbb;
-  font-size: 28rpx;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 24rpx;
-  bottom: 24rpx;
-  font-size: 32rpx;
+.ph {
+  color: var(--color-text-muted);
+  font-size: 26rpx;
+  font-weight: 300;
 }
 
 .btn-login {
   height: 88rpx;
-  background: linear-gradient(135deg, #ff5777, #ff8a9a);
-  border-radius: 44rpx;
-  color: #fff;
-  font-size: 34rpx;
-  font-weight: bold;
-  letter-spacing: 4rpx;
-  border: none;
-  margin-top: 20rpx;
-  box-shadow: 0 8rpx 24rpx rgba(255, 87, 119, 0.3);
-}
-
-.form-footer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16rpx;
-  margin-top: 32rpx;
-  .divider { color: #ddd; }
-  .link-text { font-size: 26rpx; color: #666; }
-}
-
-.other-login {
-  margin-top: 80rpx;
-}
-.divider-line {
+  background: var(--color-primary);
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  .line { flex: 1; height: 1rpx; background: #eee; }
-  .divider-text { font-size: 24rpx; color: #bbb; }
+  justify-content: center;
+  margin-top: 8rpx;
+  transition: all var(--transition-base);
+  &:active { opacity: 0.85; }
+  text {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 6rpx;
+  }
 }
-.other-icons {
+.form-links {
   display: flex;
   justify-content: center;
-  margin-top: 40rpx;
-}
-.icon-item {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 8rpx;
-  .icon {
-    width: 88rpx;
-    height: 88rpx;
-    background: #f0f0f0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32rpx;
-    color: #07c160;
-  }
-  .icon-label { font-size: 24rpx; color: #999; }
+  margin-top: 32rpx;
+  .link { font-size: 24rpx; color: var(--color-text-muted); }
+  .link-divider { color: var(--color-border); }
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 40rpx;
+  font-size: 24rpx;
+  color: var(--color-text-muted);
 }
 </style>

@@ -9,8 +9,8 @@ test.describe('电商下单全流程 E2E 测试', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#/login')
     await page.waitForLoadState('networkidle')
-    await page.fill('input[placeholder="手机号"]', '13800138001')
-    await page.fill('input[placeholder="密码"]', 'admin123')
+    await page.fill('input[placeholder="请输入手机号"]', '13800138001')
+    await page.fill('input[placeholder="请输入密码"]', 'admin123')
     await page.click('button:has-text("登录")')
     await page.waitForURL('**/dashboard', { timeout: 5000 })
   })
@@ -112,7 +112,7 @@ test.describe('电商下单全流程 E2E 测试', () => {
     
     // ========== Step 5: 测试 Dashboard ==========
     console.log('Step 5: 验证 Dashboard')
-    await page.click('.el-menu-item:has-text("首页")')
+    await page.click('.el-menu-item:has-text("仪表盘")')
     await page.waitForURL('**/dashboard', { timeout: 5000 })
     await page.waitForLoadState('networkidle')
     
