@@ -1,38 +1,54 @@
 <template>
   <view class="order-list-page">
-    <!-- Tabs -->
     <scroll-view scroll-x class="tabs-wrap" :show-scrollbar="false">
       <view class="tabs">
-        <view v-for="tab in tabs" :key="tab.key" class="tab-item" :class="{ active: currentTab === tab.key }" @tap="currentTab = tab.key">
-          <text>{{ tab.label }}</text>
+        <view
+          v-for="tab in tabs"
+          :key="tab.key"
+          class="tab-item"
+          :class="{ active: currentTab === tab.key }"
+          @tap="currentTab = tab.key"
+        >
+          <text class="tab-text" :class="{ active: currentTab === tab.key }">{{ tab.label }}</text>
         </view>
       </view>
     </scroll-view>
 
-    <!-- Orders -->
     <scroll-view scroll-y class="orders-scroll">
-      <view class="order-card" v-for="order in filteredOrders" :key="order.id" @tap="goDetail(order.id)">
+      <view
+        v-for="order in filteredOrders"
+        :key="order.id"
+        class="order-card"
+        @tap="goDetail(order.id)"
+      >
         <view class="oc-header">
           <text class="oc-no">{{ order.orderNo }}</text>
           <text class="oc-status" :class="order.status">{{ statusMap[order.status] }}</text>
         </view>
         <view class="oc-items">
-          <image v-for="(item, i) in order.items.slice(0, 3)" :key="i"
-            :src="getImg(item)" mode="aspectFill" class="oc-img" />
+          <image
+            v-for="(item, i) in order.items.slice(0, 3)"
+            :key="i"
+            :src="getImg(item)"
+            mode="aspectFill"
+            class="oc-img"
+          />
           <view class="oc-more" v-if="order.items.length > 3">
-            <text>+{{ order.items.length - 3 }}</text>
+            <text class="oc-more-text">+{{ order.items.length - 3 }}</text>
           </view>
         </view>
         <view class="oc-footer">
-          <text class="oc-count">{{ order.items.length }} 件商品</text>
-          <text class="oc-total">合计 ¥{{ order.payAmount }}</text>
+          <text class="oc-count">{{ order.items.length }}件商品</text>
+          <text class="oc-total">合计 <text class="oc-total-price">¥{{ order.payAmount }}</text></text>
         </view>
       </view>
 
-      <view v-if="filteredOrders.length === 0" class="empty">
-        <text class="empty-icon">◇</text>
-        <text class="empty-text">暂无订单</text>
-      </view>
+      <EmptyState
+        v-if="filteredOrders.length === 0"
+        icon="📦"
+        title="暂无订单"
+        description="快去挑选心仪的商品吧"
+      />
     </scroll-view>
   </view>
 </template>
@@ -41,6 +57,7 @@
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
+import EmptyState from '@/components/EmptyState.vue'
 
 const tabs = [
   { key: 'all', label: '全部' },
@@ -86,101 +103,127 @@ const goDetail = (id: string) => {
 <style lang="scss" scoped>
 .order-list-page {
   min-height: 100vh;
-  background: var(--color-bg);
+  background: var(--bg-secondary, #F5F5F5);
   display: flex;
   flex-direction: column;
 }
+
 .tabs-wrap {
-  background: var(--color-card);
-  border-bottom: 1rpx solid var(--color-border-light);
+  background: #FFFFFF;
+  border-bottom: 1rpx solid var(--border, #EEEEEE);
 }
+
 .tabs {
   display: flex;
-  padding: 8rpx 16rpx;
-  gap: 8rpx;
+  padding: 16rpx 24rpx;
+  gap: 16rpx;
 }
+
 .tab-item {
   flex-shrink: 0;
-  padding: 16rpx 28rpx;
-  font-size: 26rpx;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-  border-radius: 24rpx;
-  transition: all var(--transition-base);
+  padding: 14rpx 32rpx;
+  background: var(--bg-secondary, #F5F5F5);
+  border-radius: var(--radius-full, 9999rpx);
+
   &.active {
-    background: var(--color-primary);
-    text { color: #fff; }
+    background: var(--accent, #C8102E);
   }
 }
+
+.tab-text {
+  font-size: 26rpx;
+  color: var(--text-secondary, #333333);
+  font-weight: 500;
+
+  &.active {
+    color: #FFFFFF;
+  }
+}
+
 .orders-scroll {
   flex: 1;
   padding: 24rpx;
 }
+
 .order-card {
-  background: var(--color-card);
-  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  border-radius: var(--radius-sm, 8rpx);
   padding: 24rpx;
   margin-bottom: 20rpx;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
+
 .oc-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 20rpx;
 }
+
 .oc-no {
   font-size: 22rpx;
-  color: var(--color-text-muted);
-  font-weight: 400;
+  color: var(--text-quaternary, #999999);
 }
+
 .oc-status {
   font-size: 22rpx;
   font-weight: 500;
-  letter-spacing: 1rpx;
-  &.pending { color: var(--color-warning); }
-  &.paid { color: var(--color-primary); }
-  &.shipped { color: #3A5A7C; }
-  &.completed { color: var(--color-accent); }
-  &.cancelled { color: var(--color-text-muted); }
+
+  &.pending { color: #B8860B; }
+  &.paid { color: #C8102E; }
+  &.shipped { color: #1565C0; }
+  &.completed { color: #2E7D32; }
+  &.cancelled { color: #999999; }
 }
+
 .oc-items {
   display: flex;
-  gap: 8rpx;
+  gap: 12rpx;
 }
+
 .oc-img {
   width: 120rpx;
-  height: 150rpx;
-  border-radius: var(--radius-sm);
+  height: 120rpx;
+  border-radius: var(--radius-sm, 8rpx);
 }
+
 .oc-more {
   width: 120rpx;
-  height: 150rpx;
-  background: var(--color-surface);
-  border-radius: var(--radius-sm);
+  height: 120rpx;
+  background: var(--bg-secondary, #F5F5F5);
+  border-radius: var(--radius-sm, 8rpx);
   display: flex;
   align-items: center;
   justify-content: center;
-  text { font-size: 24rpx; color: var(--color-text-muted); }
 }
+
+.oc-more-text {
+  font-size: 24rpx;
+  color: var(--text-quaternary, #999999);
+}
+
 .oc-footer {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   margin-top: 20rpx;
   padding-top: 16rpx;
-  border-top: 1rpx solid var(--color-divider);
+  border-top: 1rpx solid var(--divider, #F0F0F0);
 }
-.oc-count { font-size: 24rpx; color: var(--color-text-muted); }
+
+.oc-count {
+  font-size: 24rpx;
+  color: var(--text-quaternary, #999999);
+}
+
 .oc-total {
-  font-family: var(--font-display);
+  font-size: 24rpx;
+  color: var(--text-tertiary, #666666);
+}
+
+.oc-total-price {
   font-size: 30rpx;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--accent, #C8102E);
 }
-.empty {
-  text-align: center;
-  padding: 200rpx 0;
-}
-.empty-icon { font-size: 64rpx; color: var(--color-text-muted); opacity: 0.4; }
-.empty-text { display: block; margin-top: 24rpx; font-size: 28rpx; color: var(--color-text-secondary); }
 </style>

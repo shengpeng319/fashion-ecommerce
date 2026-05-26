@@ -1,26 +1,24 @@
 <template>
   <view class="order-detail-page">
-    <!-- Status Header -->
     <view class="status-header" :class="order.status">
-      <text class="sh-status">{{ statusMap[order.status] }}</text>
-      <text class="sh-desc">{{ statusDescMap[order.status] }}</text>
+      <view class="sh-accent" :class="order.status"></view>
+      <view class="sh-content">
+        <text class="sh-status">{{ statusMap[order.status] }}</text>
+        <text class="sh-desc">{{ statusDescMap[order.status] }}</text>
+      </view>
     </view>
 
-    <!-- Address -->
     <view class="address-card" v-if="order.address">
-      <view class="ac-header">
-        <text class="ac-label">收货地址</text>
+      <text class="section-label">收货地址</text>
+      <view class="ac-info">
+        <text class="ac-name">{{ order.address.name }}</text>
+        <text class="ac-phone">{{ order.address.phone }}</text>
       </view>
-      <text class="ac-name">{{ order.address.name }}</text>
-      <text class="ac-phone">{{ order.address.phone }}</text>
       <text class="ac-detail">{{ order.address.province }}{{ order.address.city }}{{ order.address.district }}{{ order.address.detail }}</text>
     </view>
 
-    <!-- Items -->
     <view class="items-card">
-      <view class="ic-header">
-        <text class="ic-label">订单商品</text>
-      </view>
+      <text class="section-label">订单商品</text>
       <view v-for="item in order.items" :key="item.id" class="ic-item">
         <image :src="getImg(item)" mode="aspectFill" class="ic-img" />
         <view class="ic-info">
@@ -34,7 +32,6 @@
       </view>
     </view>
 
-    <!-- Order Info -->
     <view class="info-card">
       <view class="if-row">
         <text class="if-label">订单编号</text>
@@ -98,157 +95,187 @@ onLoad(async (opt: any) => {
 <style lang="scss" scoped>
 .order-detail-page {
   min-height: 100vh;
-  background: var(--color-bg);
+  background: var(--bg-secondary, #F5F5F5);
 }
 
-// Status Header
 .status-header {
-  padding: 56rpx 32rpx 40rpx;
-  text-align: center;
-  background: var(--color-dark);
-  &.pending { background: var(--color-dark); }
-  &.paid { background: var(--color-primary); }
-  &.shipped { background: #3A5A7C; }
-  &.completed { background: var(--color-accent); }
-  &.cancelled { background: var(--color-dark-surface); }
-}
-.sh-status {
-  font-family: var(--font-display);
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 4rpx;
-}
-.sh-desc {
-  display: block;
-  font-size: 24rpx;
-  color: rgba(255,255,255,0.7);
-  margin-top: 12rpx;
-  font-weight: 300;
-}
-
-// Address
-.address-card {
-  background: var(--color-card);
-  padding: 28rpx 32rpx;
-  margin-bottom: 20rpx;
-}
-.ac-header {
+  background: #FFFFFF;
+  padding: 48rpx 32rpx;
+  display: flex;
+  align-items: stretch;
   margin-bottom: 16rpx;
 }
-.ac-label {
-  font-size: 20rpx;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: 3rpx;
+
+.sh-accent {
+  width: 8rpx;
+  border-radius: 4rpx;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+
+  &.pending { background: #B8860B; }
+  &.paid { background: #C8102E; }
+  &.shipped { background: #1565C0; }
+  &.completed { background: #2E7D32; }
+  &.cancelled { background: #999999; }
 }
+
+.sh-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sh-status {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.sh-desc {
+  font-size: 26rpx;
+  color: var(--text-tertiary, #666666);
+  margin-top: 8rpx;
+}
+
+.address-card {
+  background: #FFFFFF;
+  padding: 24rpx 32rpx;
+  margin-bottom: 16rpx;
+}
+
+.section-label {
+  display: block;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--text-quaternary, #999999);
+  letter-spacing: 2rpx;
+  margin-bottom: 16rpx;
+}
+
+.ac-info {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 8rpx;
+}
+
 .ac-name {
-  font-family: var(--font-display);
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  color: var(--color-text);
-  margin-right: 16rpx;
+  color: var(--text-primary, #1A1A1A);
 }
+
 .ac-phone {
   font-size: 28rpx;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary, #333333);
 }
+
 .ac-detail {
   display: block;
   font-size: 26rpx;
-  color: var(--color-text-muted);
-  margin-top: 12rpx;
+  color: var(--text-tertiary, #666666);
   line-height: 1.5;
 }
 
-// Items
 .items-card {
-  background: var(--color-card);
-  margin-bottom: 20rpx;
+  background: #FFFFFF;
+  padding: 24rpx 32rpx;
+  margin-bottom: 16rpx;
 }
-.ic-header {
-  padding: 24rpx 32rpx 0;
-}
-.ic-label {
-  font-size: 20rpx;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: 3rpx;
-}
+
 .ic-item {
   display: flex;
-  padding: 24rpx 32rpx;
-  border-bottom: 1rpx solid var(--color-divider);
-  &:last-child { border-bottom: none; }
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--divider, #F0F0F0);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
+
 .ic-img {
-  width: 140rpx;
-  height: 170rpx;
-  border-radius: var(--radius-sm);
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: var(--radius-sm, 8rpx);
   margin-right: 20rpx;
+  flex-shrink: 0;
 }
-.ic-info { flex: 1; min-width: 0; }
+
+.ic-info {
+  flex: 1;
+  min-width: 0;
+}
+
 .ic-name {
   display: block;
   font-size: 28rpx;
-  color: var(--color-text);
+  color: var(--text-primary, #1A1A1A);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .ic-sku {
   display: block;
   font-size: 22rpx;
-  color: var(--color-text-muted);
+  color: var(--text-tertiary, #666666);
   margin-top: 4rpx;
 }
+
 .ic-bottom {
   display: flex;
   justify-content: space-between;
-  margin-top: 20rpx;
-}
-.ic-price {
-  font-family: var(--font-display);
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-.ic-qty {
-  font-size: 26rpx;
-  color: var(--color-text-muted);
+  margin-top: 12rpx;
 }
 
-// Order Info
+.ic-price {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--accent, #C8102E);
+}
+
+.ic-qty {
+  font-size: 26rpx;
+  color: var(--text-quaternary, #999999);
+}
+
 .info-card {
-  background: var(--color-card);
+  background: #FFFFFF;
   padding: 8rpx 32rpx 24rpx;
 }
+
 .if-row {
   display: flex;
   justify-content: space-between;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid var(--color-divider);
-  &:last-child { border-bottom: none; }
+  border-bottom: 1rpx solid var(--divider, #F0F0F0);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
+
 .if-label {
   font-size: 26rpx;
-  color: var(--color-text-muted);
+  color: var(--text-tertiary, #666666);
 }
+
 .if-value {
   font-size: 26rpx;
-  color: var(--color-text);
-  font-weight: 400;
+  color: var(--text-primary, #1A1A1A);
 }
+
 .if-total {
-  padding-top: 24rpx;
-  border-bottom: none;
-  .if-label { font-weight: 600; color: var(--color-text); }
+  .if-label {
+    font-weight: 600;
+    color: var(--text-primary, #1A1A1A);
+  }
 }
+
 .if-price {
-  font-family: var(--font-display);
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--accent, #C8102E);
 }
 </style>

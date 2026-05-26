@@ -1,9 +1,7 @@
 <template>
   <view class="order-create-page">
-    <!-- Address -->
     <view class="addr-card" @tap="goSelectAddress">
       <view v-if="address" class="addr-filled">
-        <text class="addr-label">收货地址</text>
         <text class="addr-name">{{ address.name }}  {{ address.phone }}</text>
         <text class="addr-detail">{{ address.province }}{{ address.city }}{{ address.district }}{{ address.detail }}</text>
       </view>
@@ -14,30 +12,27 @@
       <text class="addr-arrow">›</text>
     </view>
 
-    <!-- Items -->
     <view class="items-card" v-if="orderItems.length">
-      <view class="ic-label">订单摘要</view>
       <view v-for="item in orderItems" :key="item.id || item.productId" class="ic-item">
         <image :src="getImg(item)" mode="aspectFill" class="ic-img" />
         <view class="ic-info">
           <text class="ic-name">{{ item.product?.name }}</text>
           <text class="ic-sku" v-if="item.sku?.name">{{ item.sku.name }}</text>
           <view class="ic-bottom">
-            <text class="ic-price">¥{{ item.product?.price }}</text>
-            <text class="ic-qty">× {{ item.quantity }}</text>
+            <PriceDisplay :price="Number(item.product?.price || 0)" />
+            <text class="ic-qty">×{{ item.quantity }}</text>
           </view>
         </view>
       </view>
     </view>
 
-    <!-- Points Redemption -->
     <view class="points-card" v-if="isLoggedIn && memberPoints > 0">
       <view class="pc-header">
         <text class="pc-label">积分抵扣</text>
         <text class="pc-balance">{{ memberPoints }} 积分可用</text>
       </view>
       <view class="pc-row" v-if="usePoints">
-        <input v-model="pointsToUse" type="number" placeholder="请输入抵扣积分" placeholder-class="ph" class="pc-input" />
+        <input v-model="pointsToUse" type="number" placeholder="请输入抵扣积分" placeholder-class="input-ph" class="pc-input" />
         <text class="pc-hint">（1积分=1元）</text>
       </view>
       <view class="pc-toggle" @tap="usePoints = !usePoints">
@@ -48,7 +43,6 @@
       </view>
     </view>
 
-    <!-- Bottom -->
     <view class="bottom-bar">
       <view class="bb-total">
         <text class="bb-label">合计</text>
@@ -56,11 +50,10 @@
         <text class="bb-discount" v-if="pointsUsed > 0">（已抵扣¥{{ pointsUsed }}）</text>
       </view>
       <view class="bb-btn" @tap="submitOrder">
-        <text>提交订单</text>
+        <text class="bb-btn-text">提交订单</text>
       </view>
     </view>
 
-    <!-- Payment Popup -->
     <PaymentPopup
       :visible="showPayment"
       title="确认支付"
@@ -76,6 +69,7 @@ import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { request, getToken } from '@/utils/request'
 import PaymentPopup from '@/components/PaymentPopup.vue'
+import PriceDisplay from '@/components/PriceDisplay.vue'
 
 const address = ref<any>(null)
 const orderItems = ref<any[]>([])
@@ -155,8 +149,8 @@ const submitOrder = async () => {
     const items = orderItems.value.map((i: any) => ({
       productId: i.product.id, skuId: i.sku?.id || null, quantity: i.quantity
     }))
-    const res: any = await request('/orders', 'POST', { 
-      addressId: address.value.id, 
+    const res: any = await request('/orders', 'POST', {
+      addressId: address.value.id,
       items,
       pointsUsed: pointsUsed.value || 0
     })
@@ -183,239 +177,263 @@ const handlePaymentConfirm = async () => {
 .order-create-page {
   min-height: 100vh;
   padding-bottom: 140rpx;
-  background: var(--color-bg);
+  background: var(--bg-secondary, #F5F5F5);
 }
 
-// Address
 .addr-card {
   display: flex;
   align-items: center;
   padding: 32rpx;
-  background: var(--color-card);
-  margin-bottom: 20rpx;
+  background: #FFFFFF;
+  margin-bottom: 16rpx;
 }
-.addr-filled { flex: 1; }
-.addr-label {
-  font-size: 20rpx;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: 3rpx;
-  margin-bottom: 8rpx;
-  display: block;
+
+.addr-filled {
+  flex: 1;
 }
+
 .addr-name {
-  font-family: var(--font-display);
+  display: block;
   font-size: 30rpx;
   font-weight: 600;
-  color: var(--color-text);
-  display: block;
+  color: var(--text-primary, #1A1A1A);
 }
+
 .addr-detail {
   display: block;
   font-size: 24rpx;
-  color: var(--color-text-muted);
+  color: var(--text-tertiary, #666666);
   margin-top: 8rpx;
   line-height: 1.4;
 }
+
 .addr-empty {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 12rpx;
 }
+
 .addr-plus {
   font-size: 36rpx;
-  color: var(--color-primary);
+  color: var(--accent, #C8102E);
   font-weight: 300;
 }
+
 .addr-hint {
   font-size: 28rpx;
-  color: var(--color-primary);
-}
-.addr-arrow {
-  font-size: 32rpx;
-  color: var(--color-text-muted);
+  color: var(--accent, #C8102E);
 }
 
-// Items
+.addr-arrow {
+  font-size: 32rpx;
+  color: var(--text-quaternary, #999999);
+}
+
 .items-card {
-  background: var(--color-card);
+  background: #FFFFFF;
   padding: 8rpx 0;
+  margin-bottom: 16rpx;
 }
-.ic-label {
-  padding: 24rpx 32rpx 0;
-  font-size: 20rpx;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: 3rpx;
-}
+
 .ic-item {
   display: flex;
   padding: 24rpx 32rpx;
-  border-bottom: 1rpx solid var(--color-divider);
-  &:last-child { border-bottom: none; }
+  border-bottom: 1rpx solid var(--divider, #F0F0F0);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
+
 .ic-img {
-  width: 140rpx;
-  height: 170rpx;
-  border-radius: var(--radius-sm);
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: var(--radius-sm, 8rpx);
   margin-right: 20rpx;
+  flex-shrink: 0;
 }
-.ic-info { flex: 1; min-width: 0; }
+
+.ic-info {
+  flex: 1;
+  min-width: 0;
+}
+
 .ic-name {
   display: block;
   font-size: 28rpx;
-  color: var(--color-text);
+  color: var(--text-primary, #1A1A1A);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .ic-sku {
   display: block;
   font-size: 22rpx;
-  color: var(--color-text-muted);
+  color: var(--text-tertiary, #666666);
   margin-top: 4rpx;
 }
+
 .ic-bottom {
   display: flex;
   justify-content: space-between;
-  margin-top: 20rpx;
-}
-.ic-price {
-  font-family: var(--font-display);
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-.ic-qty {
-  font-size: 26rpx;
-  color: var(--color-text-muted);
+  align-items: center;
+  margin-top: 16rpx;
 }
 
-// Points
-.points-card {
-  background: var(--color-card);
-  margin: 20rpx 0;
-  padding: 28rpx 32rpx;
+.ic-qty {
+  font-size: 26rpx;
+  color: var(--text-quaternary, #999999);
 }
+
+.points-card {
+  background: #FFFFFF;
+  padding: 28rpx 32rpx;
+  margin-bottom: 16rpx;
+}
+
 .pc-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 20rpx;
 }
+
 .pc-label {
   font-size: 26rpx;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--text-primary, #1A1A1A);
 }
+
 .pc-balance {
   font-size: 22rpx;
-  color: var(--color-primary);
+  color: var(--accent, #C8102E);
   font-weight: 500;
 }
+
 .pc-row {
   display: flex;
   align-items: center;
   gap: 12rpx;
   margin-bottom: 20rpx;
 }
+
 .pc-input {
   flex: 1;
   height: 68rpx;
-  background: var(--color-surface);
-  border-radius: var(--radius-sm);
+  background: var(--bg-secondary, #F5F5F5);
+  border-radius: var(--radius-sm, 8rpx);
   padding: 0 20rpx;
   font-size: 28rpx;
-  color: var(--color-text);
+  color: var(--text-primary, #1A1A1A);
 }
-.ph { color: var(--color-text-muted); font-size: 26rpx; }
+
+.input-ph {
+  color: var(--text-quaternary, #999999);
+  font-size: 26rpx;
+}
+
 .pc-hint {
   font-size: 22rpx;
-  color: var(--color-text-muted);
+  color: var(--text-quaternary, #999999);
   flex-shrink: 0;
 }
+
 .pc-toggle {
   display: flex;
   align-items: center;
   gap: 16rpx;
 }
+
 .pc-switch {
   width: 88rpx;
   height: 48rpx;
-  background: var(--color-border);
+  background: var(--bg-tertiary, #EFEFEF);
   border-radius: 24rpx;
   position: relative;
   transition: background 0.2s;
-  &.on { background: var(--color-primary); }
+
+  &.on {
+    background: var(--accent, #C8102E);
+  }
 }
+
 .pc-switch-dot {
   position: absolute;
   top: 4rpx;
   left: 4rpx;
   width: 40rpx;
   height: 40rpx;
-  background: #fff;
+  background: #FFFFFF;
   border-radius: 50%;
   transition: left 0.2s;
-  .on & { left: 44rpx; }
-}
-.pc-switch-label {
-  font-size: 24rpx;
-  color: var(--color-text-secondary);
+
+  .on & {
+    left: 44rpx;
+  }
 }
 
-// Bottom Bar
+.pc-switch-label {
+  font-size: 24rpx;
+  color: var(--text-secondary, #333333);
+}
+
 .bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background: var(--color-dark);
+  height: 120rpx;
+  background: #FFFFFF;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 32rpx;
   z-index: 999;
+  box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.06);
 }
+
 .bb-total {
   display: flex;
   align-items: baseline;
-  gap: 12rpx;
+  gap: 8rpx;
 }
+
 .bb-label {
-  font-size: 22rpx;
-  color: var(--color-text-muted);
-  letter-spacing: 2rpx;
+  font-size: 26rpx;
+  color: var(--text-tertiary, #666666);
 }
+
 .bb-price {
-  font-family: var(--font-display);
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  color: var(--color-gold);
+  color: var(--accent, #C8102E);
 }
+
 .bb-discount {
-  display: block;
   font-size: 18rpx;
-  color: var(--color-text-muted);
-  margin-top: -2rpx;
+  color: var(--text-quaternary, #999999);
 }
+
 .bb-btn {
-  background: var(--color-gold);
-  padding: 0 40rpx;
-  height: 68rpx;
+  background: var(--accent, #C8102E);
+  padding: 0 48rpx;
+  height: 80rpx;
   display: flex;
   align-items: center;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-base);
-  &:active { opacity: 0.85; }
-  text {
-    font-size: 24rpx;
-    font-weight: 600;
-    color: var(--color-dark);
-    letter-spacing: 3rpx;
+  justify-content: center;
+  border-radius: 40rpx;
+
+  &:active {
+    opacity: 0.85;
   }
+}
+
+.bb-btn-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #FFFFFF;
 }
 </style>

@@ -1,39 +1,43 @@
 <template>
   <view class="register-page">
-    <view class="register-bg"></view>
-    <view class="register-card">
-      <view class="logo-area">
-        <text class="logo-text">加入我们</text>
-        <view class="logo-line"></view>
-        <text class="logo-sub">创建您的账号</text>
-      </view>
-
-      <view class="form-area">
-        <view class="input-group">
-          <text class="input-label">手机号</text>
-          <input class="input-field" v-model="phone" type="number" maxlength="11" placeholder="请输入手机号" placeholder-class="ph" />
-        </view>
-        <view class="input-group">
-          <text class="input-label">密码</text>
-          <input class="input-field" v-model="password" type="password" placeholder="至少6位字符" placeholder-class="ph" />
-        </view>
-        <view class="input-group">
-          <text class="input-label">昵称（选填）</text>
-          <input class="input-field" v-model="nickname" type="text" placeholder="怎么称呼您" placeholder-class="ph" />
-        </view>
-
-        <view class="btn-register" @tap="register">
-          <text>创建账号</text>
-        </view>
-
-        <view class="form-footer">
-          <text class="link" @tap="goLogin">已有账号？去登录</text>
-        </view>
-      </view>
+    <view class="back-btn" @tap="goBack">
+      <text class="back-arrow">‹</text>
     </view>
 
-    <view class="back-link" @tap="goBack">
-      <text>← Back</text>
+    <view class="brand">
+      <text class="brand-title">创建账号</text>
+      <text class="brand-sub">注册成为会员</text>
+    </view>
+
+    <view class="form-card">
+      <input
+        class="form-input"
+        v-model="phone"
+        type="number"
+        maxlength="11"
+        placeholder="请输入手机号"
+        placeholder-class="input-ph"
+      />
+      <input
+        class="form-input"
+        v-model="password"
+        type="password"
+        placeholder="至少6位字符"
+        placeholder-class="input-ph"
+      />
+      <input
+        class="form-input"
+        v-model="nickname"
+        type="text"
+        placeholder="怎么称呼您（选填）"
+        placeholder-class="input-ph"
+      />
+      <view class="register-btn" @tap="register">
+        <text class="register-btn-text">注册</text>
+      </view>
+      <view class="form-footer">
+        <text class="form-link" @tap="goLogin">已有账号？去登录</text>
+      </view>
     </view>
   </view>
 </template>
@@ -81,102 +85,104 @@ const goBack = () => uni.navigateBack()
 <style lang="scss" scoped>
 .register-page {
   min-height: 100vh;
+  background: var(--bg-secondary, #F5F5F5);
+  padding: 0 48rpx;
   position: relative;
-}
-.register-bg {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 45vh;
-  background: var(--color-dark);
-}
-.register-card {
-  position: relative;
-  z-index: 1;
-  padding-top: 80rpx;
-  margin: 0 40rpx;
 }
 
-.logo-area {
+.back-btn {
+  position: absolute;
+  top: 100rpx;
+  left: 32rpx;
+  width: 72rpx;
+  height: 72rpx;
+  background: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+.back-arrow {
+  font-size: 40rpx;
+  color: var(--text-primary, #1A1A1A);
+  margin-top: -4rpx;
+}
+
+.brand {
+  padding-top: 200rpx;
   text-align: center;
   margin-bottom: 56rpx;
 }
-.logo-text {
-  font-family: var(--font-display);
-  font-size: 48rpx;
+
+.brand-title {
+  display: block;
+  font-size: 40rpx;
   font-weight: 700;
-  color: var(--color-gold);
-  letter-spacing: 10rpx;
-}
-.logo-line {
-  width: 40rpx;
-  height: 2rpx;
-  background: var(--color-gold);
-  margin: 20rpx auto;
-}
-.logo-sub {
-  font-size: 24rpx;
-  color: var(--color-text-muted);
-  font-weight: 300;
-  letter-spacing: 2rpx;
+  color: var(--text-primary, #1A1A1A);
+  letter-spacing: 4rpx;
 }
 
-.form-area {
-  background: var(--color-card);
-  border-radius: var(--radius-xl);
-  padding: 48rpx 36rpx;
-  box-shadow: var(--shadow-lg);
-}
-.input-group {
-  margin-bottom: 32rpx;
-}
-.input-label {
+.brand-sub {
   display: block;
-  font-size: 20rpx;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  letter-spacing: 3rpx;
-  margin-bottom: 12rpx;
+  font-size: 26rpx;
+  color: var(--text-quaternary, #999999);
+  margin-top: 12rpx;
 }
-.input-field {
-  height: 88rpx;
-  background: var(--color-surface);
-  border: 1rpx solid var(--color-border-light);
-  border-radius: var(--radius-sm);
+
+.form-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-md, 16rpx);
+  padding: 48rpx 32rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 96rpx;
+  background: var(--bg-secondary, #F5F5F5);
+  border-radius: var(--radius-sm, 8rpx);
   padding: 0 24rpx;
   font-size: 30rpx;
-  color: var(--color-text);
-}
-.ph {
-  color: var(--color-text-muted);
-  font-size: 26rpx;
-  font-weight: 300;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 24rpx;
+  box-sizing: border-box;
 }
 
-.btn-register {
+.input-ph {
+  color: var(--text-quaternary, #999999);
+  font-size: 28rpx;
+}
+
+.register-btn {
+  width: 100%;
   height: 88rpx;
-  background: var(--color-primary);
+  background: var(--accent, #C8102E);
+  border-radius: 44rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 8rpx;
-  &:active { opacity: 0.85; }
-  text {
-    font-size: 28rpx;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: 6rpx;
+
+  &:active {
+    opacity: 0.85;
   }
 }
+
+.register-btn-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: 4rpx;
+}
+
 .form-footer {
   text-align: center;
   margin-top: 28rpx;
-  .link { font-size: 24rpx; color: var(--color-text-muted); }
 }
 
-.back-link {
-  text-align: center;
-  margin-top: 32rpx;
+.form-link {
   font-size: 24rpx;
-  color: var(--color-text-muted);
+  color: var(--text-quaternary, #999999);
 }
 </style>
