@@ -1,251 +1,222 @@
 // ========================================
-// FASHION — Global Styles & Design Tokens
+// FASHION — Design System (White Minimal)
+// Reference: DESIGN.md
 // ========================================
 
-/* #ifdef H5 */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700&display=swap');
-/* #endif */
-
-// ==========================================
-// CSS Custom Properties
-// ==========================================
 :root {
-  // Brand
-  --color-primary:       #6B1D2F;
-  --color-primary-dark:  #4A1520;
-  --color-primary-light: #8B2D3F;
-  --color-accent:        #1B4D3E;
-  --color-accent-light:  #2A6D5A;
-  --color-gold:          #C9A96E;
-  --color-gold-light:    #E0CDA0;
+  // --- Background layers ---
+  --bg-primary:    #FFFFFF;
+  --bg-secondary:  #F5F5F5;
+  --bg-tertiary:   #EFEFEF;
+  --bg-card:       #FFFFFF;
 
-  // Surfaces
-  --color-bg:            #F5F0EB;
-  --color-surface:       #FAF7F2;
-  --color-card:          #FFFFFF;
-  --color-dark:          #1A1514;
-  --color-dark-surface:  #252220;
-  --color-dark-card:     #2D2A28;
+  // --- Text layers ---
+  --text-primary:    #1A1A1A;
+  --text-secondary:  #333333;
+  --text-tertiary:   #666666;
+  --text-quaternary: #999999;
 
-  // Text
-  --color-text:          #1A1514;
-  --color-text-secondary:#5C5550;
-  --color-text-muted:    #8C8279;
-  --color-text-inverse:  #F5F0EB;
-  --color-text-gold:     #C9A96E;
+  // --- Accent ---
+  --accent:          #C8102E;
+  --accent-hover:    #A50D24;
+  --accent-light:    #FFF1F3;
 
-  // Borders
-  --color-border:        #E0D8CF;
-  --color-border-light:  #EDE6DD;
-  --color-divider:       #F0EBE4;
+  // --- Borders & dividers ---
+  --border:          #EEEEEE;
+  --border-light:    #F0F0F0;
+  --divider:         #F0F0F0;
 
-  // Status
-  --color-success:       #1B4D3E;
-  --color-warning:       #C9A96E;
-  --color-error:         #8B0000;
+  // --- Shadows (minimal) ---
+  --shadow-card:     0 1px 4px rgba(0,0,0,0.06);
+  --shadow-float:    0 4px 16px rgba(0,0,0,0.08);
+  --shadow-nav:      0 -1px 0 rgba(0,0,0,0.06);
 
-  // Typography
-  --font-display:        'Playfair Display', 'Times New Roman', Georgia, serif;
-  --font-body:           -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  // --- Typography ---
+  --font-cn:     'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-sans:   -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-mono:   'SF Mono', 'Menlo', monospace;
 
-  // Spacing
-  --space-xs:            8rpx;
-  --space-sm:            16rpx;
-  --space-md:            24rpx;
-  --space-lg:            32rpx;
-  --space-xl:            40rpx;
-  --space-2xl:           48rpx;
-  --space-3xl:           64rpx;
+  // --- Spacing (4px grid) ---
+  --space-1:   8rpx;
+  --space-2:   16rpx;
+  --space-3:   24rpx;
+  --space-4:   32rpx;
+  --space-5:   40rpx;
+  --space-6:   48rpx;
+  --space-8:   64rpx;
+  --space-10:  80rpx;
+  --space-12:  96rpx;
 
-  // Radius
-  --radius-sm:           8rpx;
-  --radius-md:           12rpx;
-  --radius-lg:           16rpx;
-  --radius-xl:           24rpx;
+  // --- Border radius ---
+  --radius-xs:    4rpx;
+  --radius-sm:    8rpx;
+  --radius-md:    16rpx;
+  --radius-lg:    24rpx;
+  --radius-full:  9999rpx;
 
-  // Shadow
-  --shadow-sm:           0 2rpx 12rpx rgba(26, 21, 20, 0.04);
-  --shadow-md:           0 4rpx 24rpx rgba(26, 21, 20, 0.06);
-  --shadow-lg:           0 8rpx 40rpx rgba(26, 21, 20, 0.08);
-  --shadow-xl:           0 16rpx 64rpx rgba(26, 21, 20, 0.12);
-
-  // Transition
-  --transition-fast:     0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base:     0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow:     0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  // --- Transitions ---
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms ease;
 }
 
-// ==========================================
+// ========================================
 // Base
-// ==========================================
+// ========================================
 page {
-  background-color: var(--color-bg);
+  background-color: var(--bg-secondary);
   font-size: 28rpx;
-  color: var(--color-text);
-  font-family: var(--font-body);
+  line-height: 1.6;
+  color: var(--text-primary);
+  font-family: var(--font-cn), var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-// ==========================================
-// Utility Classes
-// ==========================================
-.container { padding: var(--space-md); }
+// ========================================
+// Layout Utilities
+// ========================================
+.container { padding: 0 var(--space-4); }
 
-// Flex
 .flex { display: flex; }
 .flex-col { display: flex; flex-direction: column; }
-.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-wrap { display: flex; flex-wrap: wrap; }
 .flex-center { display: flex; justify-content: center; align-items: center; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
 .flex-1 { flex: 1; }
-.gap-xs { gap: var(--space-xs); }
-.gap-sm { gap: var(--space-sm); }
-.gap-md { gap: var(--space-md); }
-.gap-lg { gap: var(--space-lg); }
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
 
-// Text
-.text-primary { color: var(--color-primary); }
-.text-accent { color: var(--color-accent); }
-.text-gold { color: var(--color-gold); }
-.text-muted { color: var(--color-text-muted); }
-.text-secondary { color: var(--color-text-secondary); }
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.text-left { text-align: left; }
-.text-price { color: var(--color-primary); font-weight: 700; font-family: var(--font-display); }
-.text-uppercase { text-transform: uppercase; letter-spacing: 2rpx; }
-.text-display { font-family: var(--font-display); }
-
-// Typography scale
+// ========================================
+// Text Utilities
+// ========================================
 .text-xs { font-size: 20rpx; }
 .text-sm { font-size: 24rpx; }
 .text-base { font-size: 28rpx; }
 .text-md { font-size: 30rpx; }
 .text-lg { font-size: 34rpx; }
 .text-xl { font-size: 40rpx; }
-.text-2xl { font-size: 48rpx; }
-.text-3xl { font-size: 56rpx; }
+.text-2xl { font-size: 44rpx; }
 
-// Font weights
-.font-light { font-weight: 300; }
-.font-normal { font-weight: 400; }
 .font-medium { font-weight: 500; }
 .font-semibold { font-weight: 600; }
 .font-bold { font-weight: 700; }
 
-// Spacing utility
-.mt-0 { margin-top: 0; }
-.mt-xs { margin-top: var(--space-xs); }
-.mt-sm { margin-top: var(--space-sm); }
-.mt-md { margin-top: var(--space-md); }
-.mt-lg { margin-top: var(--space-lg); }
-.mt-xl { margin-top: var(--space-xl); }
-.mt-2xl { margin-top: var(--space-2xl); }
+.text-muted { color: var(--text-quaternary); }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--accent); }
+.text-center { text-align: center; }
 
-.mb-sm { margin-bottom: var(--space-sm); }
-.mb-md { margin-bottom: var(--space-md); }
-.mb-lg { margin-bottom: var(--space-lg); }
-.mb-xl { margin-bottom: var(--space-xl); }
-
-.pt-md { padding-top: var(--space-md); }
-.pb-md { padding-bottom: var(--space-md); }
-.px-md { padding-left: var(--space-md); padding-right: var(--space-md); }
-.py-sm { padding-top: var(--space-sm); padding-bottom: var(--space-sm); }
-.py-md { padding-top: var(--space-md); padding-bottom: var(--space-md); }
-.py-lg { padding-top: var(--space-lg); padding-bottom: var(--space-lg); }
-
-// Border radius
-.rounded-sm { border-radius: var(--radius-sm); }
-.rounded-md { border-radius: var(--radius-md); }
-.rounded-lg { border-radius: var(--radius-lg); }
-.rounded-xl { border-radius: var(--radius-xl); }
-.rounded-full { border-radius: 50%; }
-
-// Shadows
-.shadow-sm { box-shadow: var(--shadow-sm); }
-.shadow-md { box-shadow: var(--shadow-md); }
-.shadow-lg { box-shadow: var(--shadow-lg); }
-
-// Overflow
-.overflow-hidden { overflow: hidden; }
-.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-// Background
-.bg-primary { background-color: var(--color-primary); }
-.bg-surface { background-color: var(--color-surface); }
-.bg-card { background-color: var(--color-card); }
-.bg-dark { background-color: var(--color-dark); }
-.bg-accent { background-color: var(--color-accent); }
-
-// Transition
-.transition { transition: all var(--transition-base); }
-.transition-fast { transition: all var(--transition-fast); }
-
-// Divider line
-.divider {
-  height: 1rpx;
-  background-color: var(--color-divider);
-  margin: 0;
+// Price display
+.text-price {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 36rpx;
+}
+.text-price-original {
+  color: var(--text-quaternary);
+  font-size: 24rpx;
+  text-decoration: line-through;
+}
+.text-price-symbol {
+  font-size: 24rpx;
+  font-weight: 500;
 }
 
-// ==========================================
+// ========================================
+// Spacing Utilities
+// ========================================
+.mt-sm { margin-top: var(--space-2); }
+.mt-md { margin-top: var(--space-4); }
+.mt-lg { margin-top: var(--space-6); }
+.mb-sm { margin-bottom: var(--space-2); }
+.mb-md { margin-bottom: var(--space-4); }
+.mb-lg { margin-bottom: var(--space-6); }
+.pd-sm { padding: var(--space-2); }
+.pd-md { padding: var(--space-4); }
+.pd-lg { padding: var(--space-6); }
+
+// ========================================
 // Component: Section Header
-// ==========================================
+// ========================================
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: var(--space-lg) var(--space-md) var(--space-md);
+  padding: var(--space-6) var(--space-4) var(--space-3);
   &__title {
-    font-family: var(--font-display);
-    font-size: 36rpx;
+    font-size: 34rpx;
     font-weight: 600;
-    color: var(--color-text);
-    letter-spacing: 0.5rpx;
+    color: var(--text-primary);
   }
   &__more {
-    font-size: 26rpx;
-    color: var(--color-text-muted);
-    position: relative;
-    padding-right: 24rpx;
+    font-size: 24rpx;
+    color: var(--text-quaternary);
     &::after {
-      content: '→';
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--color-primary);
-      font-size: 20rpx;
+      content: ' >';
+      color: var(--text-quaternary);
     }
   }
 }
 
-// ==========================================
+// ========================================
+// Component: Discount Tag
+// ========================================
+.discount-tag {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+  background-color: var(--accent);
+  border-radius: 4rpx;
+}
+
+// ========================================
+// Component: Sale Badge
+// ========================================
+.sale-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+  color: #FFFFFF;
+  background-color: var(--accent);
+  border-radius: 0 0 8rpx 0;
+}
+
+// ========================================
 // Component: Status Badge
-// ==========================================
+// ========================================
 .status-badge {
   display: inline-block;
   padding: 4rpx 16rpx;
   font-size: 22rpx;
   font-weight: 500;
-  letter-spacing: 1rpx;
-  text-transform: uppercase;
-  border-radius: var(--radius-sm);
-  &--pending  { background: #F5F0EB; color: #C9A96E; }
-  &--paid     { background: #EEF2ED; color: #1B4D3E; }
-  &--shipped  { background: #ECF0F5; color: #3A5A7C; }
-  &--completed{ background: #EEF2ED; color: #1B4D3E; }
-  &--cancelled{ background: #F5EDED; color: #8B0000; }
+  border-radius: var(--radius-xs);
+  &--pending   { background: #FFF8E6; color: #B8860B; }
+  &--paid      { background: #E8F5E9; color: #2E7D32; }
+  &--shipped   { background: #E3F2FD; color: #1565C0; }
+  &--completed { background: #E8F5E9; color: #2E7D32; }
+  &--cancelled { background: #FFEBEE; color: #C62828; }
 }
 
-// ==========================================
-// Page transition
-// ==========================================
-.page-enter-active,
-.page-leave-active {
-  transition: opacity var(--transition-base);
+// ========================================
+// Misc
+// ========================================
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
+.overflow-hidden { overflow: hidden; }
+.bg-white { background-color: #FFFFFF; }
+.bg-page { background-color: var(--bg-secondary); }
+.shadow-card { box-shadow: var(--shadow-card); }
+.divider {
+  height: 1rpx;
+  background-color: var(--divider);
 }

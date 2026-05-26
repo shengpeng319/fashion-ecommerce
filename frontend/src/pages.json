@@ -4,32 +4,32 @@
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": "FASHION",
-        "navigationBarTextStyle": "white",
-        "navigationBarBackgroundColor": "#1A1514"
+        "navigationBarTextStyle": "black",
+        "navigationBarBackgroundColor": "#FFFFFF"
       }
     },
     {
       "path": "pages/category/index",
       "style": {
         "navigationBarTitleText": "全部分类",
-        "navigationBarTextStyle": "white",
-        "navigationBarBackgroundColor": "#1A1514"
+        "navigationBarTextStyle": "black",
+        "navigationBarBackgroundColor": "#FFFFFF"
       }
     },
     {
       "path": "pages/cart/index",
       "style": {
         "navigationBarTitleText": "购物车",
-        "navigationBarTextStyle": "white",
-        "navigationBarBackgroundColor": "#1A1514"
+        "navigationBarTextStyle": "black",
+        "navigationBarBackgroundColor": "#FFFFFF"
       }
     },
     {
       "path": "pages/goods/detail",
       "style": {
         "navigationBarTitleText": "",
-        "navigationBarTextStyle": "white",
-        "navigationBarBackgroundColor": "transparent",
+        "navigationBarTextStyle": "black",
+        "navigationBarBackgroundColor": "#FFFFFF",
         "navigationStyle": "custom"
       }
     }
@@ -42,16 +42,16 @@
           "path": "list",
           "style": {
             "navigationBarTitleText": "地址管理",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         },
         {
           "path": "form",
           "style": {
             "navigationBarTitleText": "编辑地址",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         }
       ]
@@ -63,24 +63,24 @@
           "path": "create",
           "style": {
             "navigationBarTitleText": "确认订单",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         },
         {
           "path": "list",
           "style": {
             "navigationBarTitleText": "我的订单",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         },
         {
           "path": "detail",
           "style": {
             "navigationBarTitleText": "订单详情",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         }
       ]
@@ -92,8 +92,8 @@
           "path": "index",
           "style": {
             "navigationBarTitleText": "",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "transparent",
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF",
             "navigationStyle": "custom"
           }
         },
@@ -101,8 +101,8 @@
           "path": "login",
           "style": {
             "navigationBarTitleText": "",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "transparent",
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF",
             "navigationStyle": "custom"
           }
         },
@@ -110,8 +110,8 @@
           "path": "register",
           "style": {
             "navigationBarTitleText": "",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "transparent",
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF",
             "navigationStyle": "custom"
           }
         }
@@ -124,24 +124,24 @@
           "path": "index",
           "style": {
             "navigationBarTitleText": "批发商城",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         },
         {
           "path": "order",
           "style": {
             "navigationBarTitleText": "批发下单",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         },
         {
           "path": "orders",
           "style": {
             "navigationBarTitleText": "批发订单",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         }
       ]
@@ -153,65 +153,79 @@
           "path": "index",
           "style": {
             "navigationBarTitleText": "会员中心",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         },
         {
           "path": "upgrade",
           "style": {
             "navigationBarTitleText": "会员升级",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         },
         {
           "path": "transactions",
           "style": {
             "navigationBarTitleText": "积分明细",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         },
         {
           "path": "referral",
           "style": {
             "navigationBarTitleText": "邀请好友",
-            "navigationBarTextStyle": "white",
-            "navigationBarBackgroundColor": "#1A1514"
+            "navigationBarTextStyle": "black",
+            "navigationBarBackgroundColor": "#FFFFFF"
           }
         }
       ]
     }
   ],
   "tabBar": {
-    "color": "#8C8279",
-    "selectedColor": "#6B1D2F",
-    "backgroundColor": "#FAF7F2",
+    "color": "#999999",
+    "selectedColor": "#1A1A1A",
+    "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "static/tabbar/home.svg",
+        "selectedIconPath": "static/tabbar/home-active.svg"
       },
       {
         "pagePath": "pages/category/index",
-        "text": "分类"
+        "text": "分类",
+        "iconPath": "static/tabbar/category.svg",
+        "selectedIconPath": "static/tabbar/category-active.svg"
       },
       {
         "pagePath": "pages/cart/index",
-        "text": "购物袋"
+        "text": "购物车",
+        "iconPath": "static/tabbar/cart.svg",
+        "selectedIconPath": "static/tabbar/cart-active.svg"
       },
       {
         "pagePath": "pages/user/index",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "static/tabbar/user.svg",
+        "selectedIconPath": "static/tabbar/user-active.svg"
       }
     ]
   },
   "globalStyle": {
-    "navigationBarTextStyle": "white",
+    "navigationBarTextStyle": "black",
     "navigationBarTitleText": "FASHION",
-    "navigationBarBackgroundColor": "#1A1514",
-    "backgroundColor": "#F5F0EB"
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F5F5"
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^wd-(.*)": "wot-design-uni/components/wd-$1/wd-$1.vue"
+    }
   }
 }

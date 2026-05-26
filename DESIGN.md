@@ -439,16 +439,59 @@ Banner轮播:
 ## 10. 技术栈
 
 ```
-框架:       Next.js 15 (App Router)
-语言:       TypeScript
-样式:       Tailwind CSS v4
-组件库:     shadcn/ui（Button, Card, Dialog, Sheet, NavigationMenu, Badge）
-动效:       Framer Motion（页面切换、列表加载、微交互）
-图标:       Lucide React, stroke-width 1.5
-图片:       next/image + blur占位 + WebP/AVIF + 懒加载
-字体:       next/font（系统字体优先）+ PingFang SC
-状态管理:   Zustand（购物车、筛选状态）
-数据获取:   SWR / TanStack Query
+框架:       uni-app (Vue 3 + TypeScript)
+平台:       H5 + 微信小程序（主要目标）
+样式:       SCSS + CSS 变量设计系统
+组件库:     wot-design-uni（自定义主题覆盖为白底极简风格）
+动效:       CSS transition + uni.createAnimation
+图标:       wot-design-uni 内置图标 + 自定义 SVG
+图片:       <image> 组件 + lazy-load 懒加载
+字体:       系统字体栈（PingFang SC / SF Pro / Microsoft YaHei）
+状态管理:   Pinia（购物车、用户、筛选状态）
+数据获取:   封装 uni.request + Pinia 缓存
+```
+
+### 组件架构
+
+```
+frontend/src/
+├── components/
+│   ├── ProductCard.vue      商品卡片（双列网格用）
+│   ├── SearchBar.vue        胶囊搜索栏
+│   ├── BannerSwiper.vue     Banner 轮播
+│   ├── PriceDisplay.vue     价格展示（红价 + 删除线原价）
+│   ├── CategoryChips.vue    横向滚动分类标签
+│   ├── CartItem.vue         购物车商品项
+│   ├── EmptyState.vue       空数据提示
+│   ├── SkeletonList.vue     骨架屏加载态
+│   └── PaymentPopup.vue     支付弹窗（已有）
+├── styles/
+│   └── common.scss          设计系统变量 + 全局样式
+├── store/                   Pinia stores
+├── utils/
+│   └── request.ts           API 请求封装
+└── pages/                   页面（uni-app 路由）
+```
+
+### wot-design-uni 主题覆盖
+
+```scss
+// 覆盖 wot-design-uni 默认主题变量，对齐 DESIGN.md 色彩系统
+:root {
+  --wot-color-primary: #C8102E;
+  --wot-color-primary-light: #FFF1F3;
+  --wot-color-success: #1B4D3E;
+  --wot-color-warning: #E6A23C;
+  --wot-color-danger: #C8102E;
+  --wot-color-info: #909399;
+  --wot-color-title: #1A1A1A;
+  --wot-color-content: #333333;
+  --wot-color-secondary: #666666;
+  --wot-color-disabled: #C0C4CC;
+  --wot-color-bg: #FFFFFF;
+  --wot-font-size: 14px;
+  --wot-radius: 4px;
+}
 ```
 
 ---
@@ -468,6 +511,8 @@ Banner轮播:
 ❌ 不隐藏价格信息（价格永远可见醒目）
 ❌ 不用无限滚动替代分页时不加骨架屏
 ❌ 不遮挡商品图（文字叠层只用在Banner，不在商品卡片上）
+❌ 不使用平台不兼容的 CSS（确保 H5 和小程序双端一致）
+❌ 不使用 Next.js / React 生态组件（项目使用 uni-app + Vue 3）
 ```
 
 ---
@@ -489,4 +534,6 @@ Banner轮播:
 □ 促销信息是否红底醒目
 □ 移动端触摸区域是否 ≥ 44px
 □ 整体色彩是否克制（白+灰+红≤3种主色）
+□ H5 和微信小程序双端表现是否一致
+□ tabBar 图标是否清晰、选中态是否明确
 ```
