@@ -237,7 +237,7 @@ const checkout = () => {
 
   &__scroll {
     height: calc(100vh - 120rpx);
-    padding-bottom: 200rpx;
+    padding-bottom: 320rpx;
   }
 
   &__header {
@@ -262,14 +262,13 @@ const checkout = () => {
 
   &__bottom {
     position: fixed;
-    bottom: 0;
+    bottom: 100rpx;
     left: 0;
     right: 0;
     display: flex;
     align-items: center;
     background: var(--bg-primary);
     padding: var(--space-3) var(--space-4);
-    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
     box-shadow: var(--shadow-nav);
     z-index: 100;
   }

@@ -60,15 +60,22 @@
     <view class="bottom-bar">
       <view class="bottom-icons">
         <view class="bottom-icon" @tap="goHome">
-          <text class="b-icon">🏠</text>
+          <view class="b-svg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+          </view>
           <text class="b-label">首页</text>
         </view>
         <view class="bottom-icon" @tap="toggleFavorite">
-          <text class="b-icon">{{ isFavorite ? '❤️' : '🤍' }}</text>
+          <view class="b-svg">
+            <svg v-if="!isFavorite" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+            <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="#C8102E" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+          </view>
           <text class="b-label">收藏</text>
         </view>
         <view class="bottom-icon" @tap="goCart">
-          <text class="b-icon">🛒</text>
+          <view class="b-svg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </view>
           <text class="b-label">购物车</text>
         </view>
       </view>
@@ -296,8 +303,11 @@ const buyNow = () => {
   gap: 2rpx;
   &:active { opacity: 0.6; }
 }
-.b-icon {
-  font-size: 36rpx;
+.b-svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48rpx;
 }
 .b-label {
   font-size: 18rpx;

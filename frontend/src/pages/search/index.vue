@@ -1,60 +1,60 @@
 <template>
-  <view class="category-page">
-    <view class="category-page__chips">
-      <CategoryChips
-        :categories="categories"
-        :activeId="activeCategoryId"
-        @select="onCategorySelect"
+  <view class="search-page">
+    <view class="search-page__bar">
+      <SearchBar
+        v-model="keyword"
+        placeholder="搜索商品"
+        @search="doSearch"
       />
     </view>
 
-    <view class="category-page__sort">
-      <view
-        v-for="tab in sortTabs"
-        :key="tab.key"
-        class="category-page__sort-tab"
-        :class="{ 'category-page__sort-tab--active': sortKey === tab.key }"
-        @tap="onSort(tab.key)"
-      >
-        <text class="category-page__sort-label">{{ tab.label }}</text>
-        <view v-if="tab.key === 'price'" class="category-page__sort-arrows">
-          <text class="category-page__sort-arrow" :class="{ 'category-page__sort-arrow--active': sortKey === 'price' && sortOrder === 'asc' }">&#9650;</text>
-          <text class="category-page__sort-arrow" :class="{ 'category-page__sort-arrow--active': sortKey === 'price' && sortOrder === 'desc' }">&#9660;</text>
-        </view>
-      </view>
+    <view v-if="!hasSearched" class="search-page__hint">
+      <text class="search-page__hint-text">输入关键词搜索商品</text>
     </view>
 
-    <scroll-view
-      class="category-page__scroll"
-      scroll-y
-      @scrolltolower="onLoadMore"
-    >
-      <SkeletonGrid v-if="loading" :count="4" />
-
-      <template v-else>
-        <view v-if="displayProducts.length > 0" class="category-page__grid">
-          <ProductCard
-            v-for="product in displayProducts"
-            :key="product.id"
-            :product="product"
-            @click="goDetail"
-          />
+    <template v-else>
+      <view class="search-page__sort">
+        <view
+          v-for="tab in sortTabs"
+          :key="tab.key"
+          class="search-page__sort-tab"
+          :class="{ 'search-page__sort-tab--active': sortKey === tab.key }"
+          @tap="onSort(tab.key)"
+        >
+          <text class="search-page__sort-label">{{ tab.label }}</text>
+          <view v-if="tab.key === 'price'" class="search-page__sort-arrows">
+            <text class="search-page__sort-arrow" :class="{ 'search-page__sort-arrow--active': sortKey === 'price' && sortOrder === 'asc' }">&#9650;</text>
+            <text class="search-page__sort-arrow" :class="{ 'search-page__sort-arrow--active': sortKey === 'price' && sortOrder === 'desc' }">&#9660;</text>
+          </view>
         </view>
-
-        <EmptyState
-          v-else
-          icon="🔍"
-          title="暂无商品"
-          description="该分类下暂无商品，换个分类看看"
-        />
-      </template>
-
-      <view v-if="!loading && displayProducts.length > 0 && noMore" class="category-page__nomore">
-        <text>— 没有更多了 —</text>
       </view>
 
-      <view class="category-page__tabbar-spacer"></view>
-    </scroll-view>
+      <scroll-view class="search-page__scroll" scroll-y @scrolltolower="onLoadMore">
+        <SkeletonGrid v-if="loading" :count="4" />
+
+        <template v-else>
+          <view v-if="results.length > 0" class="search-page__grid">
+            <ProductCard
+              v-for="product in displayProducts"
+              :key="product.id"
+              :product="product"
+              @click="goDetail"
+            />
+          </view>
+
+          <EmptyState
+            v-else
+            icon="🔍"
+            title="未找到相关商品"
+            description="换个关键词试试"
+          />
+        </template>
+
+        <view v-if="!loading && results.length > 0 && noMore" class="search-page__nomore">
+          <text>— 没有更多了 —</text>
+        </view>
+      </scroll-view>
+    </template>
   </view>
 </template>
 
@@ -62,15 +62,15 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
-import CategoryChips from '@/components/CategoryChips.vue'
+import SearchBar from '@/components/SearchBar.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import SkeletonGrid from '@/components/SkeletonGrid.vue'
 
-const categories = ref<any[]>([])
-const activeCategoryId = ref('')
-const allProducts = ref<any[]>([])
+const keyword = ref('')
+const results = ref<any[]>([])
 const loading = ref(false)
+const hasSearched = ref(false)
 const sortKey = ref<'default' | 'price' | 'sales'>('default')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const pageSize = 20
@@ -83,16 +83,8 @@ const sortTabs = [
   { key: 'sales', label: '销量' }
 ]
 
-const filteredProducts = computed(() => {
-  let list = allProducts.value
-  if (activeCategoryId.value) {
-    list = list.filter(p => String(p.categoryId) === String(activeCategoryId.value))
-  }
-  return list
-})
-
 const sortedProducts = computed(() => {
-  const list = [...filteredProducts.value]
+  const list = [...results.value]
   if (sortKey.value === 'price') {
     list.sort((a, b) => sortOrder.value === 'asc' ? a.price - b.price : b.price - a.price)
   } else if (sortKey.value === 'sales') {
@@ -105,36 +97,34 @@ const displayProducts = computed(() => {
   return sortedProducts.value.slice(0, currentPage.value * pageSize)
 })
 
-const fetchData = async () => {
+onLoad((opt: any) => {
+  if (opt?.keyword) {
+    keyword.value = opt.keyword
+    doSearch()
+  }
+})
+
+const doSearch = async (kw?: string) => {
+  const q = (kw || keyword.value || '').trim()
+  if (!q) return
+  keyword.value = q
   loading.value = true
+  hasSearched.value = true
   noMore.value = false
   currentPage.value = 1
   try {
-    const [catRes, prodRes]: any[] = await Promise.all([
-      request('/categories', 'GET'),
-      request('/products', 'GET')
-    ])
-    categories.value = Array.isArray(catRes) ? catRes : (catRes?.data || [])
-    const prods = Array.isArray(prodRes) ? prodRes : (prodRes?.data || [])
-    allProducts.value = prods.map((p: any) => ({
+    const res: any = await request(`/products?keyword=${encodeURIComponent(q)}`, 'GET')
+    const prods = Array.isArray(res) ? res : (res?.data || [])
+    results.value = prods.map((p: any) => ({
       ...p,
       thumbnail: p.thumbnail || p.image
     }))
-  } catch (e) {
-    allProducts.value = []
+    if (prods.length <= pageSize) noMore.value = true
+  } catch {
+    results.value = []
   } finally {
     loading.value = false
   }
-}
-
-onLoad(async () => {
-  await fetchData()
-})
-
-const onCategorySelect = (id: string) => {
-  activeCategoryId.value = id
-  currentPage.value = 1
-  noMore.value = false
 }
 
 const onSort = (key: string) => {
@@ -150,8 +140,7 @@ const onSort = (key: string) => {
 
 const onLoadMore = () => {
   if (loading.value || noMore.value) return
-  const total = sortedProducts.value.length
-  if (currentPage.value * pageSize >= total) {
+  if (currentPage.value * pageSize >= results.value.length) {
     noMore.value = true
     return
   }
@@ -164,17 +153,26 @@ const goDetail = (id: string | number) => {
 </script>
 
 <style lang="scss" scoped>
-.category-page {
+.search-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   background: var(--bg-secondary);
 
-  &__chips {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+  &__bar {
     background: var(--bg-primary);
+    padding: 16rpx 32rpx;
+  }
+
+  &__hint {
+    display: flex;
+    justify-content: center;
+    padding-top: 200rpx;
+  }
+
+  &__hint-text {
+    font-size: 28rpx;
+    color: var(--text-quaternary);
   }
 
   &__sort {
@@ -191,10 +189,9 @@ const goDetail = (id: string | number) => {
     justify-content: center;
     padding: var(--space-3) 0;
     margin-right: var(--space-6);
-    position: relative;
 
     &--active {
-      .category-page__sort-label {
+      .search-page__sort-label {
         color: var(--text-primary);
         font-weight: 600;
       }
@@ -204,7 +201,6 @@ const goDetail = (id: string | number) => {
   &__sort-label {
     font-size: 26rpx;
     color: var(--text-tertiary);
-    font-weight: 400;
   }
 
   &__sort-arrows {
@@ -226,10 +222,6 @@ const goDetail = (id: string | number) => {
 
   &__scroll {
     flex: 1;
-  }
-
-  &__tabbar-spacer {
-    height: 120rpx;
   }
 
   &__grid {

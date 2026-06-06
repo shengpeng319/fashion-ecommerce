@@ -107,7 +107,8 @@ const goGoods = (id: string) => {
 }
 
 const goSearch = (keyword: string) => {
-  uni.switchTab({ url: '/pages/category/index' })
+  if (!keyword.trim()) return
+  uni.navigateTo({ url: `/pages/search/index?keyword=${encodeURIComponent(keyword)}` })
 }
 </script>
 

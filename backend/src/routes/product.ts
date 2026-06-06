@@ -9,7 +9,14 @@ router.get('/', async (req, res) => {
     const { categoryId, keyword, limit = 50, offset = 0 } = req.query
     const where: any = { isActive: true }
     if (categoryId) where.categoryId = categoryId as string
-    if (keyword) where.name = { contains: keyword as string } as any
+    if (keyword) {
+      const kw = keyword as string
+      where.OR = [
+        { name: { contains: kw } },
+        { subtitle: { contains: kw } },
+        { description: { contains: kw } },
+      ]
+    }
     
     const [products, total] = await Promise.all([
       prisma.product.findMany({
