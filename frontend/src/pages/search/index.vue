@@ -99,7 +99,7 @@ const displayProducts = computed(() => {
 
 onLoad((opt: any) => {
   if (opt?.keyword) {
-    keyword.value = opt.keyword
+    keyword.value = decodeURIComponent(opt.keyword)
     doSearch()
   }
 })

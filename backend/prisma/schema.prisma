@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -68,8 +68,8 @@ model Member {
   userId        String   @unique
   level         String   @default("LIGHT")
   points        Int      @default(0)
-  totalSpent    Decimal  @default(0)
-  depositAmount Decimal  @default(0)
+  totalSpent    Decimal  @db.Decimal(10,2) @default(0)
+  depositAmount Decimal  @db.Decimal(10,2) @default(0)
   birthday      String?
   joinedAt      DateTime @default(now())
   createdAt     DateTime @default(now())
@@ -87,7 +87,7 @@ model MembershipLevel {
   bonusPoints  Int     // 到账积分
   isRefundable Boolean // 预存款是否可退
   sortOrder    Int     // 排序
-  benefits     String? // JSON格式权益描述
+  benefits     String? @db.Text // JSON格式权益描述
 }
 
 model PointsTransaction {
@@ -140,13 +140,13 @@ model Product {
   id            String   @id @default(uuid())
   name          String
   subtitle      String?
-  price         Decimal
-  originalPrice Decimal?
+  price         Decimal  @db.Decimal(10,2)
+  originalPrice Decimal? @db.Decimal(10,2)
   image         String?  // 主图
   thumbnail     String?  // 缩略图
-  images        String?  // 多图JSON
-  description   String?  
-  detail        String?  
+  images        String?  @db.Text // 多图JSON
+  description   String?  @db.Text
+  detail        String?  @db.LongText
   categoryId    String
   brandId       String?
   sales         Int      @default(0)
@@ -167,7 +167,7 @@ model SKU {
   id         String   @id @default(uuid())
   productId  String
   name       String
-  price      Decimal
+  price      Decimal  @db.Decimal(10,2)
   stock      Int      @default(0)
   attributes String
   createdAt  DateTime @default(now())
@@ -202,10 +202,10 @@ model Order {
   orderNo        String    @unique
   userId         String
   status         String
-  totalAmount    Decimal
-  discountAmount Decimal   @default(0)
-  pointsUsed     Int       @default(0)
-  payAmount      Decimal
+  totalAmount    Decimal  @db.Decimal(10,2)
+  discountAmount Decimal  @db.Decimal(10,2) @default(0)
+  pointsUsed     Int      @default(0)
+  payAmount      Decimal  @db.Decimal(10,2)
   payType        String?
   payTime        DateTime?
   addressId      String
@@ -225,7 +225,7 @@ model OrderItem {
   skuId       String?
   productName String
   skuName     String?
-  price       Decimal
+  price       Decimal @db.Decimal(10,2)
   quantity    Int
   image       String?
 
@@ -242,8 +242,8 @@ model Dealer {
   companyName String
   licenseNo   String
   level       String
-  creditLine  Decimal  @default(0)
-  usedCredit  Decimal  @default(0)
+  creditLine  Decimal  @db.Decimal(10,2) @default(0)
+  usedCredit  Decimal  @db.Decimal(10,2) @default(0)
   status      String   @default("pending")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -255,7 +255,7 @@ model Dealer {
 model WholesaleProduct {
   id          String   @id @default(uuid())
   productId   String
-  dealerPrice Decimal
+  dealerPrice Decimal @db.Decimal(10,2)
   minQty      Int      @default(1)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -268,8 +268,8 @@ model WholesaleOrder {
   orderNo     String   @unique
   dealerId    String
   status      String
-  totalAmount Decimal
-  payAmount   Decimal
+  totalAmount Decimal @db.Decimal(10,2)
+  payAmount   Decimal @db.Decimal(10,2)
   remark      String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -283,7 +283,7 @@ model ShareholderLevelConfig {
   id        String   @id @default(uuid())
   level     Int      @unique  // 1=普通股东, 2=战略股东, 3=创始人股东
   name      String            // 级别名称
-  minAmount Decimal           // 门槛金额
+  minAmount Decimal  @db.Decimal(10,2) // 门槛金额
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -307,7 +307,7 @@ model Shareholder {
 model ShareholderInvestment {
   id            String   @id @default(uuid())
   shareholderId String
-  amount        Decimal
+  amount        Decimal  @db.Decimal(10,2)
   type          String   // initial=初始投资, additional=追加投资, withdrawal=撤回
   remark        String?
   createdAt     DateTime @default(now())
@@ -318,7 +318,7 @@ model ShareholderInvestment {
 model ShareholderDividend {
   id            String   @id @default(uuid())
   shareholderId String
-  amount        Decimal
+  amount        Decimal  @db.Decimal(10,2)
   period        String   // 分红周期，如 "2024Q1"
   status        String   @default("pending")  // pending=待发放, paid=已发放
   createdAt     DateTime @default(now())
@@ -329,7 +329,7 @@ model ShareholderDividend {
 model ShareholderCost {
   id            String   @id @default(uuid())
   shareholderId String
-  amount        Decimal
+  amount        Decimal  @db.Decimal(10,2)
   type          String   // platform=平台费用, marketing=营销费用, operation=运营费用
   remark        String?
   period        String   // 周期，如 "2024Q1"

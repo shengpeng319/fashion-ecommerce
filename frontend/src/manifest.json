@@ -5,6 +5,14 @@
   "versionName": "1.0.0",
   "versionCode": "100",
   "transformPx": false,
+  "mp-weixin": {
+    "appid": "wx1f873d53541880f1",
+    "setting": {
+      "urlCheck": false,
+      "minified": true,
+      "lazyCodeLoading": "requiredComponents"
+    }
+  },
   "h5": {
     "title": "时尚女装电商",
     "router": {

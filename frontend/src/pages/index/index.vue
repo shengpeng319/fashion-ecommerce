@@ -1,7 +1,7 @@
 <template>
   <view class="home">
     <view class="home-header">
-      <SearchBar placeholder="搜索商品" @search="goSearch" />
+      <SearchBar v-model="searchKeyword" placeholder="搜索商品" @search="goSearch" />
     </view>
 
     <BannerSwiper v-if="banners.length" :banners="banners" @click="goGoods" />
@@ -67,6 +67,7 @@ import EmptyState from '@/components/EmptyState.vue'
 
 const banners = ref<any[]>([])
 const categories = ref<any[]>([])
+const searchKeyword = ref('')
 const newArrivals = ref<any[]>([])
 const recommended = ref<any[]>([])
 const activeCat = ref('')

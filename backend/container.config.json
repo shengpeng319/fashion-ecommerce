@@ -1,0 +1,11 @@
+{
+  "containerName": "fashions-api",
+  "image": "fashions-api:latest",
+  "run": {
+    "containerPort": 3001,
+    "env": {
+      "NODE_ENV": "production",
+      "PORT": "3001"
+    }
+  }
+}

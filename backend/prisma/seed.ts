@@ -42,6 +42,13 @@ function downloadImage(filename: string, url: string): Promise<void> {
 async function main() {
   console.log('Seeding database...')
 
+  // Check if already seeded
+  const existingProducts = await prisma.product.count()
+  if (existingProducts > 0) {
+    console.log(`Database already has ${existingProducts} products, skipping seed`)
+    return
+  }
+
   // Download product images
   console.log('Downloading product images...')
   for (const [filename, url] of Object.entries(IMAGE_URLS)) {
@@ -65,9 +72,9 @@ async function main() {
       subtitle: '春季新款 气质通勤',
       price: 189.00,
       originalPrice: 299.00,
-      image: '/uploads/products/shirt.jpg',
-      thumbnail: '/uploads/products/shirt.jpg',
-      images: JSON.stringify(['/uploads/products/shirt.jpg']),
+      image: IMAGE_URLS['shirt.jpg'],
+      thumbnail: IMAGE_URLS['shirt.jpg'],
+      images: JSON.stringify([IMAGE_URLS['shirt.jpg']]),
       description: '轻盈雪纺面料，法式复古设计',
       detail: '<p>商品详情：轻盈雪纺面料，法式复古设计，适合职场通勤。</p>',
       categoryId: tops.id,
@@ -79,9 +86,9 @@ async function main() {
       subtitle: '百搭修身 显瘦神器',
       price: 229.00,
       originalPrice: 369.00,
-      image: '/uploads/products/jeans.jpg',
-      thumbnail: '/uploads/products/jeans.jpg',
-      images: JSON.stringify(['/uploads/products/jeans.jpg']),
+      image: IMAGE_URLS['jeans.jpg'],
+      thumbnail: IMAGE_URLS['jeans.jpg'],
+      images: JSON.stringify([IMAGE_URLS['jeans.jpg']]),
       description: '高腰设计，拉长腿部线条',
       detail: '<p>高腰直筒牛仔裤，百搭修身。</p>',
       categoryId: pants.id,
@@ -93,9 +100,9 @@ async function main() {
       subtitle: '小清新碎花 仙气飘飘',
       price: 268.00,
       originalPrice: 428.00,
-      image: '/uploads/products/dress.jpg',
-      thumbnail: '/uploads/products/dress.jpg',
-      images: JSON.stringify(['/uploads/products/dress.jpg']),
+      image: IMAGE_URLS['dress.jpg'],
+      thumbnail: IMAGE_URLS['dress.jpg'],
+      images: JSON.stringify([IMAGE_URLS['dress.jpg']]),
       description: '碎花雪纺，飘逸仙气',
       detail: '<p>碎花雪纺连衣裙，小清新风格。</p>',
       categoryId: skirts.id,
@@ -107,9 +114,9 @@ async function main() {
       subtitle: '基础百搭 舒适透气',
       price: 89.00,
       originalPrice: 129.00,
-      image: '/uploads/products/tshirt.jpg',
-      thumbnail: '/uploads/products/tshirt.jpg',
-      images: JSON.stringify(['/uploads/products/tshirt.jpg']),
+      image: IMAGE_URLS['tshirt.jpg'],
+      thumbnail: IMAGE_URLS['tshirt.jpg'],
+      images: JSON.stringify([IMAGE_URLS['tshirt.jpg']]),
       description: '100%纯棉，基础百搭款',
       detail: '<p>简约纯棉T恤，舒适透气。</p>',
       categoryId: tops.id,
@@ -121,9 +128,9 @@ async function main() {
       subtitle: '垂感十足 显高显瘦',
       price: 199.00,
       originalPrice: 299.00,
-      image: '/uploads/products/wide-pants.jpg',
-      thumbnail: '/uploads/products/wide-pants.jpg',
-      images: JSON.stringify(['/uploads/products/wide-pants.jpg']),
+      image: IMAGE_URLS['wide-pants.jpg'],
+      thumbnail: IMAGE_URLS['wide-pants.jpg'],
+      images: JSON.stringify([IMAGE_URLS['wide-pants.jpg']]),
       description: '垂感面料，阔腿设计',
       detail: '<p>阔腿休闲裤，垂感十足。</p>',
       categoryId: pants.id,
@@ -135,9 +142,9 @@ async function main() {
       subtitle: '精致蕾丝 优雅女人味',
       price: 178.00,
       originalPrice: 268.00,
-      image: '/uploads/products/lace-skirt.jpg',
-      thumbnail: '/uploads/products/lace-skirt.jpg',
-      images: JSON.stringify(['/uploads/products/lace-skirt.jpg']),
+      image: IMAGE_URLS['lace-skirt.jpg'],
+      thumbnail: IMAGE_URLS['lace-skirt.jpg'],
+      images: JSON.stringify([IMAGE_URLS['lace-skirt.jpg']]),
       description: '精致蕾丝边，优雅大方',
       detail: '<p>蕾丝边半身裙，优雅女人味。</p>',
       categoryId: skirts.id,
