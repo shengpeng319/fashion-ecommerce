@@ -1,60 +1,83 @@
 <template>
-  <view class="category-page">
-    <view class="category-page__chips">
-      <CategoryChips
-        :categories="categories"
-        :activeId="activeCategoryId"
-        @select="onCategorySelect"
-      />
+  <view class="mall">
+    <view class="mall__sidebar">
+      <scroll-view class="mall__sidebar-scroll" scroll-y>
+        <view
+          class="mall__menu-item"
+          :class="{ 'mall__menu-item--active': activeCategoryId === '' }"
+          @tap="onCategorySelect('')"
+        >
+          <view v-if="activeCategoryId === ''" class="mall__menu-indicator" />
+          <text class="mall__menu-text">全部商品</text>
+        </view>
+        <view
+          v-for="cat in categories"
+          :key="cat.id"
+          class="mall__menu-item"
+          :class="{ 'mall__menu-item--active': activeCategoryId === cat.id }"
+          @tap="onCategorySelect(cat.id)"
+        >
+          <view v-if="activeCategoryId === cat.id" class="mall__menu-indicator" />
+          <text class="mall__menu-text">{{ cat.name }}</text>
+        </view>
+      </scroll-view>
     </view>
 
-    <view class="category-page__sort">
-      <view
-        v-for="tab in sortTabs"
-        :key="tab.key"
-        class="category-page__sort-tab"
-        :class="{ 'category-page__sort-tab--active': sortKey === tab.key }"
-        @tap="onSort(tab.key)"
+    <view class="mall__main">
+      <view class="mall__search">
+        <SearchBar v-model="searchKeyword" placeholder="搜索商品" @search="goSearch" />
+      </view>
+
+      <view class="mall__sort">
+        <view
+          v-for="tab in sortTabs"
+          :key="tab.key"
+          class="mall__sort-tab"
+          :class="{ 'mall__sort-tab--active': sortKey === tab.key }"
+          @tap="onSort(tab.key)"
+        >
+          <text class="mall__sort-label">{{ tab.label }}</text>
+          <view v-if="tab.key === 'price'" class="mall__sort-arrows">
+            <text class="mall__sort-arrow" :class="{ 'mall__sort-arrow--active': sortKey === 'price' && sortOrder === 'asc' }">&#9650;</text>
+            <text class="mall__sort-arrow" :class="{ 'mall__sort-arrow--active': sortKey === 'price' && sortOrder === 'desc' }">&#9660;</text>
+          </view>
+        </view>
+      </view>
+
+      <scroll-view
+        class="mall__scroll"
+        scroll-y
+        @scrolltolower="onLoadMore"
       >
-        <text class="category-page__sort-label">{{ tab.label }}</text>
-        <view v-if="tab.key === 'price'" class="category-page__sort-arrows">
-          <text class="category-page__sort-arrow" :class="{ 'category-page__sort-arrow--active': sortKey === 'price' && sortOrder === 'asc' }">&#9650;</text>
-          <text class="category-page__sort-arrow" :class="{ 'category-page__sort-arrow--active': sortKey === 'price' && sortOrder === 'desc' }">&#9660;</text>
+        <view v-if="loading" class="mall__loading">
+          <SkeletonGrid :count="4" />
         </view>
-      </view>
-    </view>
 
-    <scroll-view
-      class="category-page__scroll"
-      scroll-y
-      @scrolltolower="onLoadMore"
-    >
-      <SkeletonGrid v-if="loading" :count="4" />
+        <template v-else>
+          <view v-if="displayProducts.length > 0" class="mall__grid">
+            <ProductCard
+              v-for="product in displayProducts"
+              :key="product.id"
+              :product="product"
+              @click="goDetail"
+            />
+          </view>
 
-      <template v-else>
-        <view v-if="displayProducts.length > 0" class="category-page__grid">
-          <ProductCard
-            v-for="product in displayProducts"
-            :key="product.id"
-            :product="product"
-            @click="goDetail"
+          <EmptyState
+            v-else
+            icon="🔍"
+            title="暂无商品"
+            description="该分类下暂无商品"
           />
+        </template>
+
+        <view v-if="!loading && displayProducts.length > 0 && noMore" class="mall__nomore">
+          <text>— 没有更多了 —</text>
         </view>
 
-        <EmptyState
-          v-else
-          icon="🔍"
-          title="暂无商品"
-          description="该分类下暂无商品，换个分类看看"
-        />
-      </template>
-
-      <view v-if="!loading && displayProducts.length > 0 && noMore" class="category-page__nomore">
-        <text>— 没有更多了 —</text>
-      </view>
-
-      <view class="category-page__tabbar-spacer"></view>
-    </scroll-view>
+        <view class="mall__bottom-spacer" />
+      </scroll-view>
+    </view>
   </view>
 </template>
 
@@ -62,7 +85,7 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
-import CategoryChips from '@/components/CategoryChips.vue'
+import SearchBar from '@/components/SearchBar.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import SkeletonGrid from '@/components/SkeletonGrid.vue'
@@ -71,6 +94,7 @@ const categories = ref<any[]>([])
 const activeCategoryId = ref('')
 const allProducts = ref<any[]>([])
 const loading = ref(false)
+const searchKeyword = ref('')
 const sortKey = ref<'default' | 'price' | 'sales'>('default')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const pageSize = 20
@@ -78,7 +102,7 @@ const currentPage = ref(1)
 const noMore = ref(false)
 
 const sortTabs = [
-  { key: 'default', label: '综合排序' },
+  { key: 'default', label: '综合' },
   { key: 'price', label: '价格' },
   { key: 'sales', label: '销量' }
 ]
@@ -142,7 +166,7 @@ const onSort = (key: string) => {
     sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
   } else {
     sortKey.value = key as any
-    sortOrder.value = key === 'sales' ? 'desc' : 'desc'
+    sortOrder.value = 'desc'
   }
   currentPage.value = 1
   noMore.value = false
@@ -161,66 +185,117 @@ const onLoadMore = () => {
 const goDetail = (id: string | number) => {
   uni.navigateTo({ url: `/pages/goods/detail?id=${id}` })
 }
+
+const goSearch = (keyword: string) => {
+  if (!keyword.trim()) return
+  uni.navigateTo({ url: `/pages/search/index?keyword=${encodeURIComponent(keyword)}` })
+}
 </script>
 
 <style lang="scss" scoped>
-.category-page {
+.mall {
   display: flex;
-  flex-direction: column;
   height: 100vh;
-  background: var(--bg-secondary);
+  background: #F5F5F5;
 
-  &__chips {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: var(--bg-primary);
+  &__sidebar {
+    width: 180rpx;
+    height: 100%;
+    background: #FFFFFF;
+    border-right: 1rpx solid #EEEEEE;
+    flex-shrink: 0;
+  }
+
+  &__sidebar-scroll {
+    height: 100%;
+  }
+
+  &__menu-item {
+    position: relative;
+    padding: 36rpx 24rpx;
+    text-align: center;
+    transition: all 0.2s ease;
+
+    &--active {
+      background: #F5F5F5;
+    }
+  }
+
+  &__menu-indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6rpx;
+    height: 36rpx;
+    background: #C8102E;
+    border-radius: 0 4rpx 4rpx 0;
+  }
+
+  &__menu-text {
+    font-size: 28rpx;
+    color: #333333;
+    font-weight: 500;
+    letter-spacing: 2rpx;
+    line-height: 1.4;
+  }
+
+  &__menu-item--active &__menu-text {
+    color: #C8102E;
+    font-weight: 700;
+    letter-spacing: 1rpx;
+  }
+
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__search {
+    padding: 16rpx 24rpx;
+    background: #FFFFFF;
   }
 
   &__sort {
     display: flex;
     align-items: center;
-    background: var(--bg-primary);
-    border-bottom: 1rpx solid var(--border);
-    padding: 0 var(--space-4);
+    background: #FFFFFF;
+    border-bottom: 1rpx solid #EEEEEE;
+    padding: 0 24rpx;
   }
 
   &__sort-tab {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: var(--space-3) 0;
-    margin-right: var(--space-6);
-    position: relative;
+    padding: 20rpx 0;
+    margin-right: 48rpx;
+  }
 
-    &--active {
-      .category-page__sort-label {
-        color: var(--text-primary);
-        font-weight: 600;
-      }
-    }
+  &__sort-tab--active &__sort-label {
+    color: #1A1A1A;
+    font-weight: 600;
   }
 
   &__sort-label {
     font-size: 26rpx;
-    color: var(--text-tertiary);
-    font-weight: 400;
+    color: #999999;
   }
 
   &__sort-arrows {
     display: flex;
     flex-direction: column;
     margin-left: 6rpx;
-    line-height: 1;
   }
 
   &__sort-arrow {
     font-size: 14rpx;
-    color: var(--text-quaternary);
+    color: #CCCCCC;
     line-height: 1;
 
     &--active {
-      color: var(--accent);
+      color: #C8102E;
     }
   }
 
@@ -228,22 +303,26 @@ const goDetail = (id: string | number) => {
     flex: 1;
   }
 
-  &__tabbar-spacer {
-    height: 120rpx;
+  &__loading {
+    padding: 24rpx;
   }
 
   &__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
+    gap: 16rpx;
+    padding: 24rpx;
   }
 
   &__nomore {
     text-align: center;
-    padding: var(--space-6) 0 var(--space-8);
+    padding: 32rpx 0 48rpx;
     font-size: 24rpx;
-    color: var(--text-quaternary);
+    color: #BBBBBB;
+  }
+
+  &__bottom-spacer {
+    height: 120rpx;
   }
 }
 </style>
