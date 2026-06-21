@@ -9,60 +9,81 @@
 
     <view class="story__progress" :style="{ top: progressTop + 'rpx' }">
       <view
-        v-for="(item, i) in products"
-        :key="i"
+        v-for="(item, i) in preparedProducts"
+        :key="'h' + i"
         class="story__progress-bar"
       >
         <view
           class="story__progress-fill"
-          :style="i === current ? { width: progressWidth + '%' } : {
-            width: i < current ? '100%' : '0%'
-          }"
+          :style="hIndex === i ? { width: hProgress + '%' } : { width: i < hIndex ? '100%' : '0%' }"
         />
       </view>
     </view>
 
-    <view class="story__counter" :style="{ top: counterTop + 'rpx' }">
-      <text class="story__counter-text">{{ current + 1 }} / {{ products.length }}</text>
+    <view
+      v-if="currentImageCount > 1"
+      class="story__v-progress"
+    >
+      <view
+        v-for="(img, vi) in currentImageList"
+        :key="'v' + vi"
+        class="story__v-progress-bar"
+        :class="{ 'story__v-progress-bar--active': vi <= vIndex }"
+      />
+    </view>
+
+    <view class="story__counter" :style="{ top: (progressTop + 22) + 'rpx' }">
+      <text class="story__counter-text">{{ hIndex + 1 }}/{{ preparedProducts.length }}</text>
     </view>
 
     <swiper
-      class="story__swiper"
-      :current="current"
+      class="story__h-swiper"
+      :current="hIndex"
       :circular="true"
       :duration="350"
       :autoplay="false"
-      :indicator-dots="false"
-      @change="onChange"
+      @change="onHChange"
     >
-      <swiper-item v-for="(product, i) in products" :key="product.id || i">
-        <view class="story-card" @tap="onTap">
-          <image
-            :src="product.image || product.thumbnail"
-            mode="aspectFill"
-            class="story-card__image"
-            lazy-load
-          />
-          <view class="story-card__gradient" />
+      <swiper-item v-for="(product, pi) in preparedProducts" :key="product.id || pi">
+        <swiper
+          class="story__v-swiper"
+          :current="vIndex"
+          :duration="300"
+          :autoplay="false"
+          vertical
+          @change="onVChange"
+        >
+          <swiper-item v-for="(img, vi) in product.imageList" :key="vi">
+            <view class="story-card" @tap="onTap">
+              <image
+                :src="img"
+                mode="aspectFill"
+                class="story-card__image"
+                lazy-load
+              />
+              <view class="story-card__gradient" />
 
-          <view class="story-card__content">
-            <text v-if="product.subtitle" class="story-card__subtitle">{{ product.subtitle }}</text>
-            <text class="story-card__name">{{ product.name }}</text>
-            <view class="story-card__price-row">
-              <text class="story-card__price">¥{{ product.price }}</text>
-              <text v-if="product.originalPrice" class="story-card__original">¥{{ product.originalPrice }}</text>
+              <view class="story-card__content">
+                <text v-if="product.subtitle" class="story-card__subtitle">{{ product.subtitle }}</text>
+                <text class="story-card__name">{{ product.name }}</text>
+                <view class="story-card__price-row">
+                  <text class="story-card__price">¥{{ product.price }}</text>
+                  <text v-if="product.originalPrice" class="story-card__original">¥{{ product.originalPrice }}</text>
+                </view>
+                <view class="story-card__btn" @tap.stop="onBuy(product.id)">
+                  <text class="story-card__btn-text">立即购买</text>
+                </view>
+
+                <view v-if="vIndex === 0 && currentImageCount > 1" class="story-card__swipe-hint">
+                  <view class="story-card__swipe-arrow" />
+                  <text class="story-card__swipe-text">向下滑动查看更多</text>
+                </view>
+              </view>
             </view>
-            <view class="story-card__btn" @tap.stop="onBuy(product.id)">
-              <text class="story-card__btn-text">立即购买</text>
-            </view>
-          </view>
-        </view>
+          </swiper-item>
+        </swiper>
       </swiper-item>
     </swiper>
-
-    <view v-if="showHint" class="story__hint">
-      <text class="story__hint-text">← 左右滑动浏览 →</text>
-    </view>
   </view>
 </template>
 
@@ -81,14 +102,14 @@ const emit = defineEmits<{
   click: [id: string]
 }>()
 
-const current = ref(0)
-const playing = ref(true)
-const progressWidth = ref(0)
-const showHint = ref(true)
+const hIndex = ref(0)
+const vIndex = ref(0)
+const hProgress = ref(0)
+const isPlaying = ref(true)
 const statusBarHeight = ref(44)
 
-let timer: any = null
-let hintTimer: any = null
+let hTimer: any = null
+let isHChanging = false
 
 try {
   const sysInfo = uni.getWindowInfo()
@@ -96,43 +117,84 @@ try {
 } catch {}
 
 const progressTop = computed(() => statusBarHeight.value * 2 + 120)
-const counterTop = computed(() => statusBarHeight.value * 2 + 130)
 
-const startTimer = () => {
-  clearTimer()
-  if (!props.products.length) return
-  progressWidth.value = 0
-  playing.value = true
+const preparedProducts = computed(() => {
+  return (props.products || []).map((p: any) => {
+    let images: string[] = []
+    try {
+      const parsed = JSON.parse(p.images || '[]')
+      if (Array.isArray(parsed) && parsed.length) {
+        images = parsed.filter((url: string) => url)
+      }
+    } catch {}
+    if (!images.length && p.image) images = [p.image]
+    if (!images.length && p.thumbnail) images = [p.thumbnail]
+    if (!images.length) images = ['']
+    if (images.length === 1) {
+      images = [images[0], images[0], images[0]]
+    }
+    return { ...p, imageList: images }
+  })
+})
+
+const currentImageList = computed(() => {
+  const p = preparedProducts.value[hIndex.value]
+  return p ? p.imageList : []
+})
+
+const currentImageCount = computed(() => currentImageList.value.length)
+
+const startHTimer = () => {
+  clearHTimer()
+  if (!preparedProducts.value.length) return
+  hProgress.value = 0
+  isPlaying.value = true
   const step = 100 / (props.duration / 50)
-  timer = setInterval(() => {
-    progressWidth.value += step
-    if (progressWidth.value >= 100) {
-      progressWidth.value = 100
-      clearTimer()
-      if (current.value < props.products.length - 1) {
-        current.value++
+  hTimer = setInterval(() => {
+    hProgress.value += step
+    if (hProgress.value >= 100) {
+      hProgress.value = 100
+      clearHTimer()
+      if (hIndex.value < preparedProducts.value.length - 1) {
+        hIndex.value++
       } else {
-        current.value = 0
+        hIndex.value = 0
       }
     }
   }, 50)
 }
 
-const clearTimer = () => {
-  if (timer) { clearInterval(timer); timer = null }
+const clearHTimer = () => {
+  if (hTimer) { clearInterval(hTimer); hTimer = null }
 }
 
-const onChange = (e: any) => {
-  current.value = e.detail.current
-  startTimer()
+const onHChange = (e: any) => {
+  if (isHChanging) return
+  isHChanging = true
+  hIndex.value = e.detail.current
+  vIndex.value = 0
+  startHTimer()
+  setTimeout(() => { isHChanging = false }, 300)
+}
+
+const onVChange = (e: any) => {
+  const newV = e.detail.current
+  vIndex.value = newV
+  if (newV === 0) {
+    startHTimer()
+  } else {
+    clearHTimer()
+    isPlaying.value = false
+  }
 }
 
 const onTap = () => {
-  if (playing.value) {
-    clearTimer()
-    playing.value = false
+  if (vIndex.value > 0) return
+  if (isPlaying.value) {
+    clearHTimer()
+    isPlaying.value = false
   } else {
-    startTimer()
+    startHTimer()
   }
 }
 
@@ -143,15 +205,14 @@ const onBuy = (id: string) => {
 
 watch(() => props.products, (val) => {
   if (val && val.length) {
-    current.value = 0
-    startTimer()
-    hintTimer = setTimeout(() => { showHint.value = false }, 4000)
+    hIndex.value = 0
+    vIndex.value = 0
+    startHTimer()
   }
 }, { immediate: true })
 
 onUnmounted(() => {
-  clearTimer()
-  if (hintTimer) clearTimeout(hintTimer)
+  clearHTimer()
 })
 </script>
 
@@ -168,8 +229,8 @@ onUnmounted(() => {
     top: 0;
     left: 0;
     width: 100%;
-    height: 300rpx;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
+    height: 320rpx;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
     z-index: 15;
     pointer-events: none;
   }
@@ -214,7 +275,7 @@ onUnmounted(() => {
   &__progress-bar {
     flex: 1;
     height: 4rpx;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 4rpx;
     overflow: hidden;
   }
@@ -226,6 +287,31 @@ onUnmounted(() => {
     transition: width 0.05s linear;
   }
 
+  &__v-progress {
+    position: absolute;
+    right: 16rpx;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10rpx;
+    z-index: 20;
+    height: 200rpx;
+  }
+
+  &__v-progress-bar {
+    flex: 1;
+    width: 4rpx;
+    min-height: 0;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4rpx;
+    transition: all 0.3s ease;
+
+    &--active {
+      background: rgba(255, 255, 255, 0.6);
+    }
+  }
+
   &__counter {
     position: absolute;
     right: 28rpx;
@@ -234,34 +320,19 @@ onUnmounted(() => {
 
   &__counter-text {
     font-size: 22rpx;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.45);
     font-weight: 500;
   }
 
-  &__swiper {
+  &__h-swiper {
     width: 100%;
     height: 100%;
   }
 
-  &__hint {
-    position: absolute;
-    bottom: 200rpx;
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: 20;
-    animation: storyHintPulse 1.5s ease-in-out infinite;
+  &__v-swiper {
+    width: 100%;
+    height: 100%;
   }
-
-  &__hint-text {
-    font-size: 24rpx;
-    color: rgba(255, 255, 255, 0.6);
-  }
-}
-
-@keyframes storyHintPulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.8; }
 }
 
 .story-card {
@@ -342,7 +413,6 @@ onUnmounted(() => {
     border: 2rpx solid rgba(255, 255, 255, 0.6);
     border-radius: 999rpx;
     padding: 22rpx 64rpx;
-    backdrop-filter: blur(20rpx);
   }
 
   &__btn-text {
@@ -351,5 +421,33 @@ onUnmounted(() => {
     font-weight: 600;
     letter-spacing: 4rpx;
   }
+
+  &__swipe-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40rpx;
+  }
+
+  &__swipe-arrow {
+    width: 0;
+    height: 0;
+    border-left: 14rpx solid transparent;
+    border-right: 14rpx solid transparent;
+    border-top: 18rpx solid rgba(255, 255, 255, 0.45);
+    animation: cardSwipeBounce 1.5s ease-in-out infinite;
+  }
+
+  &__swipe-text {
+    font-size: 20rpx;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 8rpx;
+    letter-spacing: 2rpx;
+  }
+}
+
+@keyframes cardSwipeBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(10rpx); opacity: 0.7; }
 }
 </style>
