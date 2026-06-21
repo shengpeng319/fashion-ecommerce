@@ -196,13 +196,13 @@ const goSearch = (keyword: string) => {
 .mall {
   display: flex;
   height: 100vh;
-  background: #F5F5F5;
+  background: var(--bg-secondary, #F5F2EE);
 
   &__sidebar {
     width: 180rpx;
     height: 100%;
-    background: #FFFFFF;
-    border-right: 1rpx solid #EEEEEE;
+    background: var(--bg-card, #FFFFFF);
+    border-right: 1rpx solid var(--border, #E8E2DC);
     flex-shrink: 0;
   }
 
@@ -214,10 +214,10 @@ const goSearch = (keyword: string) => {
     position: relative;
     padding: 36rpx 24rpx;
     text-align: center;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast, 200ms cubic-bezier(0.16,1,0.3,1));
 
     &--active {
-      background: #F5F5F5;
+      background: var(--bg-secondary, #F5F2EE);
     }
   }
 
@@ -228,22 +228,22 @@ const goSearch = (keyword: string) => {
     transform: translateY(-50%);
     width: 6rpx;
     height: 36rpx;
-    background: #C8102E;
+    background: var(--accent, #B85C38);
     border-radius: 0 4rpx 4rpx 0;
   }
 
   &__menu-text {
-    font-size: 28rpx;
-    color: #333333;
-    font-weight: 500;
-    letter-spacing: 2rpx;
+    font-size: 26rpx;
+    color: var(--text-secondary, #4A4744);
+    font-weight: var(--fw-regular, 400);
+    letter-spacing: 1rpx;
     line-height: 1.4;
   }
 
   &__menu-item--active &__menu-text {
-    color: #C8102E;
-    font-weight: 700;
-    letter-spacing: 1rpx;
+    color: var(--accent, #B85C38);
+    font-weight: var(--fw-semibold, 600);
+    letter-spacing: 0.5rpx;
   }
 
   &__main {
@@ -254,16 +254,16 @@ const goSearch = (keyword: string) => {
   }
 
   &__search {
-    padding: 16rpx 24rpx;
-    background: #FFFFFF;
+    padding: var(--space-2, 16rpx) var(--space-3, 24rpx);
+    background: var(--bg-card, #FFFFFF);
   }
 
   &__sort {
     display: flex;
     align-items: center;
-    background: #FFFFFF;
-    border-bottom: 1rpx solid #EEEEEE;
-    padding: 0 24rpx;
+    background: var(--bg-card, #FFFFFF);
+    border-bottom: 1rpx solid var(--divider, #F0EBE5);
+    padding: 0 var(--space-3, 24rpx);
   }
 
   &__sort-tab {
@@ -271,16 +271,18 @@ const goSearch = (keyword: string) => {
     align-items: center;
     padding: 20rpx 0;
     margin-right: 48rpx;
+    transition: opacity var(--transition-fast);
+    &:active { opacity: 0.6; }
   }
 
   &__sort-tab--active &__sort-label {
-    color: #1A1A1A;
-    font-weight: 600;
+    color: var(--text-primary, #1C1B1A);
+    font-weight: var(--fw-semibold, 600);
   }
 
   &__sort-label {
     font-size: 26rpx;
-    color: #999999;
+    color: var(--text-tertiary, #7A7370);
   }
 
   &__sort-arrows {
@@ -291,11 +293,11 @@ const goSearch = (keyword: string) => {
 
   &__sort-arrow {
     font-size: 14rpx;
-    color: #CCCCCC;
+    color: var(--text-quaternary, #A8A29E);
     line-height: 1;
 
     &--active {
-      color: #C8102E;
+      color: var(--accent, #B85C38);
     }
   }
 
@@ -304,21 +306,21 @@ const goSearch = (keyword: string) => {
   }
 
   &__loading {
-    padding: 24rpx;
+    padding: var(--space-3, 24rpx);
   }
 
   &__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16rpx;
-    padding: 24rpx;
+    gap: var(--space-2, 16rpx);
+    padding: var(--space-3, 24rpx);
   }
 
   &__nomore {
     text-align: center;
     padding: 32rpx 0 48rpx;
     font-size: 24rpx;
-    color: #BBBBBB;
+    color: var(--text-quaternary, #A8A29E);
   }
 
   &__bottom-spacer {

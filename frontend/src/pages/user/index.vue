@@ -138,30 +138,33 @@ const logout = () => {
 <style lang="scss" scoped>
 .user-page {
   min-height: 100vh;
-  background: #F5F5F5;
+  background: var(--bg-primary, #FAFAF8);
   padding-bottom: 40rpx;
 }
 
 .user-header {
-  background: #FFFFFF;
-  padding: 0 32rpx 32rpx;
+  background: var(--bg-card, #FFFFFF);
+  padding: 0 var(--space-4, 32rpx) var(--space-4, 32rpx);
+  border-radius: 0 0 var(--radius-lg, 32rpx) var(--radius-lg, 32rpx);
+  box-shadow: var(--shadow-sm, 0 2rpx 8rpx rgba(28,27,26,0.04), 0 1rpx 2rpx rgba(28,27,26,0.02));
 }
 
 .header-top {
   display: flex;
   align-items: center;
-  padding-top: 24rpx;
+  padding-top: var(--space-3, 24rpx);
 }
 
 .avatar-circle {
   width: 128rpx;
   height: 128rpx;
-  border-radius: 50%;
+  border-radius: var(--radius-full, 50%);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
+  border: 3rpx solid var(--border, #E8E2DC);
 }
 
 .avatar-img {
@@ -171,78 +174,84 @@ const logout = () => {
 
 .avatar-letter {
   font-size: 48rpx;
-  color: #999999;
-  font-weight: 600;
+  color: var(--text-tertiary, #7A7370);
+  font-weight: var(--fw-medium, 500);
 }
 
 .header-info {
   flex: 1;
-  margin-left: 24rpx;
+  margin-left: var(--space-3, 24rpx);
 }
 
 .header-name {
   display: block;
-  font-size: 34rpx;
-  font-weight: 600;
-  color: #1A1A1A;
+  font-size: 36rpx;
+  font-weight: var(--fw-semibold, 600);
+  color: var(--text-primary, #1C1B1A);
+  letter-spacing: 0.5rpx;
 }
 
 .header-sub {
   display: block;
   font-size: 24rpx;
-  color: #999999;
+  color: var(--text-tertiary, #7A7370);
   margin-top: 6rpx;
 }
 
 .header-badge {
-  background: #C8102E;
+  background: var(--accent, #B85C38);
   color: #FFFFFF;
   font-size: 20rpx;
-  font-weight: 600;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
+  font-weight: var(--fw-medium, 500);
+  padding: 6rpx 20rpx;
+  border-radius: var(--radius-full, 9999rpx);
   margin-left: 12rpx;
   flex-shrink: 0;
+  letter-spacing: 1rpx;
 }
 
 .login-btn {
-  margin-top: 24rpx;
+  margin-top: var(--space-3, 24rpx);
   height: 88rpx;
-  background: #C8102E;
-  border-radius: 44rpx;
+  background: var(--accent, #B85C38);
+  border-radius: var(--radius-full, 9999rpx);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform var(--transition-fast, 200ms cubic-bezier(0.16,1,0.3,1));
 }
 
 .login-btn:active {
   opacity: 0.85;
+  transform: scale(0.98);
 }
 
 .login-btn-text {
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: var(--fw-semibold, 600);
   color: #FFFFFF;
+  letter-spacing: 2rpx;
 }
 
 .section-card {
-  background: #FFFFFF;
-  margin: 20rpx 24rpx 0;
-  border-radius: 16rpx;
-  padding: 28rpx;
+  background: var(--bg-card, #FFFFFF);
+  margin: var(--space-2, 16rpx) var(--space-3, 24rpx) 0;
+  border-radius: var(--radius-md, 20rpx);
+  padding: var(--space-4, 28rpx);
+  box-shadow: var(--shadow-sm, 0 2rpx 8rpx rgba(28,27,26,0.04), 0 1rpx 2rpx rgba(28,27,26,0.02));
 }
 
 .sc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28rpx;
+  margin-bottom: var(--space-4, 28rpx);
 }
 
 .sc-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #1A1A1A;
+  font-size: 32rpx;
+  font-weight: var(--fw-medium, 500);
+  color: var(--text-primary, #1C1B1A);
 }
 
 .sc-more {
@@ -250,12 +259,12 @@ const logout = () => {
   align-items: center;
   gap: 4rpx;
   font-size: 24rpx;
-  color: #999999;
+  color: var(--text-quaternary, #A8A29E);
 }
 
 .sc-arrow {
   font-size: 24rpx;
-  color: #999999;
+  color: var(--text-quaternary, #A8A29E);
 }
 
 .order-icons {
@@ -268,6 +277,8 @@ const logout = () => {
   flex-direction: column;
   align-items: center;
   gap: 10rpx;
+  transition: opacity var(--transition-fast);
+  &:active { opacity: 0.6; }
 }
 
 .oi-icon {
@@ -276,7 +287,7 @@ const logout = () => {
 
 .oi-label {
   font-size: 22rpx;
-  color: #666666;
+  color: var(--text-secondary, #4A4744);
 }
 
 .menu-list {
@@ -286,9 +297,14 @@ const logout = () => {
 .menu-item {
   display: flex;
   align-items: center;
-  height: 88rpx;
-  padding: 0 28rpx;
-  border-bottom: 1rpx solid #F0F0F0;
+  height: 96rpx;
+  padding: 0 var(--space-4, 28rpx);
+  border-bottom: 1rpx solid var(--divider, #F0EBE5);
+  transition: background var(--transition-fast);
+
+  &:active {
+    background: var(--bg-secondary, #F5F2EE);
+  }
 
   &:last-child {
     border-bottom: none;
@@ -296,12 +312,12 @@ const logout = () => {
 }
 
 .menu-item-divider {
-  border-top: 16rpx solid #F5F5F5;
+  border-top: 16rpx solid var(--bg-secondary, #F5F2EE);
   margin-top: 8rpx;
 }
 
 .menu-icon {
-  font-size: 28rpx;
+  font-size: 32rpx;
   margin-right: 20rpx;
   width: 40rpx;
   text-align: center;
@@ -310,15 +326,16 @@ const logout = () => {
 .menu-label {
   flex: 1;
   font-size: 28rpx;
-  color: #1A1A1A;
+  color: var(--text-primary, #1C1B1A);
+  font-weight: var(--fw-regular, 400);
 }
 
 .logout-text {
-  color: #C8102E;
+  color: var(--accent, #B85C38) !important;
 }
 
 .menu-arrow {
   font-size: 28rpx;
-  color: #999999;
+  color: var(--text-quaternary, #A8A29E);
 }
 </style>

@@ -1,34 +1,36 @@
 // ========================================
-// FASHION — Italian Luxury Design Tokens
+// FASHION — uni-app SCSS Variables
+// Delegates to common.scss design system
+// Ins Minimalist — warm-neutral palette
 // ========================================
 
-// Colors
-$uni-primary:        #6B1D2F;  // Borgogna — deep burgundy
-$uni-success:        #1B4D3E;  // Emerald green
-$uni-warning:        #C9A96E;  // Gold
-$uni-error:          #8B0000;  // Dark red
-$uni-text-color:     #1A1514;  // Deep brown-black
-$uni-text-color-grey:#8C8279;  // Warm grey
-$uni-bg-color:       #F5F0EB;  // Ivory cream
-$uni-border-color:   #E0D8CF;  // Warm border
-$uni-shadow-color:   rgba(26, 21, 20, 0.08);
+// Colors (synced with common.scss CSS vars for SCSS-level use)
+$uni-primary:        #B85C38;  // Terracotta
+$uni-success:        #5B8C5A;  // Sage green
+$uni-warning:        #D4A85A;  // Warm gold
+$uni-error:          #C75D4E;  // Soft red
+$uni-text-color:     #1C1B1A;  // Warm charcoal
+$uni-text-color-grey:#A8A29E;  // Warm stone
+$uni-bg-color:       #FAFAF8;  // Warm white
+$uni-border-color:   #E8E2DC;  // Warm border
+$uni-shadow-color:   rgba(28, 27, 26, 0.04);
 
 // Spacing
 $spacing-xs:  8rpx;
-$spacing-sm:  16rpx;
-$spacing-md:  24rpx;
-$spacing-lg:  32rpx;
-$spacing-xl:  40rpx;
+$spacing-sm: 16rpx;
+$spacing-md: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 40rpx;
 $spacing-2xl: 48rpx;
 $spacing-3xl: 64rpx;
 
-// Font
-$font-display: 'Playfair Display', 'Times New Roman', serif;
-$font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+// Font (modern sans-serif, no serif)
+$font-display: 'Inter', 'PingFang SC', 'Hiragino Sans GB', -apple-system, sans-serif;
+$font-body:    'Inter', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
 
-// Radius
-$radius-sm:   8rpx;
-$radius-md:   12rpx;
-$radius-lg:   16rpx;
-$radius-xl:   24rpx;
+// Radius (bigger = softer)
+$radius-sm:   12rpx;
+$radius-md:   20rpx;
+$radius-lg:   32rpx;
+$radius-xl:   48rpx;
 $radius-full: 50%;

@@ -1,80 +1,87 @@
 /* ========================================
-   FASHION ADMIN — Luxury Design Tokens
+   FASHION ADMIN — Ins Minimalist Design Tokens
+   Warm-neutral palette, sans-serif, soft shadows
    ======================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Brand palette */
-  --fashion-primary: #6B1D2F;
-  --fashion-primary-light: #8B2D3F;
-  --fashion-primary-dark: #4A1520;
-  --fashion-accent: #1B4D3E;
-  --fashion-gold: #C9A96E;
-  --fashion-gold-light: #E0CDA0;
-  --fashion-bg: #F5F0EB;
-  --fashion-surface: #FAF7F2;
-  --fashion-dark: #1A1514;
-  --fashion-dark-surface: #252220;
-  --fashion-dark-card: #2D2A28;
-  --fashion-text: #1A1514;
-  --fashion-text-secondary: #5C5550;
-  --fashion-text-muted: #8C8279;
-  --fashion-text-inverse: #F5F0EB;
-  --fashion-font-display: 'Playfair Display', 'Times New Roman', Georgia, serif;
+  /* Brand palette — Terracotta & warm neutrals */
+  --fashion-primary: #B85C38;
+  --fashion-primary-light: #C97A5A;
+  --fashion-primary-dark: #A04E2E;
+  --fashion-accent: #5B8C5A;
+  --fashion-gold: #D4A85A;
+  --fashion-gold-light: #E5C58A;
+  --fashion-bg: #FAFAF8;
+  --fashion-surface: #FFFFFF;
+  --fashion-dark: #1C1B1A;
+  --fashion-dark-surface: #252320;
+  --fashion-dark-card: #2D2A27;
+  --fashion-text: #1C1B1A;
+  --fashion-text-secondary: #4A4744;
+  --fashion-text-muted: #A8A29E;
+  --fashion-text-inverse: #FAFAF8;
+  --fashion-font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+
+  /* Soft shadows */
+  --fashion-shadow-sm: 0 2px 8px rgba(28, 27, 26, 0.04), 0 1px 2px rgba(28, 27, 26, 0.02);
+  --fashion-shadow-md: 0 8px 24px rgba(28, 27, 26, 0.06), 0 2px 8px rgba(28, 27, 26, 0.04);
 
   /* Override Element Plus CSS variables */
-  --el-color-primary: #6B1D2F;
-  --el-color-primary-light-3: #8B2D3F;
-  --el-color-primary-light-5: #A63D4F;
-  --el-color-primary-light-7: #C04D5F;
-  --el-color-primary-light-8: #D05D6F;
-  --el-color-primary-light-9: #E06D7F;
-  --el-color-primary-dark-2: #4A1520;
-  --el-color-success: #1B4D3E;
-  --el-color-warning: #C9A96E;
-  --el-color-danger: #8B0000;
-  --el-color-info: #5C5550;
-  --el-bg-color: #FAF7F2;
-  --el-bg-color-page: #F5F0EB;
-  --el-border-radius-base: 4px;
-  --el-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --el-color-primary: #B85C38;
+  --el-color-primary-light-3: #C97A5A;
+  --el-color-primary-light-5: #DA9A7E;
+  --el-color-primary-light-7: #EBBA9F;
+  --el-color-primary-light-8: #F0CAB5;
+  --el-color-primary-light-9: #F5DBCB;
+  --el-color-primary-dark-2: #A04E2E;
+  --el-color-success: #5B8C5A;
+  --el-color-warning: #D4A85A;
+  --el-color-danger: #C75D4E;
+  --el-color-info: #7A7370;
+  --el-bg-color: #FFFFFF;
+  --el-bg-color-page: #FAFAF8;
+  --el-border-radius-base: 12px;
+  --el-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
 }
 
-/* Element Plus component-level overrides for luxury feel */
+/* Element Plus component-level overrides for Ins feel */
 .el-button--primary {
-  --el-button-bg-color: #6B1D2F;
-  --el-button-border-color: #6B1D2F;
-  --el-button-hover-bg-color: #8B2D3F;
-  --el-button-hover-border-color: #8B2D3F;
-  --el-button-active-bg-color: #4A1520;
-  --el-button-active-border-color: #4A1520;
-  letter-spacing: 0.5px;
+  --el-button-bg-color: #B85C38;
+  --el-button-border-color: #B85C38;
+  --el-button-hover-bg-color: #C97A5A;
+  --el-button-hover-border-color: #C97A5A;
+  --el-button-active-bg-color: #A04E2E;
+  --el-button-active-border-color: #A04E2E;
+  letter-spacing: 0.3px;
   font-weight: 500;
+  border-radius: 12px;
 }
 
 .el-tag--primary {
-  --el-tag-bg-color: rgba(107, 29, 47, 0.1);
-  --el-tag-border-color: rgba(107, 29, 47, 0.2);
-  --el-tag-text-color: #6B1D2F;
+  --el-tag-bg-color: rgba(184, 92, 56, 0.1);
+  --el-tag-border-color: rgba(184, 92, 56, 0.2);
+  --el-tag-text-color: #B85C38;
 }
 
 .el-card {
   --el-card-bg-color: #FFFFFF;
-  --el-card-border-color: #E0D8CF;
-  border-radius: 8px;
+  --el-card-border-color: #E8E2DC;
+  border-radius: 16px;
+  box-shadow: var(--fashion-shadow-sm);
 }
 
 .el-table {
-  --el-table-header-bg-color: #FAF7F2;
-  --el-table-border-color: #EDE6DD;
+  --el-table-header-bg-color: #FAFAF8;
+  --el-table-border-color: #EDE8E2;
 }
 
 .el-menu {
-  --el-menu-bg-color: #1A1514;
-  --el-menu-text-color: #8C8279;
-  --el-menu-hover-bg-color: #252220;
-  --el-menu-active-color: #C9A96E;
+  --el-menu-bg-color: #1C1B1A;
+  --el-menu-text-color: #A8A29E;
+  --el-menu-hover-bg-color: #252320;
+  --el-menu-active-color: #D4A85A;
 }
 
 .el-pagination .btn-next,
@@ -82,19 +89,23 @@
   background: transparent;
 }
 
+.el-input__wrapper {
+  border-radius: 12px;
+}
+
 .el-input__wrapper:focus-within {
-  box-shadow: 0 0 0 1px #6B1D2F inset !important;
+  box-shadow: 0 0 0 1px #B85C38 inset !important;
 }
 
 .el-select .el-input__wrapper:focus-within {
-  box-shadow: 0 0 0 1px #6B1D2F inset !important;
+  box-shadow: 0 0 0 1px #B85C38 inset !important;
 }
 
 /* Global reset */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #F5F0EB;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  background: #FAFAF8;
 }
 
 #app {

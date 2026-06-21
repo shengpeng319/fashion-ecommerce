@@ -1,74 +1,90 @@
 // ========================================
-// FASHION — Design System (White Minimal)
-// Reference: DESIGN.md
+// FASHION — Design System (Ins Minimalist)
+// Warm-neutral palette, soft shadows, airy spacing
 // ========================================
 
 :root {
-  // --- Background layers ---
-  --bg-primary:    #FFFFFF;
-  --bg-secondary:  #F5F5F5;
-  --bg-tertiary:   #EFEFEF;
-  --bg-card:       #FFFFFF;
+  // --- Background layers (warm, not cold) ---
+  --bg-primary:    #FAFAF8;  // 暖白
+  --bg-secondary:  #F5F2EE;  // 暖灰米
+  --bg-tertiary:   #EDE8E2;  // 温暖深灰米
+  --bg-card:       #FFFFFF;  // 卡片纯白对比
 
-  // --- Text layers ---
-  --text-primary:    #1A1A1A;
-  --text-secondary:  #333333;
-  --text-tertiary:   #666666;
-  --text-quaternary: #999999;
+  // --- Text layers (warm charcoal) ---
+  --text-primary:    #1C1B1A;
+  --text-secondary:  #4A4744;
+  --text-tertiary:   #7A7370;
+  --text-quaternary: #A8A29E;
 
-  // --- Accent ---
-  --accent:          #C8102E;
-  --accent-hover:    #A50D24;
-  --accent-light:    #FFF1F3;
+  // --- Accent (Terracotta — warm, muted, Ins-style) ---
+  --accent:          #B85C38;
+  --accent-hover:    #A04E2E;
+  --accent-light:    #F9EDE8;
 
   // --- Borders & dividers ---
-  --border:          #EEEEEE;
-  --border-light:    #F0F0F0;
-  --divider:         #F0F0F0;
+  --border:          #E8E2DC;
+  --border-light:    #F0EBE5;
+  --divider:         #F0EBE5;
 
-  // --- Shadows (minimal) ---
-  --shadow-card:     0 1px 4px rgba(0,0,0,0.06);
-  --shadow-float:    0 4px 16px rgba(0,0,0,0.08);
-  --shadow-nav:      0 -1px 0 rgba(0,0,0,0.06);
+  // --- Shadows (soft, layered) ---
+  --shadow-xs:    0 1rpx 2rpx rgba(28, 27, 26, 0.04);
+  --shadow-sm:    0 2rpx 8rpx rgba(28, 27, 26, 0.04), 0 1rpx 2rpx rgba(28, 27, 26, 0.02);
+  --shadow-md:    0 8rpx 24rpx rgba(28, 27, 26, 0.06), 0 2rpx 8rpx rgba(28, 27, 26, 0.04);
+  --shadow-lg:    0 16rpx 48rpx rgba(28, 27, 26, 0.08), 0 4rpx 16rpx rgba(28, 27, 26, 0.04);
+  --shadow-card:  var(--shadow-sm);
+  --shadow-float: var(--shadow-md);
+  --shadow-nav:   0 -1rpx 0 rgba(28, 27, 26, 0.04);
 
   // --- Typography ---
-  --font-cn:     'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  --font-sans:   -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-  --font-mono:   'SF Mono', 'Menlo', monospace;
+  --font-display: 'Inter', 'PingFang SC', 'Hiragino Sans GB', -apple-system, sans-serif;
+  --font-body:    'Inter', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+  --font-cn:      'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-sans:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-mono:    'SF Mono', 'JetBrains Mono', 'Menlo', monospace;
 
-  // --- Spacing (4px grid) ---
+  // --- Font weights ---
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  // --- Spacing (8rpx grid) ---
   --space-1:   8rpx;
-  --space-2:   16rpx;
-  --space-3:   24rpx;
-  --space-4:   32rpx;
-  --space-5:   40rpx;
-  --space-6:   48rpx;
-  --space-8:   64rpx;
-  --space-10:  80rpx;
-  --space-12:  96rpx;
+  --space-2:  16rpx;
+  --space-3:  24rpx;
+  --space-4:  32rpx;
+  --space-5:  40rpx;
+  --space-6:  48rpx;
+  --space-8:  64rpx;
+  --space-10: 80rpx;
+  --space-12: 96rpx;
 
-  // --- Border radius ---
-  --radius-xs:    4rpx;
-  --radius-sm:    8rpx;
-  --radius-md:    16rpx;
-  --radius-lg:    24rpx;
-  --radius-full:  9999rpx;
+  // --- Border radius (bigger = softer, Ins-style) ---
+  --radius-xs:    8rpx;
+  --radius-sm:   12rpx;
+  --radius-md:   20rpx;
+  --radius-lg:   32rpx;
+  --radius-xl:   48rpx;
+  --radius-full: 9999rpx;
 
-  // --- Transitions ---
-  --transition-fast:   150ms ease;
-  --transition-base:   250ms ease;
-  --transition-slow:   400ms ease;
+  // --- Transitions (elastic ease-out) ---
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.65, 0, 0.35, 1);
+  --transition-fast:  200ms var(--ease-out);
+  --transition-base:  350ms var(--ease-out);
+  --transition-slow:  500ms var(--ease-out);
 }
 
 // ========================================
 // Base
 // ========================================
 page {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-primary);
   font-size: 28rpx;
   line-height: 1.6;
   color: var(--text-primary);
-  font-family: var(--font-cn), var(--font-sans);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -92,14 +108,16 @@ page {
 .text-xs { font-size: 20rpx; }
 .text-sm { font-size: 24rpx; }
 .text-base { font-size: 28rpx; }
-.text-md { font-size: 30rpx; }
-.text-lg { font-size: 34rpx; }
-.text-xl { font-size: 40rpx; }
-.text-2xl { font-size: 44rpx; }
+.text-md { font-size: 32rpx; }
+.text-lg { font-size: 36rpx; }
+.text-xl { font-size: 44rpx; }
+.text-2xl { font-size: 56rpx; }
 
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold { font-weight: 700; }
+.font-light { font-weight: var(--fw-light); }
+.font-regular { font-weight: var(--fw-regular); }
+.font-medium { font-weight: var(--fw-medium); }
+.font-semibold { font-weight: var(--fw-semibold); }
+.font-bold { font-weight: var(--fw-bold); }
 
 .text-muted { color: var(--text-quaternary); }
 .text-secondary { color: var(--text-secondary); }
@@ -109,8 +127,9 @@ page {
 // Price display
 .text-price {
   color: var(--accent);
-  font-weight: 600;
-  font-size: 36rpx;
+  font-weight: var(--fw-semibold);
+  font-size: 40rpx;
+  font-family: var(--font-display);
 }
 .text-price-original {
   color: var(--text-quaternary);
@@ -119,7 +138,7 @@ page {
 }
 .text-price-symbol {
   font-size: 24rpx;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 // ========================================
@@ -144,9 +163,11 @@ page {
   align-items: baseline;
   padding: var(--space-6) var(--space-4) var(--space-3);
   &__title {
-    font-size: 34rpx;
-    font-weight: 600;
+    font-size: 36rpx;
+    font-weight: var(--fw-medium);
     color: var(--text-primary);
+    font-family: var(--font-display);
+    letter-spacing: 1rpx;
   }
   &__more {
     font-size: 24rpx;
@@ -159,31 +180,31 @@ page {
 }
 
 // ========================================
-// Component: Discount Tag
+// Component: Discount Tag (pill-shaped)
 // ========================================
 .discount-tag {
   display: inline-block;
-  padding: 4rpx 12rpx;
+  padding: 4rpx 16rpx;
   font-size: 20rpx;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   color: #FFFFFF;
   background-color: var(--accent);
-  border-radius: 4rpx;
+  border-radius: var(--radius-full);
 }
 
 // ========================================
-// Component: Sale Badge
+// Component: Sale Badge (pill, top-left)
 // ========================================
 .sale-badge {
   position: absolute;
-  top: 0;
-  left: 0;
-  padding: 4rpx 12rpx;
+  top: var(--space-1);
+  left: var(--space-1);
+  padding: 4rpx 16rpx;
   font-size: 20rpx;
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   color: #FFFFFF;
   background-color: var(--accent);
-  border-radius: 0 0 8rpx 0;
+  border-radius: var(--radius-full);
 }
 
 // ========================================
@@ -193,13 +214,37 @@ page {
   display: inline-block;
   padding: 4rpx 16rpx;
   font-size: 22rpx;
-  font-weight: 500;
-  border-radius: var(--radius-xs);
+  font-weight: var(--fw-medium);
+  border-radius: var(--radius-full);
   &--pending   { background: #FFF8E6; color: #B8860B; }
   &--paid      { background: #E8F5E9; color: #2E7D32; }
   &--shipped   { background: #E3F2FD; color: #1565C0; }
   &--completed { background: #E8F5E9; color: #2E7D32; }
   &--cancelled { background: #FFEBEE; color: #C62828; }
+}
+
+// ========================================
+// Skeleton Shimmer
+// ========================================
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// ========================================
+// Page Transition
+// ========================================
+.page-enter {
+  animation: fadeInUp var(--transition-base);
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 // ========================================
@@ -214,8 +259,8 @@ page {
 }
 .overflow-hidden { overflow: hidden; }
 .bg-white { background-color: #FFFFFF; }
-.bg-page { background-color: var(--bg-secondary); }
-.shadow-card { box-shadow: var(--shadow-card); }
+.bg-page { background-color: var(--bg-primary); }
+.shadow-card { box-shadow: var(--shadow-sm); }
 .divider {
   height: 1rpx;
   background-color: var(--divider);
